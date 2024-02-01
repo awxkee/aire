@@ -42,15 +42,15 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
 
                     scope.launch(Dispatchers.IO) {
-                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.cyberpunk).scaleWith(0.15f)
-                        scope.launch {
-                            imagesArray.add(bitmap)
-                        }
-                        val bmp = Aire.glitch(bitmap, -0.0075f, -0.0075f)
-//                        val bmp = Aire.gaussianBlur(bitmap, 30, 7f)
-                        scope.launch {
-                            imagesArray.add(bmp)
-                        }
+//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.cyberpunk).scaleWith(0.15f)
+//                        scope.launch {
+//                            imagesArray.add(bitmap)
+//                        }
+//                        val bmp = Aire.glitch(bitmap, -0.0075f, -0.0075f)
+////                        val bmp = Aire.gaussianBlur(bitmap, 30, 7f)
+//                        scope.launch {
+//                            imagesArray.add(bmp)
+//                        }
                     }
                 })
                 Surface(
