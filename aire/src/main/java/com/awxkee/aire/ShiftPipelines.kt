@@ -14,8 +14,8 @@ interface ShiftPipelines {
 
     fun glitch(
         bitmap: Bitmap,
-        channelsShiftX: Float = -0.1f,
-        channelsShiftY: Float = -0.1f,
+        channelsShiftX: Float = -0.075f,
+        channelsShiftY: Float = -0.075f,
         corruptionSize: Float = 0.009f,
         corruptionCount: Int = 60,
         corruptionShiftX: Float = -0.05f,
