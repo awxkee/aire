@@ -32,3 +32,22 @@ static vector<float> compute1DGaussianKernel(float width, float sigma) {
         kernel[x] /= sum;
     return std::move(kernel);
 }
+
+class LowPassFilter {
+public:
+    LowPassFilter(double cutoff) {
+        mCutoff = cutoff;
+        mY1 = 0;
+    }
+
+    double process(double x0) {
+        double y0 = x0 * (1 - mCutoff) + mY1 * mCutoff;
+        mY1 = y0;
+
+        return y0;
+    }
+
+private:
+    double mCutoff;
+    double mY1;
+};

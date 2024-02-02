@@ -12,28 +12,6 @@
 
 using namespace std;
 
-class LowPassFilter {
-public:
-    // Constructor
-    LowPassFilter(double cutoff) {
-        m_cutoff = cutoff;
-        m_y1 = 0;
-    }
-
-    // Processes a sample of the input signal and returns the filtered sample
-    double process(double x0) {
-        double y0 = x0 * (1 - m_cutoff) + m_y1 * m_cutoff;
-        m_y1 = y0;
-
-        return y0;
-    }
-
-private:
-    // State variables
-    double m_cutoff;
-    double m_y1;
-};
-
 namespace aire {
     template<class V>
     void glitchEffect(V *data, int stride, int width, int height, float channelsShiftX,
@@ -73,8 +51,9 @@ namespace aire {
         std::uniform_int_distribution<> startY(0, height - 1);
         std::uniform_int_distribution<> length(1, width - 1);
 
-        std::uniform_int_distribution<> randomHeight(1, std::max(int(ceil(height * corruptionSize)),
-                                                                 2));
+        std::uniform_int_distribution<> randomHeight(1,
+                                                     std::max(int(ceil(height * corruptionSize)),
+                                                              2));
 
         int corruptionShiftX = width * cShiftX;
         int corruptionShiftY = height * cShiftY;
@@ -103,9 +82,9 @@ namespace aire {
                     auto src = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(transient.data()) +
                                                      sourceY * stride);
 
-                    dst[z * stride + j * 4] = src[sourceY * stride + sourceX * 4];
-                    dst[z * stride + j * 4 + 1] = src[sourceY * stride + sourceX * 4 + 1];
-                    dst[z * stride + j * 4 + 2] = src[sourceY * stride + sourceX * 4 + 2];
+                    dst[j * 4] = src[sourceX * 4];
+                    dst[j * 4 + 1] = src[sourceX * 4 + 1];
+                    dst[j * 4 + 2] = src[sourceX * 4 + 2];
                 }
             }
         }
@@ -126,9 +105,8 @@ namespace aire {
                 int px = x * 4;
                 float cb = float((src[px + 3])) / 255.f;
                 float ca = float((halfSrc[px + 3])) / 255.f;
-                float a0 = ca + cb*(1.0f - ca);
                 float newR = blendColor(halfSrc[px] / 255.f, src[px] / 255.f, ca, cb);
-                float newG = blendColor(halfSrc[px + 1] / 255.f, src[px + 1] / 255.f, ca,cb);
+                float newG = blendColor(halfSrc[px + 1] / 255.f, src[px + 1] / 255.f, ca, cb);
                 float newB = blendColor(halfSrc[px + 2] / 255.f, src[px + 2] / 255.f, ca, cb);
                 dst[px] = newR * 255;
                 dst[px + 1] = newG * 255;

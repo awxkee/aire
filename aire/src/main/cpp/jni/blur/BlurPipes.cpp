@@ -12,6 +12,7 @@
 #include "blur/BilateralBlur.h"
 #include "blur/GaussBlur.h"
 #include <string>
+#include "blur/TentBlur.h"
 
 extern "C"
 JNIEXPORT jobject JNICALL
@@ -93,10 +94,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_medianBlurPipeline(JNIEnv *env, 
                                                                    jint radius) {
     try {
         std::vector<AcquirePixelFormat> formats;
-        formats.insert(formats.begin(), APF_F16);
         formats.insert(formats.begin(), APF_RGBA8888);
-        formats.insert(formats.begin(), APF_565);
-        formats.insert(formats.begin(), APF_RGBA1010102);
         jobject newBitmap = AcquireBitmapPixels(env,
                                                 bitmap,
                                                 formats,
@@ -104,27 +102,10 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_medianBlurPipeline(JNIEnv *env, 
                                                 [radius](std::vector<uint8_t> &input, int stride,
                                                          int width, int height,
                                                          AcquirePixelFormat fmt) -> BuiltImagePresentation {
-                                                    switch (fmt) {
-                                                        case APF_RGBA8888:
-                                                            medianBlur<uint32_t>(
-                                                                    reinterpret_cast<uint32_t *>(input.data()),
-                                                                    stride, width, height, radius);
-                                                            break;
-                                                        case APF_565:
-                                                            medianBlur<uint16_t>(
-                                                                    reinterpret_cast<uint16_t *>(input.data()),
-                                                                    stride, width, height, radius);
-                                                            break;
-                                                        case APF_F16:
-                                                            medianBlur<uint64_t>(
-                                                                    reinterpret_cast<uint64_t *>(input.data()),
-                                                                    stride, width, height, radius);
-                                                            break;
-                                                        case APF_RGBA1010102:
-                                                            medianBlur<uint32_t>(
-                                                                    reinterpret_cast<uint32_t *>(input.data()),
-                                                                    stride, width, height, radius);
-                                                            break;
+                                                    if (fmt == APF_RGBA8888) {
+                                                        medianBlur(
+                                                                reinterpret_cast<uint8_t *>(input.data()),
+                                                                stride, width, height, radius);
                                                     }
                                                     return {
                                                             .data = input,
@@ -201,6 +182,41 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_gaussianBlurPipeline(JNIEnv *env
                                                                           stride, width,
                                                                           height, radius,
                                                                           sigma);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_tentBlurPipeline(JNIEnv *env, jobject thiz,
+                                                                 jobject bitmap, jint radius) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [radius](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::tentBlur(input.data(),
+                                                                       stride, width,
+                                                                       height, radius);
                                                     }
                                                     return {
                                                             .data = input,

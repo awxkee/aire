@@ -7,7 +7,7 @@
 namespace aire {
     template<class V>
     void
-    generateHalftoneHorizontalLines(std::vector<V>& data, int stride, int width, int height,
+    generateHalftoneHorizontalLines(std::vector<V> &data, int stride, int width, int height,
                                     int lineSize, int lineSpacing, V lineColor, V alpha) {
         for (int y = 0; y < height; y += lineSize + lineSpacing) {
             for (int j = y; j < lineSize + y; ++j) {
@@ -25,7 +25,7 @@ namespace aire {
     }
 
     template void
-    generateHalftoneHorizontalLines(std::vector<uint8_t>& data, int stride, int width, int height,
+    generateHalftoneHorizontalLines(std::vector<uint8_t> &data, int stride, int width, int height,
                                     int lineSize, int lineSpacing, uint8_t lineColor,
                                     uint8_t alpha);
 

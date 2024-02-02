@@ -54,17 +54,12 @@ namespace aire::HWY_NAMESPACE {
 
         const FixedTag<uint8_t, 4> du8;
         const FixedTag<uint8_t, 16> du8x16;
-        const FixedTag<uint8_t, 8> du8x8;
-        const FixedTag<uint16_t, 8> du16x8;
         const FixedTag<uint32_t, 4> du32x4;
         const FixedTag<float32_t, 4> dfx4;
         using VF = Vec<decltype(dfx4)>;
         using VU = Vec<decltype(du8)>;
-        using VU8x16 = Vec<decltype(du8x16)>;
         const auto max255 = Set(dfx4, 255.0f);
         const VF zeros = Zero(dfx4);
-
-        float *kernelData = kernel.data();
 
         for (int x = 0; x < width; ++x) {
             VF store = zeros;
@@ -96,18 +91,12 @@ namespace aire::HWY_NAMESPACE {
         const int iRadius = ceil(radius);
 
         const FixedTag<uint8_t, 4> du8;
-        const FixedTag<uint8_t, 16> du8x16;
         const FixedTag<uint32_t, 4> du32x4;
-        const FixedTag<uint8_t, 8> du8x8;
         const FixedTag<float32_t, 4> dfx4;
-        const FixedTag<uint16_t, 8> du16x8;
-        using VU8x16 = Vec<decltype(du8x16)>;
         using VF = Vec<decltype(dfx4)>;
         using VU = Vec<decltype(du8)>;
         const auto max255 = Set(dfx4, 255.0f);
         const VF zeros = Zero(dfx4);
-
-        float *kernelData = kernel.data();
 
         auto dst = reinterpret_cast<uint8_t *>(data + y * stride);
         for (int x = 0; x < width; ++x) {

@@ -7,7 +7,6 @@
 
 #include <cstdint>
 
-template<class V>
-void medianBlur(V* data, int stride, int width, int height, int radius);
+void medianBlur(uint8_t * data, int stride, int width, int height, int radius);
 
 #endif //JXLCODER_MEDIANBLUR_H

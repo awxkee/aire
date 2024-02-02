@@ -45,6 +45,13 @@ class BlurPipelinesImpl: BlurPipelines {
         return medianBlurPipeline(bitmap, radius)
     }
 
+    override fun tentBlur(bitmap: Bitmap, radius: Int): Bitmap {
+        if (radius < 1) {
+            throw IllegalStateException("Radius must be more or equal 1")
+        }
+        return tentBlurPipeline(bitmap, radius)
+    }
+
     private external fun gaussianBlurPipeline(bitmap: Bitmap, radius: Int, sigma: Float): Bitmap
 
     private external fun bilateralBlurPipeline(bitmap: Bitmap, radius: Int, sigma: Float, spatialSigma: Float): Bitmap
@@ -54,4 +61,6 @@ class BlurPipelinesImpl: BlurPipelines {
     private external fun stackNativeBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
 
     private external fun boxBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
+
+    private external fun tentBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
 }

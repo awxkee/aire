@@ -14,7 +14,8 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         conversion/Rgb1010102toF16.cpp conversion/Rgba2Rgb.cpp conversion/Rgba8ToF16.cpp conversion/Rgba16bitCopy.cpp
         conversion/Rgba1010102toF32.cpp conversion/RgbaF16bitNBitU8.cpp conversion/RGBAlpha.cpp conversion/HalfFloats.cpp
         jni/AcquireBitmapPixels.cpp shift/Glitch.cpp halftone/Halftone.cpp
-        scale/XScaler.cpp jni/blur/BlurPipes.cpp jni/shift/ShiftPipelines.cpp)
+        scale/XScaler.cpp jni/blur/BlurPipes.cpp jni/shift/ShiftPipelines.cpp jni/base/Base.cpp
+        base/Grayscale.cpp base/Dilation.cpp base/Channels.cpp base/Threshold.cpp blur/TentBlur.cpp)
 
 add_library(libhwy STATIC IMPORTED)
 

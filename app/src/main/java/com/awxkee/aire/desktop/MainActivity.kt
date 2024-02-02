@@ -42,14 +42,26 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
 
                     scope.launch(Dispatchers.IO) {
-//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.cyberpunk).scaleWith(0.15f)
+//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.default_test).scaleWith(0.35f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
-//                        val bmp = Aire.glitch(bitmap, -0.0075f, -0.0075f)
-////                        val bmp = Aire.gaussianBlur(bitmap, 30, 7f)
+//                        val glitch = Aire.medianBlur(bitmap, 5)
+//                        scope.launch {
+//                            imagesArray.add(glitch)
+//                        }
+//                        val gray = Aire.grayscale(bitmap)
+//                        val tent = Aire.tentBlur(bitmap, 17)
+//                        scope.launch {
+//                            imagesArray.add(tent)
+//                        }
+//                        var bmp = Aire.threshold(gray, 37)
 //                        scope.launch {
 //                            imagesArray.add(bmp)
+//                        }
+//                        val dilated = Aire.dilate(bmp, 5)
+//                        scope.launch {
+//                            imagesArray.add(dilated)
 //                        }
                     }
                 })
