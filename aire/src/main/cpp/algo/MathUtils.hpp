@@ -33,6 +33,11 @@ static vector<float> compute1DGaussianKernel(float width, float sigma) {
     return std::move(kernel);
 }
 
+static std::vector<std::vector<int>> getStructuringKernel(int size) {
+    std::vector<std::vector<int>> kernel(size, std::vector<int>(size, 1));
+    return std::move(kernel);
+}
+
 class LowPassFilter {
 public:
     LowPassFilter(double cutoff) {

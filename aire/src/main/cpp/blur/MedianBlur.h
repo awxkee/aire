@@ -7,6 +7,20 @@
 
 #include <cstdint>
 
-void medianBlur(uint8_t * data, int stride, int width, int height, int radius);
+namespace aire {
+
+    enum MedianSelector {
+        MEDIAN_QUICK_SELECT = 1,
+        MEDIAN_WIRTH = 2,
+        MEDIAN_NTH_ELEMENT = 3
+    };
+
+    void medianBlurChannel(uint8_t *data, const int width, const int height, const int radius,
+                           const MedianSelector selector);
+
+    void
+    medianBlur(uint8_t *data, const int stride, const int width, const int height, const int radius,
+               const MedianSelector selector);
+}
 
 #endif //JXLCODER_MEDIANBLUR_H

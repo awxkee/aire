@@ -11,13 +11,9 @@ interface BasePipelines {
         bPrimary: Float = 0.114f
     ): Bitmap
 
-    /**
-     * Image prefer be threshold before dilate
-     */
+    fun erode(bitmap: Bitmap, kernelSize: Int): Bitmap
+
     fun dilate(bitmap: Bitmap, kernelSize: Int): Bitmap
 
-    /**
-     * Image prefer be grayscale before the thresholding
-     */
     fun threshold(bitmap: Bitmap, @IntRange(from = 0, to = 255) level: Int): Bitmap
 }

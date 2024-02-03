@@ -15,7 +15,10 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         conversion/Rgba1010102toF32.cpp conversion/RgbaF16bitNBitU8.cpp conversion/RGBAlpha.cpp conversion/HalfFloats.cpp
         jni/AcquireBitmapPixels.cpp shift/Glitch.cpp halftone/Halftone.cpp
         scale/XScaler.cpp jni/blur/BlurPipes.cpp jni/shift/ShiftPipelines.cpp jni/base/Base.cpp
-        base/Grayscale.cpp base/Dilation.cpp base/Channels.cpp base/Threshold.cpp blur/TentBlur.cpp)
+        jni/pipelines/Pipelines.cpp algo/median/QuickSelect.cpp algo/median/Wirth.cpp base/Arithmetics.cpp
+        base/Erosion.cpp shift/WindStagger.cpp blur/AnisotropicDiffusion.cpp
+        base/Grayscale.cpp base/Dilation.cpp base/Channels.cpp base/Threshold.cpp blur/TentBlur.cpp
+        pipelines/RemoveShadows.cpp)
 
 add_library(libhwy STATIC IMPORTED)
 

@@ -20,7 +20,7 @@
 #define HWY_FAST_MATH_INLINE inline __attribute__((flatten))
 
 HWY_BEFORE_NAMESPACE();
-namespace coder::HWY_NAMESPACE {
+namespace aire::HWY_NAMESPACE {
 
 // These templates are not found via ADL.
     using hwy::HWY_NAMESPACE::Abs;
@@ -260,6 +260,11 @@ namespace coder::HWY_NAMESPACE {
         return GetLane(FastPow2f(D, Set(D, f)));
     }
 
+    HWY_FAST_MATH_INLINE float FastExp2f(float f) {
+        HWY_CAPPED(float, 1) D;
+        return GetLane(Exp2f(D, Set(D, f)));
+    }
+
     HWY_FAST_MATH_INLINE float FastPowf(float b, float e) {
         HWY_CAPPED(float, 1) D;
         return GetLane(FastPowf(D, Set(D, b), Set(D, e)));
@@ -326,7 +331,9 @@ HWY_AFTER_NAMESPACE();
 #ifndef LIB_JXL_BASE_FAST_MATH_ONCE
 #define LIB_JXL_BASE_FAST_MATH_ONCE
 
-namespace coder {
+namespace aire {
+    inline float FastExp2f(float f) { return HWY_STATIC_DISPATCH(FastExp2f)(f); }
+
     inline float FastLog2f(float f) { return HWY_STATIC_DISPATCH(FastLog2f)(f); }
 
     inline float FastPow2f(float f) { return HWY_STATIC_DISPATCH(FastPow2f)(f); }

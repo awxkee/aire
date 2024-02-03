@@ -6,8 +6,13 @@
 #include <vector>
 #include "MathUtils.hpp"
 #include <thread>
+#include <fast_math-inl.h>
+
+#include "hwy/highway.h"
 
 using namespace std;
+using namespace hwy;
+using namespace hwy::HWY_NAMESPACE;
 
 namespace aire {
     template<class V>
@@ -18,35 +23,40 @@ namespace aire {
         const float dRangeSigma = 2.f * rangeSigma * rangeSigma;
         const float dSpatialSigma = 2.f * spatialSigma * spatialSigma;
 
-        float rStore = 0.f;
-        float gStore = 0.f;
-        float bStore = 0.f;
-        float aStore = 0.f;
+        const FixedTag<uint8_t, 4> du8;
+        const FixedTag<uint32_t, 4> du32x4;
+        const FixedTag<float32_t, 4> dfx4;
+        using VF = Vec<decltype(dfx4)>;
+        using VU = Vec<decltype(du8)>;
+        const auto zeros = Zero(dfx4);
+
+        const float lumaPrimaries[4] = {0.299f, 0.587f, 0.114f, 0.f};
+        const VF vLumaPrimaries = LoadU(dfx4, lumaPrimaries);
+
         const int iRadius = ceil(radius);
         auto src = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) + y * stride);
         auto dst = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(transient) +
                                          y * stride);
+
+        std::vector<std::vector<float>> spatialWeights(2 * iRadius + 1,
+                                                       std::vector<float>(2 * iRadius + 1, 0));
+
+        for (int j = -iRadius; j <= iRadius; ++j) {
+            for (int i = -iRadius; i <= iRadius; ++i) {
+                int py = clamp(y + j, 0, height - 1);
+                float dx = (float(i) - float(0));
+                float dy = (float(py) - float(y));
+                float distance = std::sqrt(dx * dx + dy * dy);
+                spatialWeights[j + iRadius][i + iRadius] = -distance / dSpatialSigma;
+            }
+        }
+
         for (int x = 0; x < width; ++x) {
-
-            rStore = 0.f;
-            gStore = 0.f;
-            bStore = 0.f;
-            aStore = 0.f;
-
+            VF store = zeros;
             int currentPixelPosition = x * 4;
-
-            V currentR = src[currentPixelPosition];
-            V currentG = src[currentPixelPosition + 1];
-            V currentB = src[currentPixelPosition + 2];
-
-            float kernelSumR = 0.f;
-            float kernelSumG = 0.f;
-            float kernelSumB = 0.f;
-
-            const float lumaPrimaries[3] = {0.299f, 0.587f, 0.114f};
-
-            float intensity = currentR * lumaPrimaries[0] + currentG * lumaPrimaries[1] +
-                              currentB * lumaPrimaries[2];
+            VF current = ConvertTo(dfx4, PromoteTo(du32x4, LoadU(du8, &src[currentPixelPosition])));
+            float kernelSum = 0.f;
+            float intensity = ExtractLane(SumOfLanes(dfx4, Mul(current, vLumaPrimaries)), 0);
 
             for (int j = -iRadius; j <= iRadius; ++j) {
                 for (int i = -iRadius; i <= iRadius; ++i) {
@@ -54,36 +64,27 @@ namespace aire {
                     int px = clamp(x + i, 0, width - 1);
                     auto mSrc = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) +
                                                       py * stride);
-                    float dx = (float(px) - float(x));
-                    float dy = (float(py) - float(y));
-                    float distance = std::sqrt(dx * dx + dy * dy);
 
                     int srcX = px * 4;
 
-                    float localIntensity =
-                            mSrc[srcX] * lumaPrimaries[0] + mSrc[srcX + 1] * lumaPrimaries[1] +
-                            mSrc[srcX + 2] * lumaPrimaries[2];
+                    VF local = ConvertTo(dfx4, PromoteTo(du32x4, LoadU(du8, &mSrc[srcX])));
+
+                    float localIntensity = ExtractLane(SumOfLanes(dfx4, Mul(local, vLumaPrimaries)),
+                                                       0);
                     float drIntensity = localIntensity - intensity;
 
                     float weight = std::exp(
-                            -distance / dSpatialSigma -
+                            spatialWeights[j + iRadius][i + iRadius] -
                             (drIntensity * drIntensity) / dRangeSigma);
 
-                    kernelSumR += weight;
-                    kernelSumG += weight;
-                    kernelSumB += weight;
-
-                    rStore += mSrc[srcX] * weight;
-                    gStore += mSrc[srcX + 1] * weight;
-                    bStore += mSrc[srcX + 2] * weight;
+                    kernelSum += weight;
+                    store = Add(store, Mul(local, Set(dfx4, weight)));
                 }
             }
 
-            dst[0] = ceil(rStore / kernelSumR);
-            dst[1] = ceil(gStore / kernelSumG);
-            dst[2] = ceil(bStore / kernelSumB);
-            dst[3] = src[currentPixelPosition + 3];
-
+            VU pixel = DemoteTo(du8, ConvertTo(du32x4, Div(store, Set(dfx4, kernelSum))));
+            StoreU(pixel, du8, &dst[0]);
+            dst[3] = src[3];
             dst += 4;
         }
     }

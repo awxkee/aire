@@ -5,6 +5,8 @@
 #include "base/Channels.h"
 #include "base/Dilation.h"
 #include "base/Threshold.h"
+#include "base/Erosion.h"
+#include "MathUtils.hpp"
 
 //
 // Created by Radzivon Bartoshyk on 02/02/2024.
@@ -66,7 +68,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_dilatePipeline(JNIEnv *env, jobj
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-                                                        auto kernel = aire::getDilateKernel(
+                                                        auto kernel = getStructuringKernel(
                                                                 kernelSize);
 
                                                         std::vector<uint8_t> output(
@@ -155,4 +157,51 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_thresholdPipeline(JNIEnv *env, j
         throwException(env, msg);
         return nullptr;
     }
+}
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_erodePipeline(JNIEnv *env, jobject thiz,
+                                                              jobject bitmap, jint kernelSize) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [kernelSize](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        auto kernel = getStructuringKernel(
+                                                                kernelSize);
+
+                                                        std::vector<uint8_t> output(
+                                                                stride * height);
+
+                                                        aire::erodeRGBA(input.data(),
+                                                                        output.data(),
+                                                                        stride,
+                                                                        width,
+                                                                        height,
+                                                                        kernel);
+
+                                                        input = output;
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+
 }

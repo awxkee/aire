@@ -13,6 +13,10 @@ class BasePipelinesImpl : BasePipelines {
         return grayscalePipeline(bitmap, rPrimary, gPrimary, bPrimary)
     }
 
+    override fun erode(bitmap: Bitmap, kernelSize: Int): Bitmap {
+        return erodePipeline(bitmap, kernelSize)
+    }
+
     override fun dilate(bitmap: Bitmap, kernelSize: Int): Bitmap {
         return dilatePipeline(bitmap, kernelSize)
     }
@@ -26,6 +30,8 @@ class BasePipelinesImpl : BasePipelines {
         gPrimary: Float,
         bPrimary: Float
     ): Bitmap
+
+    private external fun erodePipeline(bitmap: Bitmap, kernelSize: Int): Bitmap
 
     private external fun dilatePipeline(bitmap: Bitmap, kernelSize: Int): Bitmap
 

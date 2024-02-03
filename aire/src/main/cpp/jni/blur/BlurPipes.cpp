@@ -13,6 +13,7 @@
 #include "blur/GaussBlur.h"
 #include <string>
 #include "blur/TentBlur.h"
+#include "blur/AnisotropicDiffusion.h"
 
 extern "C"
 JNIEXPORT jobject JNICALL
@@ -91,7 +92,7 @@ extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_medianBlurPipeline(JNIEnv *env, jobject thiz,
                                                                    jobject bitmap,
-                                                                   jint radius) {
+                                                                   jint radius, jint selector) {
     try {
         std::vector<AcquirePixelFormat> formats;
         formats.insert(formats.begin(), APF_RGBA8888);
@@ -99,13 +100,14 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_medianBlurPipeline(JNIEnv *env, 
                                                 bitmap,
                                                 formats,
                                                 false,
-                                                [radius](std::vector<uint8_t> &input, int stride,
+                                                [radius, selector](std::vector<uint8_t> &input, int stride,
                                                          int width, int height,
                                                          AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-                                                        medianBlur(
+                                                        aire::medianBlur(
                                                                 reinterpret_cast<uint8_t *>(input.data()),
-                                                                stride, width, height, radius);
+                                                                stride, width, height, radius,
+                                                                static_cast<aire::MedianSelector>(selector));
                                                     }
                                                     return {
                                                             .data = input,
@@ -134,7 +136,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_bilateralBlurPipeline(JNIEnv *en
         jobject newBitmap = AcquireBitmapPixels(env,
                                                 bitmap,
                                                 formats,
-                                                true,
+                                                false,
                                                 [radius, sigma, spatialSigma](
                                                         std::vector<uint8_t> &input, int stride,
                                                         int width, int height,
@@ -217,6 +219,53 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_tentBlurPipeline(JNIEnv *env, jo
                                                         aire::tentBlur(input.data(),
                                                                        stride, width,
                                                                        height, radius);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_anisotropicDiffusionPipeline(JNIEnv *env,
+                                                                             jobject thiz,
+                                                                             jobject bitmap,
+                                                                             jint numOfSteps,
+                                                                             jfloat conduction,
+                                                                             jfloat diffusion) {
+    try {
+        if (numOfSteps <= 0) {
+            std::string msg("Number of steps must be positive");
+            throw AireError(msg);
+        }
+        if (conduction == 0.f) {
+            std::string msg("Conduction must not be 0");
+            throw AireError(msg);
+        }
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [numOfSteps, conduction, diffusion](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::anisotropicDiffusion(input.data(),
+                                                                       stride, width,
+                                                                       height, diffusion, conduction, numOfSteps);
                                                     }
                                                     return {
                                                             .data = input,

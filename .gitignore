@@ -17,3 +17,5 @@ local.properties
 /app/src/main/res/drawable-xxhdpi/default_test.jpeg
 .idea
 /app/src/main/res/drawable-xxhdpi/test_png.png
+/app/release/output-metadata.json
+*.apk

@@ -89,7 +89,7 @@ namespace aire {
             }
         }
 
-        std::vector<uint8_t> halftone(transient2.size());
+        std::vector<uint8_t> halftone(stride * height);
         generateHalftoneHorizontalLines(halftone, stride, width, height, 2, 2, uint8_t(0),
                                         uint8_t(255 * 0.15f));
 

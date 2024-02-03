@@ -3,17 +3,54 @@
 //
 
 #include "Grayscale.h"
+#include "color/Gamut.h"
+#include "hwy/highway.h"
+#include <fast_math-inl.h>
 
 namespace aire {
-    template<class T>
+
+    using namespace hwy;
+    using namespace hwy::HWY_NAMESPACE;
+    using namespace aire::HWY_NAMESPACE;
+
+    template<class D, HWY_IF_F32_D(D), typename T = TFromD<D>, typename V = VFromD<D>>
+    HWY_FAST_MATH_INLINE V SRGBToLinear(D d, V v) {
+        const auto lowerValueThreshold = Set(d, T(0.045f));
+        const auto lowValueDivider = ApproximateReciprocal(Set(d, T(12.92f)));
+        const auto lowMask = v <= lowerValueThreshold;
+        const auto lowValue = Mul(v, lowValueDivider);
+        const auto powerStatic = Set(d, T(2.4f));
+        const auto addStatic = Set(d, T(0.055f));
+        const auto scaleStatic = ApproximateReciprocal(Set(d, T(1.055f)));
+        const auto highValue = Pow(d, Mul(Add(v, addStatic), scaleStatic), powerStatic);
+        return IfThenElse(lowMask, lowValue, highValue);
+    }
+
+    template<class D, HWY_IF_U8_D(D), typename T = TFromD<D>>
     void
-    grayscale(T *pixels, T *destination, int stride, int width, int height, const float rPrimary,
-              const float gPrimary, const float bPrimary) {
+    grayscaleHWY(D du, T *pixels, T *destination, int stride, int width, int height,
+                 const float rPrimary,
+                 const float gPrimary, const float bPrimary) {
+        const FixedTag<uint32_t, 4> du32x4;
+        const FixedTag<float32_t, 4> dfx4;
+        using VF = Vec<decltype(dfx4)>;
+        using VU = Vec<decltype(du)>;
+
+        const auto vScale = Set(dfx4, 255.f);
+        const auto vRevertScale = ApproximateReciprocal(vScale);
+
+        const float lumaPrimaries[4] = {rPrimary, gPrimary, bPrimary, 0.f};
+        const VF vLumaPrimaries = LoadU(dfx4, lumaPrimaries);
+
         for (int y = 0; y < height; ++y) {
             auto dst = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(destination) + y * stride);
             auto src = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(pixels) + y * stride);
             for (int x = 0; x < width; ++x) {
-                T pixel = rPrimary * src[0] + gPrimary * src[1] + bPrimary * src[2];
+                VF local = Mul(ConvertTo(dfx4, PromoteTo(du32x4, LoadU(du, &src[0]))), vRevertScale);
+                VF pv = Mul(SumOfLanes(dfx4, Mul(
+                        SRGBToLinear(dfx4, local),
+                        vLumaPrimaries)), vScale);
+                T pixel = ExtractLane(DemoteTo(du, ConvertTo(du32x4, pv)), 0);
                 dst[0] = pixel;
                 dst[1] = pixel;
                 dst[2] = pixel;
@@ -24,8 +61,12 @@ namespace aire {
         }
     }
 
-    template void
+    void
     grayscale(uint8_t *pixels, uint8_t *destination, int stride, int width, int height,
               const float rPrimary,
-              const float gPrimary, const float bPrimary);
+              const float gPrimary, const float bPrimary) {
+        const FixedTag<uint8_t, 4> du8;
+        grayscaleHWY(du8, pixels, destination, stride, width, height, rPrimary, gPrimary,
+                     bPrimary);
+    }
 }

@@ -12,6 +12,7 @@
 #define HWY_TARGET_INCLUDE "blur/TentBlur.cpp"
 
 #include "hwy/foreach_target.h"
+#include "algo/support-inl.h"
 #include "hwy/highway.h"
 
 using namespace std;
@@ -56,16 +57,16 @@ namespace aire::HWY_NAMESPACE {
 
                     int srcX = px * 4;
 
-                    VU vuPixels = LoadU(du8, &mSrc[srcX]);
+                    VF vuPixels = ConvertToFloat(df32, LoadU(du8, &mSrc[srcX]));
 
                     float weight = kernel[j + halfKernel][i + halfKernel];
-                    store = Add(store, Mul(Mul(ConvertTo(df32, PromoteTo(du32, vuPixels)), vScale),
+                    store = Add(store, Mul(Mul(vuPixels, vScale),
                                            Set(df32, weight)));
                 }
             }
 
             store = Mul(store, revertScale);
-            VU pixels = DemoteTo(du8, ConvertTo(du32, store));
+            VU pixels = DemoteToU8(du8, store);
             StoreU(pixels, du8, dst);
             dst += 4;
         }
@@ -111,15 +112,15 @@ namespace aire::HWY_NAMESPACE {
 
                 int srcX = px * 4;
 
-                VU vuPixels = LoadU(du8, &mSrc[srcX]);
+                VF vuPixels = ConvertToFloat(df32, LoadU(du8, &mSrc[srcX]));
 
                 float weight = kernel[i + halfKernel];
-                store = Add(store, Mul(Mul(ConvertTo(df32, PromoteTo(du32, vuPixels)), vScale),
+                store = Add(store, Mul(Mul(vuPixels, vScale),
                                        Set(df32, weight)));
             }
 
             store = Mul(store, revertScale);
-            VU pixels = DemoteTo(du8, ConvertTo(du32, store));
+            VU pixels = DemoteToU8(du8, store);
             StoreU(pixels, du8, dst);
             dst += 4;
         }
@@ -145,7 +146,7 @@ namespace aire::HWY_NAMESPACE {
                     [start, end, width, height, stride, data, radius, &transient, &kernel, scale]() {
                         for (int y = start; y < end; ++y) {
                             tentBlurPass(data, transient.data(), y,
-                                           stride, width, height, radius, kernel, scale);
+                                         stride, width, height, radius, kernel, scale);
                         }
                     });
         }

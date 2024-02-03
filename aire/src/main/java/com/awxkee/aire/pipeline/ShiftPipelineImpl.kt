@@ -5,6 +5,15 @@ import com.awxkee.aire.ShiftPipelines
 import java.security.InvalidParameterException
 
 class ShiftPipelineImpl : ShiftPipelines {
+    override fun horizontalWindStagger(
+        bitmap: Bitmap,
+        windStrength: Float,
+        streamsCount: Int,
+        clearColor: Int
+    ): Bitmap {
+        return horizontalWindStaggerImpl(bitmap, windStrength, streamsCount, clearColor)
+    }
+
     override fun tiltShift(
         bitmap: Bitmap,
         radius: Float,
@@ -36,6 +45,13 @@ class ShiftPipelineImpl : ShiftPipelines {
             corruptionShiftY
         )
     }
+
+    private external fun horizontalWindStaggerImpl(
+        bitmap: Bitmap,
+        windStrength: Float,
+        streamsCount: Int,
+        clearColor: Int
+    ): Bitmap
 
     private external fun tiltShiftImpl(
         bitmap: Bitmap,

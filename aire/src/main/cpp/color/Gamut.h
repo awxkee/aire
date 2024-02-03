@@ -50,3 +50,12 @@ GamutRgbToXYZ(const glm::mat3x2 primariesXy, const glm::vec2 whitePoint) {
     };
     return ret;
 }
+
+inline __attribute__((flatten))
+float SRGBToLinear(float v) {
+    if (v <= 0.045f) {
+        return v / 12.92f;
+    } else {
+        return pow((v + 0.055f) / 1.055f, 2.4f);
+    }
+}

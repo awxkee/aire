@@ -1,8 +1,12 @@
 package com.awxkee.aire
 
 import android.graphics.Bitmap
+import android.graphics.Color
 
 interface ShiftPipelines {
+
+    fun horizontalWindStagger(bitmap: Bitmap, windStrength: Float = 0.2f, streamsCount: Int = 90, clearColor: Int = Color.BLACK.toInt()): Bitmap
+
     fun tiltShift(
         bitmap: Bitmap,
         radius: Float,

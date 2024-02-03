@@ -1,6 +1,7 @@
 package com.awxkee.aire
 
 import android.graphics.Bitmap
+import androidx.annotation.IntRange
 
 interface BlurPipelines {
 
@@ -12,8 +13,19 @@ interface BlurPipelines {
 
     fun stackBlur(bitmap: Bitmap, radius: Int): Bitmap
 
-    fun medianBlur(bitmap: Bitmap, radius: Int): Bitmap
+    fun medianBlur(
+        bitmap: Bitmap,
+        radius: Int,
+        selector: MedianSelector = MedianSelector.WIRTH
+    ): Bitmap
 
     fun tentBlur(bitmap: Bitmap, radius: Int): Bitmap
+
+    fun anisotropicDiffusion(
+        bitmap: Bitmap,
+        @IntRange(from = 1) numOfSteps: Int = 20,
+        conduction: Float = 0.1f,
+        diffusion: Float = 0.01f
+    ): Bitmap
 
 }

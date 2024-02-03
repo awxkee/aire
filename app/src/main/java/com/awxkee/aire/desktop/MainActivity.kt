@@ -3,6 +3,7 @@ package com.awxkee.aire.desktop
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -25,10 +26,12 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import com.awxkee.aire.Aire
+import com.awxkee.aire.MedianSelector
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
+import kotlin.system.measureTimeMillis
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,13 +45,22 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
 
                     scope.launch(Dispatchers.IO) {
-//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.default_test).scaleWith(0.35f)
+//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.default_test)
+//                            .scaleWith(0.15f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
-//                        val glitch = Aire.medianBlur(bitmap, 5)
+//
+//                        val time = measureTimeMillis {
+//                            val glitch = Aire.anisotropicDiffusion(bitmap, 40, 0.7f, 0.01f)
+//                            scope.launch {
+//                                imagesArray.add(glitch)
+//                            }
+//                        }
+//                        Log.d("AireMedian", "exec time $time")
+//                        val dilate = Aire.bilateralBlur(bitmap, 5)
 //                        scope.launch {
-//                            imagesArray.add(glitch)
+//                            imagesArray.add(dilate)
 //                        }
 //                        val gray = Aire.grayscale(bitmap)
 //                        val tent = Aire.tentBlur(bitmap, 17)

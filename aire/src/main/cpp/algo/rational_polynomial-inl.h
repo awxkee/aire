@@ -19,7 +19,7 @@
 
 HWY_BEFORE_NAMESPACE();
 
-namespace coder {
+namespace aire {
     namespace HWY_NAMESPACE {
         namespace {
 

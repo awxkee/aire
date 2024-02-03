@@ -2,8 +2,9 @@ package com.awxkee.aire.pipeline
 
 import android.graphics.Bitmap
 import com.awxkee.aire.BlurPipelines
+import com.awxkee.aire.MedianSelector
 
-class BlurPipelinesImpl: BlurPipelines {
+class BlurPipelinesImpl : BlurPipelines {
     override fun gaussianBlur(bitmap: Bitmap, radius: Int, sigma: Float): Bitmap {
         if (radius < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
@@ -14,7 +15,12 @@ class BlurPipelinesImpl: BlurPipelines {
         return gaussianBlurPipeline(bitmap, radius, sigma)
     }
 
-    override fun bilateralBlur(bitmap: Bitmap, radius: Int, rangeSigma: Float, spatialSigma: Float): Bitmap {
+    override fun bilateralBlur(
+        bitmap: Bitmap,
+        radius: Int,
+        rangeSigma: Float,
+        spatialSigma: Float
+    ): Bitmap {
         if (radius < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
@@ -38,25 +44,46 @@ class BlurPipelinesImpl: BlurPipelines {
         return stackNativeBlurPipeline(bitmap, radius)
     }
 
-    override fun medianBlur(bitmap: Bitmap, radius: Int): Bitmap {
+    override fun medianBlur(bitmap: Bitmap, radius: Int, selector: MedianSelector): Bitmap {
         if (radius < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
-        return medianBlurPipeline(bitmap, radius)
+        return medianBlurPipeline(bitmap, radius, selector.value)
     }
 
     override fun tentBlur(bitmap: Bitmap, radius: Int): Bitmap {
-        if (radius < 1) {
+        if (radius < 3) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
         return tentBlurPipeline(bitmap, radius)
     }
 
+    override fun anisotropicDiffusion(
+        bitmap: Bitmap,
+        numOfSteps: Int,
+        conduction: Float,
+        diffusion: Float
+    ): Bitmap {
+        return anisotropicDiffusionPipeline(bitmap, numOfSteps, conduction, diffusion)
+    }
+
+    private external fun anisotropicDiffusionPipeline(
+        bitmap: Bitmap,
+        numOfSteps: Int,
+        conduction: Float,
+        diffusion: Float
+    ): Bitmap
+
     private external fun gaussianBlurPipeline(bitmap: Bitmap, radius: Int, sigma: Float): Bitmap
 
-    private external fun bilateralBlurPipeline(bitmap: Bitmap, radius: Int, sigma: Float, spatialSigma: Float): Bitmap
+    private external fun bilateralBlurPipeline(
+        bitmap: Bitmap,
+        radius: Int,
+        sigma: Float,
+        spatialSigma: Float
+    ): Bitmap
 
-    private external fun medianBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
+    private external fun medianBlurPipeline(bitmap: Bitmap, radius: Int, selector: Int): Bitmap
 
     private external fun stackNativeBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
 

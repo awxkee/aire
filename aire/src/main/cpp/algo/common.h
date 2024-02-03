@@ -14,7 +14,7 @@
 #include <memory>
 #include <string>
 
-namespace coder {
+namespace aire {
 // Some enums and typedefs used by more than one header file.
 
     constexpr size_t kBitsPerByte = 8;  // more clear than CHAR_BIT

@@ -2,7 +2,7 @@
 // Created by Radzivon Bartoshyk on 02/02/2024.
 //
 
-#include "Dilation.h"
+#include "Erosion.h"
 #include <vector>
 #include <algorithm>
 #include <thread>
@@ -12,7 +12,7 @@ using namespace std;
 namespace aire {
 
     template<class T>
-    void dilateRGBA(T *pixels, T *destination, int stride, int width, int height,
+    void erodeRGBA(T *pixels, T *destination, int stride, int width, int height,
                     std::vector<std::vector<int>> &kernel) {
 
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
@@ -33,7 +33,7 @@ namespace aire {
                             for (int x = 0; x < width; ++x) {
                                 int mSize = kernel.size() / 2;
 
-                                long max = 0;
+                                long min = 0;
 
                                 for (int m = -mSize; m < mSize; ++m) {
                                     std::vector<int> sub = kernel[m + mSize];
@@ -47,8 +47,8 @@ namespace aire {
                                                     reinterpret_cast<uint8_t *>(pixels) +
                                                     newY * stride);
                                             const uint32_t item = src[newX] * sub[n + nSize];
-                                            if (item > max) {
-                                                max = item;
+                                            if (item < min) {
+                                                min = item;
                                             }
                                         }
                                     }
@@ -56,7 +56,7 @@ namespace aire {
 
                                 auto dst = reinterpret_cast<uint32_t *>(
                                         reinterpret_cast<uint8_t *>(destination) + y * stride);
-                                dst[x] = max;
+                                dst[x] = min;
                             }
                         }
                     });
@@ -68,7 +68,7 @@ namespace aire {
     }
 
     template<class T>
-    void dilate(T *pixels, T *destination, int width, int height,
+    void erode(T *pixels, T *destination, int width, int height,
                 std::vector<std::vector<int>> &kernel) {
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     height * width / (256 * 256)), 1, 12);
@@ -89,7 +89,7 @@ namespace aire {
                                     reinterpret_cast<uint8_t *>(destination) + y * width);
                             for (int x = 0; x < width; ++x) {
                                 int mSize = kernel.size() / 2;
-                                T max = 0;
+                                T min = 0;
                                 for (int m = -mSize; m < mSize; ++m) {
                                     std::vector<int> sub = kernel[m + mSize];
                                     int nSize = sub.size() / 2;
@@ -103,14 +103,14 @@ namespace aire {
                                                     reinterpret_cast<uint8_t *>(pixels) +
                                                     newY * width);
                                             T vl = src[newX] * kernelItem;
-                                            if (vl > max) {
-                                                max = vl;
+                                            if (vl > min) {
+                                                min = vl;
                                             }
                                         }
                                     }
                                 }
 
-                                dst[x] = max;
+                                dst[x] = min;
                             }
                         }
                     });
@@ -122,10 +122,10 @@ namespace aire {
     }
 
     template void
-    dilate(uint8_t *pixels, uint8_t *destination, int width, int height,
+    erode(uint8_t *pixels, uint8_t *destination, int width, int height,
            std::vector<std::vector<int>> &kernel);
 
     template
-    void dilateRGBA(uint8_t *pixels, uint8_t *destination, int stride, int width, int height,
+    void erodeRGBA(uint8_t *pixels, uint8_t *destination, int stride, int width, int height,
                     std::vector<std::vector<int>> &kernel);
 }
