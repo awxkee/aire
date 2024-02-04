@@ -126,7 +126,7 @@ Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_horizontalWindStaggerImpl(JNIEnv
                                                                                     height,
                                                                                     windStrength,
                                                                                     streamsCount,
-                                                                                    clearColor);
+                                                                                    static_cast<uint32_t>(clearColor));
                                                         input = std::move(output);
                                                     }
                                                     return {

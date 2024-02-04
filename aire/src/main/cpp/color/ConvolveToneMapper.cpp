@@ -7,6 +7,10 @@
 #include "color/eotf-inl.h"
 #include "tone/LogarithmicToneMapper.hpp"
 #include "tone/AcesFilmicToneMapper.hpp"
+#include "tone/ExposureToneMapper.hpp"
+#include "tone/HejlBurgessToneMapper.hpp"
+#include "tone/HableFilmicToneMapper.hpp"
+#include "tone/AcesFilmicToneMapper.hpp"
 #include "algo/support-inl.h"
 
 namespace aire {
@@ -30,9 +34,6 @@ namespace aire {
 
         const auto vScale = Set(dfx4, 255.f);
         const auto vRevertScale = ApproximateReciprocal(vScale);
-
-        const float lumaPrimaries[4] = {rPrimary, gPrimary, bPrimary, 0.f};
-        const VF vLumaPrimaries = LoadU(dfx4, lumaPrimaries);
 
         const auto zeros = Zero(dfx4);
 
@@ -96,6 +97,26 @@ namespace aire {
     }
 
     void acesFilm(uint8_t *data, int stride, int width, int height, float exposure) {
+        AcesFilmicToneMapper<FixedTag<float32_t, 4>> toneMapper(exposure);
+        convolveToneMapper(data, stride, width, height, &toneMapper);
+    }
+
+    void exposure(uint8_t *data, int stride, int width, int height, float exposure) {
+        ExposureToneMapper<FixedTag<float32_t, 4>> toneMapper(exposure);
+        convolveToneMapper(data, stride, width, height, &toneMapper);
+    }
+
+    void hejlBurgess(uint8_t *data, int stride, int width, int height, float exposure) {
+        HejlBurgessToneMapper<FixedTag<float32_t, 4>> toneMapper(exposure);
+        convolveToneMapper(data, stride, width, height, &toneMapper);
+    }
+
+    void hableFilmic(uint8_t *data, int stride, int width, int height, float exposure) {
+        HableFilmicToneMapper<FixedTag<float32_t, 4>> toneMapper(exposure);
+        convolveToneMapper(data, stride, width, height, &toneMapper);
+    }
+
+    void acesHill(uint8_t *data, int stride, int width, int height, float exposure) {
         AcesFilmicToneMapper<FixedTag<float32_t, 4>> toneMapper(exposure);
         convolveToneMapper(data, stride, width, height, &toneMapper);
     }

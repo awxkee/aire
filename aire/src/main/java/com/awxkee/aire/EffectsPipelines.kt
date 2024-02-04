@@ -21,6 +21,7 @@ interface EffectsPipelines {
     ): Bitmap
 
     fun fractalGlass(bitmap: Bitmap, glassSize: Float = 0.2f, amplitude: Float = 0.2f): Bitmap
+
     fun oil(bitmap: Bitmap, radius: Int, levels: Float = 1f): Bitmap
 
     /* Prefer relative clustering for ex. width*height * 0.01f = numClusters */

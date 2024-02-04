@@ -2,6 +2,7 @@ package com.awxkee.aire.desktop
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -40,7 +41,6 @@ class MainActivity : ComponentActivity() {
                     mutableStateListOf<Bitmap>()
                 }
                 LaunchedEffect(key1 = Unit, block = {
-
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.default_test)
@@ -48,9 +48,9 @@ class MainActivity : ComponentActivity() {
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
-//                        val dilate = Aire.tentBlur(bitmap, 15)
+//                            val bmp = Aire.acesHillToneMapping(bitmap, 1f)
 //                        scope.launch {
-//                            imagesArray.add(dilate)
+//                            imagesArray.add(bmp)
 //                        }
 
                         var radius = 1

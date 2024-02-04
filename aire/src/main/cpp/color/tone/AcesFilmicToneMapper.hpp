@@ -13,13 +13,10 @@ namespace aire {
     private:
         using V = Vec<D>;
         D df_;
-        TFromD<D> den;
         TFromD<D> exposure;
 
     public:
         AcesFilmicToneMapper(const TFromD<D> exposure = 1.0f) : exposure(exposure), ToneMapper<D>() {
-            TFromD<D> Lmax = 1;
-            den = static_cast<TFromD<D>>(1) / log(static_cast<TFromD<D>>(1 + Lmax * exposure));
         }
 
         ~AcesFilmicToneMapper() override = default;

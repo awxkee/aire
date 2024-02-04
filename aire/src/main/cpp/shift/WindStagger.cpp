@@ -21,7 +21,7 @@ namespace aire {
     using namespace hwy::HWY_NAMESPACE;
 
     void horizontalWindStagger(uint8_t *data, uint8_t *source, int stride, int width, int height,
-                               float windStrength, int streamsCount, int clearColor) {
+                               float windStrength, int streamsCount, uint32_t clearColor) {
         int staggerWidth = width * abs(windStrength);
         const FixedTag<uint8_t, 4> du8;
         const FixedTag<float32_t, 4> dfx4;

@@ -9,4 +9,8 @@
 namespace aire {
     void logarithmic(uint8_t *data, int stride, int width, int height, float exposure);
     void acesFilm(uint8_t *data, int stride, int width, int height, float exposure);
+    void hejlBurgess(uint8_t *data, int stride, int width, int height, float exposure);
+    void hableFilmic(uint8_t *data, int stride, int width, int height, float exposure);
+    void acesHill(uint8_t *data, int stride, int width, int height, float exposure);
+    void exposure(uint8_t *data, int stride, int width, int height, float exposure);
 }
