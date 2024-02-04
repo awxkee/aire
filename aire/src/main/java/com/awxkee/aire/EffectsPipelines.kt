@@ -11,6 +11,13 @@ interface EffectsPipelines {
         amplitude: Float = 1f
     ): Bitmap
 
+    fun perlinDistortion(
+        bitmap: Bitmap,
+        intensity: Float = 0.02f,
+        turbulence: Float = 1f,
+        amplitude: Float = 1f
+    ): Bitmap
+
     fun waterEffect(
         bitmap: Bitmap,
         fractionSize: Float = 0.05f,

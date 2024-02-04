@@ -20,7 +20,8 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         jni/EffectsPipelines.cpp effect/OilEffect.cpp effect/CrystallizeEffect.cpp blur/PoissonBlur.cpp
         base/Grayscale.cpp base/Dilation.cpp base/Channels.cpp base/Threshold.cpp blur/TentBlur.cpp
         pipelines/RemoveShadows.cpp blur/FastBilateral.cpp color/Gamut.cpp base/Convolve1D.cpp
-        effect/FractalGlassEffect.cpp effect/WaterEffect.cpp jni/ScalePipelines.cpp jni/ToneMappingPipelines.cpp)
+        effect/FractalGlassEffect.cpp effect/WaterEffect.cpp jni/ScalePipelines.cpp jni/ToneMappingPipelines.cpp
+        effect/PerlinDistortion.cpp)
 
 add_library(libhwy STATIC IMPORTED)
 

@@ -6,6 +6,7 @@
 #include "effect/OilEffect.h"
 #include "effect/CrystallizeEffect.h"
 #include "effect/WaterEffect.h"
+#include "effect/PerlinDistortion.h"
 #include "color/ConvolveToneMapper.h"
 
 //
@@ -185,6 +186,45 @@ Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_waterEffectImpl(JNIEnv *env, j
                                                                           amplitudeX,
                                                                           frequencyY,
                                                                           amplitudeY);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_perlinDistortionImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat intensity, jfloat turbulence,
+                                                                       jfloat amplitude) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [intensity, turbulence, amplitude](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::perlinDistortion(input.data(),
+                                                                          stride, width,
+                                                                          height,
+                                                                          intensity,
+                                                                          turbulence,
+                                                                          amplitude);
                                                     }
                                                     return {
                                                             .data = input,

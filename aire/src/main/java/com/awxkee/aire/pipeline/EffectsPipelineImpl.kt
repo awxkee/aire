@@ -13,6 +13,15 @@ class EffectsPipelineImpl : EffectsPipelines {
         return marbleImpl(bitmap, intensity, turbulence, amplitude)
     }
 
+    override fun perlinDistortion(
+        bitmap: Bitmap,
+        intensity: Float,
+        turbulence: Float,
+        amplitude: Float
+    ): Bitmap {
+        return perlinDistortionImpl(bitmap, intensity, turbulence, amplitude)
+    }
+
     override fun waterEffect(
         bitmap: Bitmap,
         fractionSize: Float,
@@ -35,6 +44,13 @@ class EffectsPipelineImpl : EffectsPipelines {
     override fun crystallize(bitmap: Bitmap, numClusters: Int, strokeColor: Int): Bitmap {
         return crystallizeImpl(bitmap, numClusters, strokeColor)
     }
+
+    private external fun perlinDistortionImpl(
+        bitmap: Bitmap,
+        intensity: Float,
+        turbulence: Float,
+        amplitude: Float
+    ): Bitmap
 
     private external fun fractalGlassImpl(
         bitmap: Bitmap,

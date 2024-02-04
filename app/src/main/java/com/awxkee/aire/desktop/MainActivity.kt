@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
-//                            val bmp = Aire.acesHillToneMapping(bitmap, 1f)
+//                        val bmp = Aire.perlinDistortion(bitmap, intensity = 0f)
 //                        scope.launch {
 //                            imagesArray.add(bmp)
 //                        }
