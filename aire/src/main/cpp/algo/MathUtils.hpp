@@ -56,3 +56,11 @@ private:
     double mCutoff;
     double mY1;
 };
+
+static inline int min3(int a, int b, int c) {
+    return std::min(a, std::min(b, c));
+}
+
+static inline int max3(int a, int b, int c) {
+    return std::max(a, std::max(b, c));
+}

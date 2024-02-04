@@ -9,7 +9,11 @@ interface BlurPipelines {
 
     fun bilateralBlur(bitmap: Bitmap, radius: Int, rangeSigma: Float, spatialSigma: Float): Bitmap
 
+    fun fastBilateralBlur(bitmap: Bitmap, rangeSigma: Float, spatialSigma: Float): Bitmap
+
     fun boxBlur(bitmap: Bitmap, radius: Int): Bitmap
+
+    fun poissonBlur(bitmap: Bitmap, radius: Int): Bitmap
 
     fun stackBlur(bitmap: Bitmap, radius: Int): Bitmap
 

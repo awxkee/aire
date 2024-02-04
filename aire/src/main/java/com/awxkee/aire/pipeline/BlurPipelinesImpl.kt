@@ -30,11 +30,26 @@ class BlurPipelinesImpl : BlurPipelines {
         return bilateralBlurPipeline(bitmap, radius, rangeSigma, spatialSigma)
     }
 
+    override fun fastBilateralBlur(
+        bitmap: Bitmap,
+        rangeSigma: Float,
+        spatialSigma: Float
+    ): Bitmap {
+        return fastBilateralPipeline(bitmap, rangeSigma, spatialSigma)
+    }
+
     override fun boxBlur(bitmap: Bitmap, radius: Int): Bitmap {
         if (radius < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
         return boxBlurPipeline(bitmap, radius)
+    }
+
+    override fun poissonBlur(bitmap: Bitmap, radius: Int): Bitmap {
+        if (radius < 1) {
+            throw IllegalStateException("Radius must be more or equal 1")
+        }
+        return poissonBlurPipeline(bitmap, radius)
     }
 
     override fun stackBlur(bitmap: Bitmap, radius: Int): Bitmap {
@@ -73,6 +88,10 @@ class BlurPipelinesImpl : BlurPipelines {
         conduction: Float,
         diffusion: Float
     ): Bitmap
+
+    private external fun poissonBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
+
+    private external fun fastBilateralPipeline(bitmap: Bitmap, radiusSigma: Float, spatialSigma: Float): Bitmap
 
     private external fun gaussianBlurPipeline(bitmap: Bitmap, radius: Int, sigma: Float): Bitmap
 

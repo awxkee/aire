@@ -5,26 +5,13 @@
 #include "Grayscale.h"
 #include "color/Gamut.h"
 #include "hwy/highway.h"
-#include <fast_math-inl.h>
+#include "color/eotf-inl.h"
 
 namespace aire {
 
     using namespace hwy;
     using namespace hwy::HWY_NAMESPACE;
     using namespace aire::HWY_NAMESPACE;
-
-    template<class D, HWY_IF_F32_D(D), typename T = TFromD<D>, typename V = VFromD<D>>
-    HWY_FAST_MATH_INLINE V SRGBToLinear(D d, V v) {
-        const auto lowerValueThreshold = Set(d, T(0.045f));
-        const auto lowValueDivider = ApproximateReciprocal(Set(d, T(12.92f)));
-        const auto lowMask = v <= lowerValueThreshold;
-        const auto lowValue = Mul(v, lowValueDivider);
-        const auto powerStatic = Set(d, T(2.4f));
-        const auto addStatic = Set(d, T(0.055f));
-        const auto scaleStatic = ApproximateReciprocal(Set(d, T(1.055f)));
-        const auto highValue = Pow(d, Mul(Add(v, addStatic), scaleStatic), powerStatic);
-        return IfThenElse(lowMask, lowValue, highValue);
-    }
 
     template<class D, HWY_IF_U8_D(D), typename T = TFromD<D>>
     void
@@ -48,7 +35,7 @@ namespace aire {
             for (int x = 0; x < width; ++x) {
                 VF local = Mul(ConvertTo(dfx4, PromoteTo(du32x4, LoadU(du, &src[0]))), vRevertScale);
                 VF pv = Mul(SumOfLanes(dfx4, Mul(
-                        SRGBToLinear(dfx4, local),
+                        aire::HWY_NAMESPACE::SRGBToLinear(dfx4, local),
                         vLumaPrimaries)), vScale);
                 T pixel = ExtractLane(DemoteTo(du, ConvertTo(du32x4, pv)), 0);
                 dst[0] = pixel;

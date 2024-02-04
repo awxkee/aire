@@ -6,6 +6,7 @@
 #define JXLCODER_BILATERALBLUR_H
 
 #include <cstdint>
+#include "FastBilateral.h"
 
 namespace aire {
     template<class V>

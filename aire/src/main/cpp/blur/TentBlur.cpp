@@ -12,8 +12,8 @@
 #define HWY_TARGET_INCLUDE "blur/TentBlur.cpp"
 
 #include "hwy/foreach_target.h"
-#include "algo/support-inl.h"
 #include "hwy/highway.h"
+#include "algo/support-inl.h"
 
 using namespace std;
 
@@ -29,8 +29,8 @@ namespace aire::HWY_NAMESPACE {
                  std::vector<std::vector<float>> &kernel, float scale) {
 
         const FixedTag<uint8_t, 4> du8;
+        const FixedTag<uint8_t, 16> du8x16;
         const FixedTag<float32_t, 4> df32;
-        const FixedTag<uint32_t, 4> du32;
         using VU = Vec<decltype(du8)>;
         using VF = Vec<decltype(df32)>;
 
@@ -49,8 +49,37 @@ namespace aire::HWY_NAMESPACE {
 
             for (int j = -halfKernel; j <= halfKernel; ++j) {
                 int py = clamp(y + j, 0, height - 1);
+                int i = -halfKernel;
 
-                for (int i = -halfKernel; i <= halfKernel; ++i) {
+                for (; i + 4 <= halfKernel && x + i + 4 < width; i += 4) {
+                    int px = clamp(x + i, 0, width - 1);
+                    auto mSrc = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) +
+                                                      py * stride);
+
+                    int srcX = px * 4;
+
+                    VF v1, v2, v3, v4;
+                    auto pu = LoadU(du8x16, &mSrc[srcX]);
+                    ConvertToFloatVec16(du8x16, pu, v1, v2, v3, v4);
+
+                    float weight = kernel[j + halfKernel][i + halfKernel];
+                    store = Add(store, Mul(Mul(v1, vScale),
+                                           Set(df32, weight)));
+
+                    weight = kernel[j + halfKernel][i + halfKernel + 1];
+                    store = Add(store, Mul(Mul(v2, vScale),
+                                           Set(df32, weight)));
+
+                    weight = kernel[j + halfKernel][i + halfKernel + 2];
+                    store = Add(store, Mul(Mul(v3, vScale),
+                                           Set(df32, weight)));
+
+                    weight = kernel[j + halfKernel][i + halfKernel + 3];
+                    store = Add(store, Mul(Mul(v4, vScale),
+                                           Set(df32, weight)));
+                }
+
+                for (; i <= halfKernel; ++i) {
                     int px = clamp(x + i, 0, width - 1);
                     auto mSrc = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) +
                                                       py * stride);
@@ -63,60 +92,6 @@ namespace aire::HWY_NAMESPACE {
                     store = Add(store, Mul(Mul(vuPixels, vScale),
                                            Set(df32, weight)));
                 }
-            }
-
-            store = Mul(store, revertScale);
-            VU pixels = DemoteToU8(du8, store);
-            StoreU(pixels, du8, dst);
-            dst += 4;
-        }
-    }
-
-    template<class V>
-    void
-    tentBlurPass1D(V *data, V *transient, int y, int stride, int width, int height, int radius,
-                   std::vector<float> &kernel, const float scale, const bool vertical) {
-
-        const FixedTag<uint8_t, 4> du8;
-        const FixedTag<float32_t, 4> df32;
-        const FixedTag<uint32_t, 4> du32;
-        using VU = Vec<decltype(du8)>;
-        using VF = Vec<decltype(df32)>;
-
-        auto dst = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(transient) +
-                                         y * stride);
-
-        const VF vScale = Set(df32, scale);
-        const VF revertScale = ApproximateReciprocal(vScale);
-
-        int halfKernel = kernel.size() / 2;
-
-        for (int x = 0; x < width; ++x) {
-            VF store = Zero(df32);
-
-            for (int i = -halfKernel; i <= halfKernel; ++i) {
-                int py;
-                if (vertical) {
-                    py = clamp(y + i, 0, height - 1);
-                } else {
-                    py = y;
-                }
-                int px;
-                if (!vertical) {
-                    px = clamp(x + i, 0, width - 1);
-                } else {
-                    px = x;
-                }
-                auto mSrc = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) +
-                                                  py * stride);
-
-                int srcX = px * 4;
-
-                VF vuPixels = ConvertToFloat(df32, LoadU(du8, &mSrc[srcX]));
-
-                float weight = kernel[i + halfKernel];
-                store = Add(store, Mul(Mul(vuPixels, vScale),
-                                       Set(df32, weight)));
             }
 
             store = Mul(store, revertScale);
@@ -165,12 +140,6 @@ namespace aire::HWY_NAMESPACE {
     tentBlurPass(uint8_t *data, uint8_t *transient, int y, int stride, int width, int height,
                  int radius,
                  std::vector<std::vector<float>> &kernel, float scale);
-
-    template
-    void
-    tentBlurPass1D(uint8_t *data, uint8_t *transient, int y, int stride, int width, int height,
-                   int radius,
-                   std::vector<float> &kernel, const float scale, const bool vertical);
 }
 
 HWY_AFTER_NAMESPACE();

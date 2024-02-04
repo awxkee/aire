@@ -33,7 +33,11 @@ namespace aire {
                             for (int x = 0; x < width; ++x) {
                                 int mSize = kernel.size() / 2;
 
-                                long max = 0;
+                                auto srcLocal = reinterpret_cast<uint32_t *>(
+                                        reinterpret_cast<uint8_t *>(pixels) +
+                                        y * stride);
+
+                                long max = srcLocal[x];
 
                                 for (int m = -mSize; m < mSize; ++m) {
                                     std::vector<int> sub = kernel[m + mSize];
@@ -89,7 +93,13 @@ namespace aire {
                                     reinterpret_cast<uint8_t *>(destination) + y * width);
                             for (int x = 0; x < width; ++x) {
                                 int mSize = kernel.size() / 2;
-                                T max = 0;
+
+                                auto srcLocal = reinterpret_cast<T *>(
+                                        reinterpret_cast<uint8_t *>(pixels) +
+                                        y * height);
+
+                                T max = srcLocal[x];
+
                                 for (int m = -mSize; m < mSize; ++m) {
                                     std::vector<int> sub = kernel[m + mSize];
                                     int nSize = sub.size() / 2;

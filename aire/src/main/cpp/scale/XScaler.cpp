@@ -49,7 +49,7 @@ using namespace std;
 
 HWY_BEFORE_NAMESPACE();
 
-namespace coder::HWY_NAMESPACE {
+namespace aire::HWY_NAMESPACE {
 
     using hwy::HWY_NAMESPACE::Set;
     using hwy::HWY_NAMESPACE::FixedTag;
@@ -933,9 +933,7 @@ namespace coder::HWY_NAMESPACE {
 
 HWY_AFTER_NAMESPACE();
 
-#if HWY_ONCE
-namespace coder {
-    HWY_EXPORT(scaleImageFloat16HWY);
+namespace aire {
 
     void scaleImageFloat16(const uint16_t *input,
                            int srcStride,
@@ -945,12 +943,10 @@ namespace coder {
                            int outputWidth, int outputHeight,
                            int components,
                            XSampler option) {
-        HWY_DYNAMIC_DISPATCH(scaleImageFloat16HWY)(input, srcStride, inputWidth, inputHeight,
-                                                   output, dstStride, outputWidth, outputHeight,
-                                                   components, option);
+        aire::HWY_NAMESPACE::scaleImageFloat16HWY(input, srcStride, inputWidth, inputHeight,
+                                                  output, dstStride, outputWidth, outputHeight,
+                                                  components, option);
     }
-
-    HWY_EXPORT(scaleImageU8HWY);
 
     void scaleImageU8(const uint8_t *input,
                       int srcStride,
@@ -961,9 +957,8 @@ namespace coder {
                       int components,
                       int depth,
                       XSampler option) {
-        HWY_DYNAMIC_DISPATCH(scaleImageU8HWY)(input, srcStride, inputWidth, inputHeight, output,
-                                              dstStride, outputWidth, outputHeight, components,
-                                              depth, option);
+        aire::HWY_NAMESPACE::scaleImageU8HWY(input, srcStride, inputWidth, inputHeight, output,
+                                             dstStride, outputWidth, outputHeight, components,
+                                             depth, option);
     }
 }
-#endif

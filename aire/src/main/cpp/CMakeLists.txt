@@ -13,18 +13,20 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         conversion/CopyUnaligned.cpp conversion/F32ToRGB1010102.cpp conversion/Rgb565.cpp conversion/Rgb1010102.cpp
         conversion/Rgb1010102toF16.cpp conversion/Rgba2Rgb.cpp conversion/Rgba8ToF16.cpp conversion/Rgba16bitCopy.cpp
         conversion/Rgba1010102toF32.cpp conversion/RgbaF16bitNBitU8.cpp conversion/RGBAlpha.cpp conversion/HalfFloats.cpp
-        jni/AcquireBitmapPixels.cpp shift/Glitch.cpp halftone/Halftone.cpp
-        scale/XScaler.cpp jni/blur/BlurPipes.cpp jni/shift/ShiftPipelines.cpp jni/base/Base.cpp
-        jni/pipelines/Pipelines.cpp algo/median/QuickSelect.cpp algo/median/Wirth.cpp base/Arithmetics.cpp
-        base/Erosion.cpp shift/WindStagger.cpp blur/AnisotropicDiffusion.cpp
+        jni/AcquireBitmapPixels.cpp shift/Glitch.cpp halftone/Halftone.cpp color/ConvolveToneMapper.cpp
+        scale/XScaler.cpp jni/BlurPipes.cpp jni/ShiftPipelines.cpp jni/Base.cpp
+        jni/Pipelines.cpp algo/median/QuickSelect.cpp algo/median/Wirth.cpp base/Arithmetics.cpp
+        base/Erosion.cpp shift/WindStagger.cpp blur/AnisotropicDiffusion.cpp effect/MarbleEffect.cpp
+        jni/EffectsPipelines.cpp effect/OilEffect.cpp effect/CrystallizeEffect.cpp blur/PoissonBlur.cpp
         base/Grayscale.cpp base/Dilation.cpp base/Channels.cpp base/Threshold.cpp blur/TentBlur.cpp
-        pipelines/RemoveShadows.cpp)
+        pipelines/RemoveShadows.cpp blur/FastBilateral.cpp color/Gamut.cpp base/Convolve1D.cpp
+        effect/FractalGlassEffect.cpp effect/WaterEffect.cpp jni/ScalePipelines.cpp jni/ToneMappingPipelines.cpp)
 
 add_library(libhwy STATIC IMPORTED)
 
 set_target_properties(${CMAKE_PROJECT_NAME} libhwy PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libhwy.a)
 
-add_definitions(-DHWY_COMPILE_ONLY_STATIC)
+add_definitions(-DHWY_COMPILE_ONLY_STATIC -DJC_VORONOI_IMPLEMENTATION)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -37,7 +39,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DHWY_COMPILE_ONLY_STATIC)
 endif ()
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/algo ${CMAKE_SOURCE_DIR}/conversion)
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/algo ${CMAKE_SOURCE_DIR}/conversion
+        ${CMAKE_SOURCE_DIR}/eigen ${CMAKE_SOURCE_DIR}/eigen/Core)
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
         android

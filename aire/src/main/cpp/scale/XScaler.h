@@ -44,7 +44,7 @@ enum XSampler {
     bicubic = 10
 };
 
-namespace coder {
+namespace aire {
     void scaleImageFloat16(const uint16_t *input,
                            int srcStride,
                            int inputWidth, int inputHeight,
