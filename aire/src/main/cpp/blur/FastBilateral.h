@@ -40,7 +40,7 @@
 
 #pragma once
 
-#include <Dense>
+#include "Eigen/Dense"
 #include <memory>
 #include <vector>
 
