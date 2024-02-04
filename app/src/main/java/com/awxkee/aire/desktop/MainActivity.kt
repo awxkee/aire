@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
 
                     scope.launch(Dispatchers.IO) {
-                        val bitmap =
+      /*                  val bitmap =
                             BitmapFactory.decodeResource(resources, R.drawable.default_test)
                                 .scaleWith(0.2f)
                         scope.launch {
@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
                         scope.launch {
                             imagesArray.add(dilate)
                         }
-
+*/
                         var radius = 1
 //                        repeat(15) {
 //                            val time = measureTimeMillis {
