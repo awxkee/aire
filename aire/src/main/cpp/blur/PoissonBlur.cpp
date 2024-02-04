@@ -10,7 +10,7 @@
 namespace aire {
     void poissonBlur(uint8_t *data, int stride, int width, int height, int radius) {
         auto kernel = generatePoissonBlur(radius);
-        convolve1D(data, stride, width, height, kernel);
+        convolve1D(data, stride, width, height, kernel, kernel);
     }
 
     std::vector<float> generatePoissonBlur(int radius) {

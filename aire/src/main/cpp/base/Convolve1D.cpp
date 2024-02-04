@@ -114,8 +114,7 @@ namespace aire {
         }
     }
 
-    void
-    convolve1D(uint8_t *data, int stride, int width, int height, const std::vector<float>& kernel) {
+    void convolve1D(uint8_t *data, int stride, int width, int height, const std::vector<float>& horizontal, const std::vector<float> &vertical) {
 
         std::vector<uint8_t> transient(stride * height);
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
@@ -131,10 +130,10 @@ namespace aire {
                 end = height;
             }
             workers.emplace_back(
-                    [start, end, width, height, stride, data, &transient, &kernel]() {
+                    [start, end, width, height, stride, data, &transient, &horizontal]() {
                         for (int y = start; y < end; ++y) {
                             convolve1DHorizontalPass(transient, data, stride, y, width, height,
-                                                     kernel);
+                                                     horizontal);
                         }
                     });
         }
@@ -152,10 +151,10 @@ namespace aire {
                 end = height;
             }
             workers.emplace_back(
-                    [start, end, width, height, stride, data, &transient, &kernel]() {
+                    [start, end, width, height, stride, data, &transient, &vertical]() {
                         for (int y = start; y < end; ++y) {
                             convolve1DVerticalPass(transient, data, stride, y, width, height,
-                                                   kernel);
+                                                   vertical);
                         }
                     });
         }

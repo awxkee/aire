@@ -19,7 +19,7 @@ namespace aire {
 
     void boxBlurU8(uint8_t *data, int stride, int width, int height, int radius) {
         const auto kernel = generateBoxKernel(radius);
-        convolve1D(data, stride, width, height, kernel);
+        convolve1D(data, stride, width, height, kernel, kernel);
     }
 
     std::vector<float> generateBoxKernel(int radius) {

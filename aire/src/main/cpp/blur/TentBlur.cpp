@@ -14,6 +14,8 @@
 #include "hwy/foreach_target.h"
 #include "hwy/highway.h"
 #include "algo/support-inl.h"
+#include "Eigen/Eigen"
+#include "base/Convolve1D.h"
 
 using namespace std;
 
@@ -209,8 +211,12 @@ namespace aire {
     HWY_EXPORT(tentBlurHWY);
 
     void tentBlur(uint8_t *data, int stride, int width, int height, int radius) {
-        HWY_DYNAMIC_DISPATCH(tentBlurHWY)(data, stride, width, height, radius,
-                                          float(1.f / (pow(2.0f, 8.0f) - 1)));
+//        HWY_DYNAMIC_DISPATCH(tentBlurHWY)(data, stride, width, height, radius,
+//                                          float(1.f / (pow(2.0f, 8.0f) - 1)));
+
+        auto gen1DKernel = generate1DTentFilterKernelNormalized(2 * radius + 1);
+
+        convolve1D(data, stride, width, height, gen1DKernel, gen1DKernel);
     }
 }
 

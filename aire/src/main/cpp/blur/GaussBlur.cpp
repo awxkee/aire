@@ -16,7 +16,7 @@ namespace aire {
 
     void gaussBlurU8(uint8_t *data, int stride, int width, int height, float radius, float sigma) {
         vector<float> kernel = compute1DGaussianKernel(radius * 2 + 1, sigma);
-        convolve1D(data, stride, width, height, kernel);
+        convolve1D(data, stride, width, height, kernel, kernel);
     }
 
 }
