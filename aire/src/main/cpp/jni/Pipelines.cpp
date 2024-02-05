@@ -2,6 +2,7 @@
 #include "JNIUtils.h"
 #include "AcquireBitmapPixels.h"
 #include "pipelines/RemoveShadows.h"
+#include "pipelines/MobileDehaze.h"
 
 //
 // Created by Radzivon Bartoshyk on 02/02/2024.
@@ -32,6 +33,41 @@ Java_com_awxkee_aire_pipeline_ProcessingPipelinesImpl_removeShadowsPipelines(JNI
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::removeShadows(input.data(), stride,
                                                                             width, height, kernelSize);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_ProcessingPipelinesImpl_dehazeImpl(JNIEnv *env, jobject thiz, jobject bitmap) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::dehaze(input.data(), stride,
+                                                                     width, height);
                                                     }
                                                     return {
                                                             .data = input,

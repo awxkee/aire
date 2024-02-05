@@ -66,7 +66,7 @@ namespace aire {
 
             R = Clamp(MulAdd(Sub(ones, vAlpha), R, Mul(newR, vAlpha)), zeros, ones);
             G = Clamp(MulAdd(Sub(ones, vAlpha), G, Mul(newG, vAlpha)), zeros, ones);
-            B = Clamp(MulAdd(Sub(ones, vAlpha), G, Mul(newG, vAlpha)), zeros, ones);
+            B = Clamp(MulAdd(Sub(ones, vAlpha), B, Mul(newB, vAlpha)), zeros, ones);
         }
 
         HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) override {

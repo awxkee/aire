@@ -43,21 +43,21 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-//                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                                .scaleWith(0.1f)
-//                        scope.launch {
-//                            imagesArray.add(bitmap)
-//                        }
-//
-////                        repeat(12) {
-//                        val time = measureTimeMillis {
-//                            val glitch =
-//                                Aire.monochrome(bitmap, color = floatArrayOf(0.7f, 0f, 0f, 1f))
-//                            scope.launch {
-//                                imagesArray.add(glitch)
-//                            }
-//                        }
+                        val bitmap =
+                            BitmapFactory.decodeResource(resources, R.drawable.haze)
+                                .scaleWith(0.1f)
+                        scope.launch {
+                            imagesArray.add(bitmap)
+                        }
+
+//                        repeat(12) {
+                        val time = measureTimeMillis {
+                            val glitch =
+                                Aire.monochrome(bitmap, color = floatArrayOf(0f, 0f, 0.7f, 1f))
+                            scope.launch {
+                                imagesArray.add(glitch)
+                            }
+                        }
 //
 //                            Log.d(
 //                                "AireMedian",
