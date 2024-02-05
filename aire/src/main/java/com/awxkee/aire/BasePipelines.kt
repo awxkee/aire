@@ -17,5 +17,5 @@ interface BasePipelines {
 
     fun threshold(bitmap: Bitmap, @IntRange(from = 0, to = 255) level: Int): Bitmap
 
-    fun vibrace(bitmap: Bitmap, vibrance: Float): Bitmap
+    fun vibrance(bitmap: Bitmap, vibrance: Float): Bitmap
 }

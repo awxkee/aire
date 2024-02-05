@@ -11,7 +11,10 @@
 #include "tone/HejlBurgessToneMapper.hpp"
 #include "tone/HableFilmicToneMapper.hpp"
 #include "tone/AcesFilmicToneMapper.hpp"
+#include "tone/MonochromeToneMapper.hpp"
 #include "algo/support-inl.h"
+#include "Eigen/Eigen"
+#include "color/Blend.h"
 
 namespace aire {
 
@@ -54,9 +57,9 @@ namespace aire {
 
                 toneMapper->Execute(rf4, gf4, bf4);
 
-                rf4 = aire::HWY_NAMESPACE::LinearSRGBTosRGB(dfx4,rf4);
-                gf4 = aire::HWY_NAMESPACE::LinearSRGBTosRGB(dfx4,gf4);
-                bf4 = aire::HWY_NAMESPACE::LinearSRGBTosRGB(dfx4,bf4);
+                rf4 = aire::HWY_NAMESPACE::LinearSRGBTosRGB(dfx4, rf4);
+                gf4 = aire::HWY_NAMESPACE::LinearSRGBTosRGB(dfx4, gf4);
+                bf4 = aire::HWY_NAMESPACE::LinearSRGBTosRGB(dfx4, bf4);
 
                 rf4 = Clamp(Mul(rf4, vScale), zeros, vScale);
                 gf4 = Clamp(Mul(gf4, vScale), zeros, vScale);
@@ -119,5 +122,53 @@ namespace aire {
     void acesHill(uint8_t *data, int stride, int width, int height, float exposure) {
         AcesFilmicToneMapper<FixedTag<float32_t, 4>> toneMapper(exposure);
         convolveToneMapper(data, stride, width, height, &toneMapper);
+    }
+
+    void monochrome(uint8_t *data, int stride, int width, int height, float colors[4], float exposure) {
+        const float rPrimary = 0.299f;
+        const float gPrimary = 0.587f;
+        const float bPrimary = 0.114f;
+
+        const float coeffs[3] = {rPrimary, gPrimary, bPrimary};
+        MonochromeToneMapper<FixedTag<float32_t, 4>> toneMapper(colors, coeffs, exposure);
+        convolveToneMapper(data, stride, width, height, &toneMapper);
+    }
+
+    void whiteBalance(uint8_t *data, int stride, int width, int height, const float temperature, const float tnt) {
+        Eigen::Matrix3f RGBtoYIG;
+        RGBtoYIG << 0.299, 0.587, 0.114, 0.596, -0.274, -0.322, 0.212, -0.523, 0.311;
+        Eigen::Matrix3f YIQtoRGB = RGBtoYIG.inverse();
+        const Eigen::Vector3f filter = {0.93, 0.54, 0.0};
+        const float tmpr = temperature;
+        const float tint = tnt / 100.f;
+        const Eigen::Vector3f temp = {tmpr, tmpr, tmpr};
+        for (int y = 0; y < height; ++y) {
+            auto pixels = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
+            int x = 0;
+
+            for (; x < width; ++x) {
+                Eigen::Vector3f rgb;
+                rgb << pixels[0], pixels[1], pixels[2];
+                rgb /= 255.f;
+                Eigen::Vector3f yiq = RGBtoYIG * rgb;
+                yiq.z() = clamp(yiq.z() + tint * 0.5226 * 0.1, -0.5226, 0.5226);
+                rgb = YIQtoRGB * yiq;
+
+                Eigen::Vector3f processed;
+                processed[0] = (rgb[0] < 0.5 ? (2.0 * rgb[0] * filter[0]) : (1.0 - 2.0 * (1.0 - rgb[0]) * (1.0 - filter[0])));
+                processed[1] = (rgb[1] < 0.5 ? (2.0 * rgb[1] * filter[1]) : (1.0 - 2.0 * (1.0 - rgb[1]) * (1.0 - filter[1])));
+                processed[2] = (rgb[2] < 0.5 ? (2.0 * rgb[2] * filter[2]) : (1.0 - 2.0 * (1.0 - rgb[2]) * (1.0 - filter[2])));
+
+                Eigen::Vector3f rs = mix(rgb, processed, tmpr);
+                rs *= 255.f;
+                rs = rs.array().max(0.f).min(255.f);
+
+                pixels[0] = rs.x();
+                pixels[1] = rs.y();
+                pixels[2] = rs.z();
+
+                pixels += 4;
+            }
+        }
     }
 }

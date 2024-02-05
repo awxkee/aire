@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.graphics.ColorUtils
 import com.awxkee.aire.Aire
 import com.awxkee.aire.BitmapScaleMode
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
@@ -43,19 +44,20 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.img_6639)
-//                                .scaleWith(0.35f)
+//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                                .scaleWith(0.1f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
-
-//                        repeat(12) {
-//                            val time = measureTimeMillis {
-//                                val glitch = Aire.exposure(bitmap, 2f)
-//                                scope.launch {
-//                                    imagesArray.add(glitch)
-//                                }
+//
+////                        repeat(12) {
+//                        val time = measureTimeMillis {
+//                            val glitch =
+//                                Aire.whiteBalance(bitmap, temperature = 0.5f, tint = 0f)
+//                            scope.launch {
+//                                imagesArray.add(glitch)
 //                            }
+//                        }
 //
 //                            Log.d(
 //                                "AireMedian",

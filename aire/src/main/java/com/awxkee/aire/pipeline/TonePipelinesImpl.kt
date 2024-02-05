@@ -28,6 +28,18 @@ class TonePipelinesImpl : TonePipelines {
         return acesHillImpl(bitmap, exposure)
     }
 
+    override fun monochrome(bitmap: Bitmap, color: FloatArray, exposure: Float): Bitmap {
+        return monochromeImpl(bitmap, color, exposure)
+    }
+
+    override fun whiteBalance(bitmap: Bitmap, temperature: Float, tint: Float): Bitmap {
+        return whiteBalanceImpl(bitmap, temperature, tint)
+    }
+
+    private external fun whiteBalanceImpl(bitmap: Bitmap, temperature: Float, tint: Float): Bitmap
+
+    private external fun monochromeImpl(bitmap: Bitmap, color: FloatArray, exposure: Float): Bitmap
+
     private external fun acesHillImpl(bitmap: Bitmap, exposure: Float): Bitmap
 
     private external fun hableFilmicImpl(bitmap: Bitmap, exposure: Float): Bitmap

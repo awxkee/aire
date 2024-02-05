@@ -36,6 +36,7 @@ namespace aire {
         int streamSize = float(height) / float(streamsCount);
 
         std::default_random_engine generator;
+        generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
         std::uniform_int_distribution<> wind(width * 0.0001f, clamp(staggerWidth, 0, width - 1));
         int lastY = 0;
         int passedY = 0;

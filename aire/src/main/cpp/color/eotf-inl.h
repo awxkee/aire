@@ -75,7 +75,7 @@ namespace aire::HWY_NAMESPACE {
     using hwy::HWY_NAMESPACE::Vec;
     using hwy::HWY_NAMESPACE::TFromD;
 
-    template<class DF, class V, HWY_IF_FLOAT(TFromD < DF >)>
+    template<class DF, class V, HWY_IF_FLOAT(TFromD<DF>)>
 
     HWY_API V
     HLGEotf(const DF df, V v) {
@@ -90,14 +90,13 @@ namespace aire::HWY_NAMESPACE {
         const VF32 inversed12 = ApproximateReciprocal(Set(df, static_cast<T>(12.0f)));
         const auto cmp = v < mm;
         auto branch1 = Mul(Mul(v, v), inversed3);
-        auto branch2 = Mul(aire::HWY_NAMESPACE::Exp2f(df, Add(Div(Sub(v, c), a), b)),
+        auto branch2 = Mul(aire::HWY_NAMESPACE::sleef::Exp(df, Add(Div(Sub(v, c), a), b)),
                            inversed12);
         return IfThenElse(cmp, branch1, branch2);
     }
 
-    template<class D, class V, HWY_IF_FLOAT(TFromD < D >)>
-
-    HWY_API V ToLinearPQ(const D df, V v, const TFromD <D> sdrReferencePoint) {
+    template<class D, class V, HWY_IF_FLOAT(TFromD<D>)>
+    HWY_API V ToLinearPQ(const D df, V v, const TFromD<D> sdrReferencePoint) {
         const V zeros = Zero(df);
         v = Max(zeros, v);
         using T = hwy::HWY_NAMESPACE::TFromD<D>;
@@ -116,8 +115,7 @@ namespace aire::HWY_NAMESPACE {
         return v;
     }
 
-    template<class D, typename V = Vec <D>, HWY_IF_FLOAT(TFromD < D >)>
-
+    template<class D, typename V = Vec<D>, HWY_IF_FLOAT(TFromD<D>)>
     HWY_API V bt2020GammaCorrection(const D d, V color) {
         const V bt2020 = Set(d, betaRec2020);
         const V alpha2020 = Set(d, alphaRec2020);
@@ -133,7 +131,7 @@ namespace aire::HWY_NAMESPACE {
         return IfThenElse(cmp, branch1, branch2);
     }
 
-    template<class D, typename V = Vec <D>, HWY_IF_FLOAT(TFromD < D >)>
+    template<class D, typename V = Vec<D>, HWY_IF_FLOAT(TFromD<D>)>
 
     HWY_API V LinearITUR709ToITUR709(const D df, V value) {
         const auto minCurve = Set(df, static_cast<TFromD<D>>(0.018f));
@@ -163,7 +161,7 @@ namespace aire::HWY_NAMESPACE {
         }
     }
 
-    template<class D, typename V = Vec <D>, HWY_IF_FLOAT(TFromD < D >)>
+    template<class D, typename V = Vec<D>, HWY_IF_FLOAT(TFromD<D>)>
 
     HWY_API V LinearSRGBTosRGB(const D df, V value) {
         const auto minCurve = Set(df, static_cast<TFromD<D>>(0.0031308f));
@@ -185,8 +183,7 @@ namespace aire::HWY_NAMESPACE {
         }
     }
 
-    template<class D, typename V = Vec <D>, HWY_IF_FLOAT(TFromD < D >)>
-
+    template<class D, typename V = Vec<D>, HWY_IF_FLOAT(TFromD<D>)>
     HWY_API V SMPTE428Eotf(const D df, V value) {
         const auto zeros = Zero(df);
         const auto ones = Set(df, static_cast<TFromD<D>>(1.0f));
@@ -232,16 +229,16 @@ namespace aire::HWY_NAMESPACE {
         return IfThenElse(lowMask, lowValue, highValue);
     }
 
-    template<class D, typename T = Vec <D>, HWY_IF_FLOAT(TFromD < D >)>
+    template<class D, typename T = Vec<D>, HWY_IF_FLOAT(TFromD<D>)>
 
     HWY_API T dciP3PQGammaCorrection(const D d, T color) {
         const auto pw = Set(d, 1 / 2.6f);
         return aire::HWY_NAMESPACE::Pow(d, color, pw);
     }
 
-    template<class D, typename T = Vec <D>, HWY_IF_FLOAT(TFromD < D >)>
+    template<class D, typename T = Vec<D>, HWY_IF_FLOAT(TFromD<D>)>
 
-    HWY_API T gammaEotf(const D d, T color, TFromD <D> gamma) {
+    HWY_API T gammaEotf(const D d, T color, TFromD<D> gamma) {
         const auto pw = Set(d, 1 / gamma);
         return aire::HWY_NAMESPACE::Pow(d, color, pw);
     }

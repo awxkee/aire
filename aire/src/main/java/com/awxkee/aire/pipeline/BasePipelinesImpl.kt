@@ -25,7 +25,7 @@ class BasePipelinesImpl : BasePipelines {
         return thresholdPipeline(bitmap, level)
     }
 
-    override fun vibrace(bitmap: Bitmap, vibrance: Float): Bitmap {
+    override fun vibrance(bitmap: Bitmap, vibrance: Float): Bitmap {
         return vibrancePipeline(bitmap, vibrance)
     }
 

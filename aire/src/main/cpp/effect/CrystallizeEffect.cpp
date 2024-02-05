@@ -79,6 +79,7 @@ namespace aire {
         std::vector<jcv_point> jcvPoints(numClusters);
 
         std::default_random_engine generator;
+        generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
         std::uniform_int_distribution<> widthGenerator(1, width - 1);
         std::uniform_int_distribution<> heightGenerator(1, height - 1);
 

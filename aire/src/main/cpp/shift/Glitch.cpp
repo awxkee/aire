@@ -18,6 +18,7 @@ namespace aire {
                       float channelsShiftY, float corruptionSize, int corruptionCount,
                       float cShiftX, float cShiftY) {
         std::default_random_engine generator;
+        generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
         std::uniform_int_distribution<int> distribution(0, width);
 
         std::vector<V> transient(stride * height);

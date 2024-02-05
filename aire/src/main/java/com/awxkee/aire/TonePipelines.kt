@@ -14,4 +14,8 @@ interface TonePipelines {
     fun hableFilmicToneMapping(bitmap: Bitmap, exposure: Float = 1.0f): Bitmap
 
     fun acesHillToneMapping(bitmap: Bitmap, exposure: Float = 1.0f): Bitmap
+
+    fun monochrome(bitmap: Bitmap, color: FloatArray, exposure: Float = 1.0f): Bitmap
+
+    fun whiteBalance(bitmap: Bitmap, temperature: Float = 5000f, tint: Float = 0.0f): Bitmap
 }
