@@ -21,8 +21,9 @@ namespace aire {
             const auto ones = Set(df_, 1.0f);
             const auto twoF = Set(df_, 2.0f);
             const auto halFofOnes = Set(df_, 0.5f);
-            const auto positive = Mul(Mul(twoF, v), Lin);
-            const auto negPart = NegMulAdd(Mul(Sub(ones, Lin), twoF), Sub(ones, Set(df_, clr)), ones);
+            const auto vColor = Set(df_, clr);
+            const auto positive = Mul(Mul(twoF, vColor), Lin);
+            const auto negPart = NegMulAdd(Mul(Sub(ones, Lin), twoF), Sub(ones, vColor), ones);
             const auto decision = Lin < halFofOnes;
             return IfThenElse(decision, positive, negPart);
         }
@@ -38,7 +39,7 @@ namespace aire {
 
         ~MonochromeToneMapper() override = default;
 
-        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) {
+        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) override {
             const V mExposure = Set(df_, exposure);
             const V lumaR = Set(df_, lumaCoefficients[0]);
             const V lumaG = Set(df_, lumaCoefficients[1]);
@@ -63,12 +64,12 @@ namespace aire {
 
             const auto vAlpha = Set(df_, color[3]);
 
-            R = MulAdd(Sub(ones, vAlpha), R, Mul(newR, vAlpha));
-            G = MulAdd(Sub(ones, vAlpha), G, Mul(newG, vAlpha));
-            B = MulAdd(Sub(ones, vAlpha), B, Mul(newB, vAlpha));
+            R = Clamp(MulAdd(Sub(ones, vAlpha), R, Mul(newR, vAlpha)), zeros, ones);
+            G = Clamp(MulAdd(Sub(ones, vAlpha), G, Mul(newG, vAlpha)), zeros, ones);
+            B = Clamp(MulAdd(Sub(ones, vAlpha), G, Mul(newG, vAlpha)), zeros, ones);
         }
 
-        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) {
+        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) override {
             r *= exposure;
             g *= exposure;
             b *= exposure;
@@ -76,12 +77,12 @@ namespace aire {
             const float Lin =
                     r * lumaCoefficients[0] + g * lumaCoefficients[1] + b * lumaCoefficients[2];
 
-            TFromD<D> newR = (Lin < 0.5f) ? (2.f * Lin * r) : (1.f - 2.f * (1.f - Lin) * (1.f - color[0]));
-            TFromD<D> newG = (Lin < 0.5f) ? (2.f * Lin * g) : (1.f - 2.f * (1.f - Lin) * (1.f - color[1]));
-            TFromD<D> newB = (Lin < 0.5f) ? (2.f * Lin * g) : (1.f - 2.f * (1.f - Lin) * (1.f - color[2]));
+            TFromD<D> newR = (Lin < 0.5f) ? (2.f * Lin * color[0]) : (1.f - 2.f * (1.f - Lin) * (1.f - color[0]));
+            TFromD<D> newG = (Lin < 0.5f) ? (2.f * Lin * color[1]) : (1.f - 2.f * (1.f - Lin) * (1.f - color[1]));
+            TFromD<D> newB = (Lin < 0.5f) ? (2.f * Lin * color[2]) : (1.f - 2.f * (1.f - Lin) * (1.f - color[2]));
 
             r = std::clamp(blendColor(r, newR, color[3]), 0.0f, 1.0f);
-            g = std::clamp(blendColor(g, newB, color[3]), 0.0f, 1.0f);
+            g = std::clamp(blendColor(g, newG, color[3]), 0.0f, 1.0f);
             b = std::clamp(blendColor(b, newB, color[3]), 0.0f, 1.0f);
         }
 

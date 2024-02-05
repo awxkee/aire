@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
 ////                        repeat(12) {
 //                        val time = measureTimeMillis {
 //                            val glitch =
-//                                Aire.whiteBalance(bitmap, temperature = 0.5f, tint = 0f)
+//                                Aire.monochrome(bitmap, color = floatArrayOf(0.7f, 0f, 0f, 1f))
 //                            scope.launch {
 //                                imagesArray.add(glitch)
 //                            }

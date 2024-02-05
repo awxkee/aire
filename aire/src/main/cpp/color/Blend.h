@@ -25,6 +25,12 @@ static Eigen::Vector3f mix(const Eigen::Vector3f& x, const Eigen::Vector3f& y, f
     return x * (1.0f - a) + y * a;
 }
 
+inline __attribute__((flatten))
+static float mix(const float x, const float y, float a) {
+    a = std::max(0.0f, std::min(1.0f, a));
+    return x * (1.0f - a) + y * a;
+}
+
 static uint8_t blendColor(const uint8_t fg, const uint8_t bg, const uint8_t a) {
     return (fg * a + bg * (255 - a) + 127) / 255;
 }

@@ -26,7 +26,7 @@ namespace aire {
 
         ~LogarithmicToneMapper() override = default;
 
-        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) {
+        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) override {
             const V mExposure = Set(df_, exposure);
             const V lumaR = Set(df_, lumaCoefficients[0]);
             const V lumaG = Set(df_, lumaCoefficients[1]);
@@ -55,7 +55,7 @@ namespace aire {
             B = Mul(B, scales);
         }
 
-        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) {
+        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) override {
             r *= exposure;
             g *= exposure;
             b *= exposure;

@@ -21,14 +21,14 @@ namespace aire {
 
         ~ExposureToneMapper() override = default;
 
-        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) {
+        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) override {
             const V mExposure = Set(df_, exposure);
             R = Mul(R, mExposure);
             G = Mul(G, mExposure);
             B = Mul(B, mExposure);
         }
 
-        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) {
+        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) override {
             r = r * exposure;
             g = g * exposure;
             b = b * exposure;

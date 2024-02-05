@@ -21,14 +21,14 @@ namespace aire {
 
         ~AcesFilmicToneMapper() override = default;
 
-        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) {
+        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) override {
             const V mExposure = Set(df_, exposure);
             R = ACESFilm(Mul(R, mExposure));
             G = ACESFilm(Mul(G, mExposure));
             B = ACESFilm(Mul(B, mExposure));
         }
 
-        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) {
+        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) override {
             r = ACESFilm(r * exposure);
             g = ACESFilm(g * exposure);
             b = ACESFilm(b * exposure);

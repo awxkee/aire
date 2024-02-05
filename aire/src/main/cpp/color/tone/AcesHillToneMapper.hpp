@@ -77,14 +77,14 @@ namespace aire {
 
     private:
 
-        HWY_FAST_MATH_INLINE V AcesCurve(const V Cin) {
+        HWY_FAST_MATH_INLINE V AcesCurve(const V Cin) override {
             const V a = MulSub(Cin, Add(Cin, Set(df_, 0.0245786f)), Set(df_, 0.000090537f));
             const V b = MulAdd(Cin, MulAdd(Set(df_, 0.983729f), Cin, Set(df_, 0.4329510f)), Set(df_, 0.238081f));
             const V Cout = Div(a, b);
             return Cout;
         }
 
-        HWY_FAST_MATH_INLINE TFromD<D> AcesCurve(const TFromD<D> Cin) {
+        HWY_FAST_MATH_INLINE TFromD<D> AcesCurve(const TFromD<D> Cin) override {
             const TFromD<D> a = Cin * (Cin + 0.0245786f) - 0.000090537f;
             const TFromD<D> b = Cin * (0.983729f * Cin + 0.4329510f) + 0.238081f;
             const TFromD<D> Cout = a / b;

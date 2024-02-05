@@ -46,13 +46,13 @@ namespace aire {
 
         ~HejlBurgessToneMapper() override = default;
 
-        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) {
+        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) override {
             R = hejlBurgess(R);
             G = hejlBurgess(G);
             B = hejlBurgess(B);
         }
 
-        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) {
+        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) override {
             r = hejlBurgess(r);
             g = hejlBurgess(g);
             b = hejlBurgess(b);

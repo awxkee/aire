@@ -37,14 +37,14 @@ namespace aire {
 
         ~HableFilmicToneMapper() override = default;
 
-        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) {
+        HWY_FAST_MATH_INLINE void Execute(V &R, V &G, V &B) override {
             const auto vExpo = Set(df_, exposure);
             R = hable(Mul(R, vExpo));
             G = hable(Mul(G, vExpo));
             B = hable(Mul(B, vExpo));
         }
 
-        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) {
+        HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) override {
             r = hable(r*exposure);
             g = hable(g*exposure);
             b = hable(b*exposure);
