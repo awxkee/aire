@@ -21,7 +21,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         base/Grayscale.cpp base/Dilation.cpp base/Channels.cpp base/Threshold.cpp blur/TentBlur.cpp
         pipelines/RemoveShadows.cpp blur/FastBilateral.cpp color/Gamut.cpp base/Convolve1D.cpp
         effect/FractalGlassEffect.cpp effect/WaterEffect.cpp jni/ScalePipelines.cpp jni/ToneMappingPipelines.cpp
-        effect/PerlinDistortion.cpp)
+        effect/PerlinDistortion.cpp base/Vibrance.cpp)
 
 add_library(libhwy STATIC IMPORTED)
 

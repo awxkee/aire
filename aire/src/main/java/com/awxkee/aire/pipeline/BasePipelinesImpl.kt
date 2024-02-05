@@ -25,11 +25,17 @@ class BasePipelinesImpl : BasePipelines {
         return thresholdPipeline(bitmap, level)
     }
 
+    override fun vibrace(bitmap: Bitmap, vibrance: Float): Bitmap {
+        return vibrancePipeline(bitmap, vibrance)
+    }
+
     private external fun grayscalePipeline(
         bitmap: Bitmap, rPrimary: Float,
         gPrimary: Float,
         bPrimary: Float
     ): Bitmap
+
+    private external fun vibrancePipeline(bitmap: Bitmap, vibrance: Float): Bitmap
 
     private external fun erodePipeline(bitmap: Bitmap, kernelSize: Int): Bitmap
 

@@ -29,8 +29,6 @@ namespace aire {
         for (int y = 0; y < height; ++y) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(output.data()) +
                                                    y * stride);
-            auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) +
-                                                   y * stride);
             for (int x = 0; x < width; ++x) {
                 int px = x * 4;
 
@@ -43,9 +41,14 @@ namespace aire {
                 int sourceY = clamp(static_cast<int>(floor(y + cosTable[displacement])), 0,
                                     height - 1);
 
-                dst[px] = clamp((src[px] + 127 * noise) / 1.25f, 0.f, 255.f);
-                dst[px + 1] = clamp((src[px + 1] + 127 * noise) / 1.25f, 0.f, 255.f);
-                dst[px + 2] = clamp((src[px + 2] + 127 * noise) / 1.25f, 0.f, 255.f);
+                auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) +
+                                                       sourceY * stride);
+
+                int sc = sourceX * 4;
+
+                dst[px] = clamp((src[sc] + 127 * noise) / 1.25f, 0.f, 255.f);
+                dst[px + 1] = clamp((src[sc + 1] + 127 * noise) / 1.25f, 0.f, 255.f);
+                dst[px + 2] = clamp((src[sc + 2] + 127 * noise) / 1.25f, 0.f, 255.f);
                 dst[px + 3] = src[px + 3];
             }
         }

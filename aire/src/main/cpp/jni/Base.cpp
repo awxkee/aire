@@ -6,6 +6,7 @@
 #include "base/Dilation.h"
 #include "base/Threshold.h"
 #include "base/Erosion.h"
+#include "base/Vibrance.h"
 #include "MathUtils.hpp"
 
 //
@@ -212,4 +213,40 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_erodePipeline(JNIEnv *env, jobje
         return nullptr;
     }
 
+}
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_vibrancePipeline(JNIEnv *env, jobject thiz, jobject bitmap, jfloat vibrance) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [vibrance](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::vibrance(input.data(),
+                                                                       stride,
+                                                                       width,
+                                                                       height,
+                                                                       vibrance);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
 }

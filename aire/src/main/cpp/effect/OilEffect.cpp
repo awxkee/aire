@@ -49,10 +49,6 @@ namespace aire {
                         uint8_t g = src[posX + 1];
                         uint8_t b = src[posX + 2];
                         int intensity = clamp((r + g + b) / 3 * levels, 0, 255);
-                        if (intensityIteration >= intensities.size()) {
-                            std::string msg("Invalid intensities count");
-                            throw AireError(msg);
-                        }
                         rStore[intensityIteration] = r;
                         gStore[intensityIteration] = g;
                         bStore[intensityIteration] = b;

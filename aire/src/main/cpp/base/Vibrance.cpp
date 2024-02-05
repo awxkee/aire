@@ -1,0 +1,31 @@
+//
+// Created by Radzivon Bartoshyk on 05/02/2024.
+//
+
+#include "Vibrance.h"
+#include <algorithm>
+#include "fast_math-inl.h"
+
+namespace aire {
+    void vibrance(uint8_t *pixels, int stride, int width, int height, float vibrance) {
+        for (int y = 0; y < height; ++y) {
+            auto data = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(pixels) + y * stride);
+            int x = 0;
+
+            for (; x < width; ++x) {
+                int red = data[0];
+                int green = data[1];
+                int blue = data[2];
+
+                int avgIntensity = (red + green + blue) / 3;
+                int mx = std::max({red, green, blue});
+                int vibranceBoost = std::clamp((mx - avgIntensity) * vibrance / 100, -255.f, 255.f);
+
+                data[0] = std::clamp(red + vibranceBoost, 0, 255);
+                data[1] = std::clamp(green + vibranceBoost, 0, 255);
+                data[2] = std::clamp(blue + vibranceBoost, 0, 255);
+                data += 4;
+            }
+        }
+    }
+}

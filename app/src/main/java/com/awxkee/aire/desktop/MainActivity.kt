@@ -43,27 +43,23 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.default_test)
-//                                .scaleWith(0.2f)
+//                            BitmapFactory.decodeResource(resources, R.drawable.img_6639)
+//                                .scaleWith(0.3f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
-//                        val bmp = Aire.perlinDistortion(bitmap, intensity = 0f)
-//                        scope.launch {
-//                            imagesArray.add(bmp)
-//                        }
-
-                        var radius = 1
-//                        repeat(15) {
+//
+//                        var radius = 30
+//                        repeat(6) {
 //                            val time = measureTimeMillis {
-//                                val glitch = Aire.poissonBlur(bitmap, radius.toInt())
+//                                val glitch = Aire.vibrace(bitmap, 90f)
 //                                scope.launch {
 //                                    imagesArray.add(glitch)
 //                                }
 //                            }
 //
-//                            Log.d("AireMedian", "Gauss execution time for radius ${radius}, ${time}ms")
-//                            radius += 3
+//                            Log.d("AireMedian", "Poisson execution time for radius ${radius}, ${time}ms")
+//                            radius += 6
 //                        }
 //                        }
 //                        Log.d("AireMedian", "exec time $time")

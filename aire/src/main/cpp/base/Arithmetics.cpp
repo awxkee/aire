@@ -89,11 +89,6 @@ namespace aire {
         const FixedTag<uint32_t, 1> du32x1;
         const FixedTag<uint32_t, 4> du32x4;
 
-        std::stringstream ss;
-        ss << "Hexadecimal representation using std::stringstream: 0x" << std::hex << value << std::endl;
-        std::string str = ss.str();
-        LOGE("%s", str.c_str());
-
         const auto low = Set(du32x1, value);
         const auto high = Set(du32x4, value);
         for (int y = 0; y < height; ++y) {

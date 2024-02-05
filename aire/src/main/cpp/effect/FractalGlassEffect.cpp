@@ -33,9 +33,6 @@ namespace aire {
                     reinterpret_cast<uint8_t *>(displacement.data()) +
                     y * width);
             for (int x = 0; x < width; ++x) {
-//                float dx = 20.f * sin(2 * M_PI * y / height * 8.f);
-//                float dy = intensity * cos(2 * M_PI * x / width);
-
                 float displ = displacementSource[x] / 255.f * (width * amplitude);
 
                 int newX = clamp(static_cast<int>((displ + x)) % width, 0, width - 1);

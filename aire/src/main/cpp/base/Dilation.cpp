@@ -96,7 +96,7 @@ namespace aire {
 
                                 auto srcLocal = reinterpret_cast<T *>(
                                         reinterpret_cast<uint8_t *>(pixels) +
-                                        y * height);
+                                        y * width);
 
                                 T max = srcLocal[x];
 

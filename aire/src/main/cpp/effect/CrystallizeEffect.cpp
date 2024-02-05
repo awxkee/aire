@@ -32,7 +32,6 @@ namespace aire {
         float xIncrement = static_cast<float>(dx) / static_cast<float>(steps);
         float yIncrement = static_cast<float>(dy) / static_cast<float>(steps);
 
-        // Set initial coordinates
         float x = static_cast<float>(x1);
         float y = static_cast<float>(y1);
 
@@ -41,7 +40,6 @@ namespace aire {
         uint8_t g1 = color >> 8 & 0xff;
         uint8_t b1 = color & 0xff;
 
-        // Draw the line
         for (int i = 0; i <= steps; ++i) {
             if (x >= 0 && x < width && y >= 0 && y < height) {
                 uint8_t *src = reinterpret_cast<uint8_t *>((reinterpret_cast<uint8_t *>(bitmap) +
@@ -66,7 +64,6 @@ namespace aire {
             x += xIncrement;
             y += yIncrement;
         }
-
     }
 
     void crystallize(uint8_t *data, int stride, int width, int height, int numClusters,
