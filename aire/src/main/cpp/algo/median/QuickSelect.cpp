@@ -53,5 +53,3 @@ V QuickSelect(V arr[], int n) {
 template uint32_t QuickSelect(uint32_t arr[], int n);
 template uint8_t QuickSelect(uint8_t arr[], int n);
 template int QuickSelect(int arr[], int n);
-
-#undef ELEM_SWAP

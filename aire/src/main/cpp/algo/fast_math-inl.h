@@ -16,6 +16,7 @@
 
 #include "common.h"
 #include "rational_polynomial-inl.h"
+#include "sleef-hwy.h"
 
 #define HWY_FAST_MATH_INLINE inline __attribute__((flatten))
 
@@ -121,7 +122,7 @@ namespace aire::HWY_NAMESPACE {
 
     template<class DF, class V>
     HWY_FAST_MATH_INLINE V Pow(const DF df, V val, V n) {
-        return Exp2f(df, Mul(n, Lognf(df, val)));
+        return hwy::HWY_NAMESPACE::sleef::Exp(df, Mul(n, hwy::HWY_NAMESPACE::sleef::LogFast(df, val)));
     }
 
 // Computes base-2 logarithm like std::log2. Undefined if negative / NaN.

@@ -44,22 +44,24 @@ class MainActivity : ComponentActivity() {
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.img_6639)
-//                                .scaleWith(0.3f)
+//                                .scaleWith(0.35f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
-//
-//                        var radius = 30
-//                        repeat(6) {
+
+//                        repeat(12) {
 //                            val time = measureTimeMillis {
-//                                val glitch = Aire.vibrace(bitmap, 90f)
+//                                val glitch = Aire.exposure(bitmap, 2f)
 //                                scope.launch {
 //                                    imagesArray.add(glitch)
 //                                }
 //                            }
 //
-//                            Log.d("AireMedian", "Poisson execution time for radius ${radius}, ${time}ms")
-//                            radius += 6
+//                            Log.d(
+//                                "AireMedian",
+//                                "Rescale done in, ${time}ms"
+//                            )
+////                            radius += 3
 //                        }
 //                        }
 //                        Log.d("AireMedian", "exec time $time")

@@ -69,11 +69,14 @@ void stackBlurCanvasRGB(uint8_t *pixels, int width, int height, int radius) {
     int radiusPlus1 = radius + 1;
     int sumFactor = radiusPlus1 * (radiusPlus1 + 1) / 2;
 
+    std::vector<BlurStack*> allocations;
     BlurStack *stackStart = new BlurStack();
+    allocations.insert(allocations.end(), stackStart);
     BlurStack *stack = stackStart;
     BlurStack *stackEnd = stackStart;
     for (int i = 1; i < div; i++) {
         stack->next = new BlurStack();
+        allocations.insert(allocations.end(), stack->next);
         stack = stack->next;
         if (i == radiusPlus1) stackEnd = stack;
     }
@@ -243,6 +246,9 @@ void stackBlurCanvasRGB(uint8_t *pixels, int width, int height, int radius) {
         }
     }
 
+    for (BlurStack* allocation: allocations) {
+        delete allocation;
+    }
 }
 
 void shgStackBlur(uint8_t *data, int width, int height, int radius) {

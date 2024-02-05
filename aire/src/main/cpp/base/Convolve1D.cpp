@@ -34,6 +34,12 @@ namespace aire {
         const VF zeros = Zero(dfx4);
         const FixedTag<uint8_t, 16> du8x16;
 
+        // Preheat kernel memory to stack
+        VF kernelCache[kernel.size()];
+        for (int j = 0; j < kernel.size(); ++j) {
+            kernelCache[j] = Set(dfx4, kernel[j]);
+        }
+
         for (int x = 0; x < width; ++x) {
             VF store = zeros;
 
@@ -46,21 +52,19 @@ namespace aire {
                 auto pu = LoadU(du8x16, &src[pos]);
                 ConvertToFloatVec16(du8x16, pu, v1, v2, v3, v4);
 
-                float weight = kernel[r + iRadius];
-                VF dWeight = Set(dfx4, weight);
+                VF dWeight = kernelCache[r + iRadius];
                 store = Add(store, Mul(v1, dWeight));
-                dWeight = Set(dfx4, kernel[r + iRadius + 1]);
+                dWeight = kernelCache[r + iRadius + 1];
                 store = Add(store, Mul(v2, dWeight));
-                dWeight = Set(dfx4, kernel[r + iRadius + 2]);
+                dWeight = kernelCache[r + iRadius + 2];
                 store = Add(store, Mul(v3, dWeight));
-                dWeight = Set(dfx4, kernel[r + iRadius + 3]);
+                dWeight = kernelCache[r + iRadius + 3];
                 store = Add(store, Mul(v4, dWeight));
             }
 
             for (; r <= iRadius; ++r) {
                 int pos = clamp((x + r), 0, width - 1) * 4;
-                float weight = kernel[r + iRadius];
-                VF dWeight = Set(dfx4, weight);
+                VF dWeight = kernelCache[r + iRadius];
                 VU pixels = LoadU(du8, &src[pos]);
                 store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
             }
@@ -89,6 +93,12 @@ namespace aire {
         const auto max255 = Set(dfx4, 255.0f);
         const VF zeros = Zero(dfx4);
 
+        // Preheat kernel memory to stack
+        VF kernelCache[kernel.size()];
+        for (int j = 0; j < kernel.size(); ++j) {
+            kernelCache[j] = Set(dfx4, kernel[j]);
+        }
+
         auto dst = reinterpret_cast<uint8_t *>(data + y * stride);
         for (int x = 0; x < width; ++x) {
             VF store = zeros;
@@ -99,8 +109,7 @@ namespace aire {
                 auto src = reinterpret_cast<uint8_t *>(transient.data() +
                                                        clamp((r + y), 0, height - 1) * stride);
                 int pos = clamp(x, 0, width - 1) * 4;
-                float weight = kernel[r + iRadius];
-                VF dWeight = Set(dfx4, weight);
+                VF dWeight = kernelCache[r + iRadius];
                 VU pixels = LoadU(du8, &src[pos]);
                 store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
             }

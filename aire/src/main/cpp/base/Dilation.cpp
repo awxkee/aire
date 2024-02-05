@@ -6,10 +6,16 @@
 #include <vector>
 #include <algorithm>
 #include <thread>
+#include "hwy/highway.h"
+#include "algo/support-inl.h"
 
 using namespace std;
 
 namespace aire {
+
+    using namespace hwy;
+    using namespace std;
+    using namespace hwy::HWY_NAMESPACE;
 
     template<class T>
     void dilateRGBA(T *pixels, T *destination, int stride, int width, int height,
@@ -100,10 +106,13 @@ namespace aire {
 
                                 T max = srcLocal[x];
 
-                                for (int m = -mSize; m < mSize; ++m) {
-                                    std::vector<int> sub = kernel[m + mSize];
+                                for (int n = -mSize; n < mSize; ++n) {
+                                    std::vector<int> sub = kernel[n + mSize];
                                     int nSize = sub.size() / 2;
-                                    for (int n = -nSize; n < nSize; ++n) {
+
+                                    int m = -nSize;
+
+                                    for (; m < nSize; ++m) {
                                         float kernelItem = sub[n + nSize];
                                         int newX = x + m;
                                         int newY = y + n;

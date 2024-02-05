@@ -17,6 +17,7 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
         }
         std::vector<AcquirePixelFormat> formats;
         formats.insert(formats.begin(), APF_RGBA8888);
+        formats.insert(formats.begin(), APF_F16);
         jobject newBitmap = AcquireBitmapPixels(env,
                                                 bitmap,
                                                 formats,
@@ -26,12 +27,12 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-                                                        int lineWidth = width * sizeof(uint8_t) * 4;
+                                                        int lineWidth = dstWidth * sizeof(uint8_t) * 4;
                                                         int alignment = 64;
                                                         int padding = (alignment - (lineWidth % alignment)) % alignment;
-                                                        int dstStride = (int) width * 4 * (int) sizeof(uint8_t) + padding;
+                                                        int dstStride = lineWidth + padding;
 
-                                                        std::vector<uint8_t > output(dstStride * dstHeight);
+                                                        std::vector<uint8_t> output(dstStride * dstHeight);
 
                                                         aire::scaleImageU8(
                                                                 reinterpret_cast<const uint8_t *>(input.data()),
@@ -42,7 +43,32 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                                 dstHeight,
                                                                 4, 8,
                                                                 static_cast<XSampler>(scaleMode)
-                                                                );
+                                                        );
+
+                                                        return {
+                                                                .data = output,
+                                                                .stride = dstStride,
+                                                                .width = dstWidth,
+                                                                .height = dstHeight,
+                                                                .pixelFormat = fmt
+                                                        };
+                                                    } else if (fmt == APF_F16) {
+                                                        int lineWidth = dstWidth * sizeof(uint16_t) * 4;
+                                                        int alignment = 64;
+                                                        int padding = (alignment - (lineWidth % alignment)) % alignment;
+                                                        int dstStride = lineWidth + padding;
+
+                                                        std::vector<uint8_t> output(dstStride * dstHeight);
+
+                                                        aire::scaleImageFloat16(
+                                                                reinterpret_cast<const uint16_t *>(input.data()),
+                                                                stride,
+                                                                width, height,
+                                                                reinterpret_cast<uint16_t *>(output.data()),
+                                                                dstStride, dstWidth,
+                                                                dstHeight, 4,
+                                                                static_cast<XSampler>(scaleMode)
+                                                        );
 
                                                         return {
                                                                 .data = output,

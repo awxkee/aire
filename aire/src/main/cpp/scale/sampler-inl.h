@@ -35,6 +35,7 @@
 
 #include "hwy/highway.h"
 #include "math-inl.h"
+#include "algo/sleef-hwy.h"
 
 using hwy::HWY_NAMESPACE::Set;
 using hwy::HWY_NAMESPACE::FixedTag;
@@ -195,7 +196,7 @@ HWY_MATH_INLINE T sincV(const D d, T x) {
     const T ones = Set(d, 1);
     const T zeros = Zero(d);
     auto maskEqualToZero = x == zeros;
-    T sine = hwy::HWY_NAMESPACE::Sin(d, x);
+    T sine = hwy::HWY_NAMESPACE::sleef::SinFast(d, x);
     x = IfThenElse(maskEqualToZero, ones, x);
     T result = Div(sine, x);
     result = IfThenElse(maskEqualToZero, ones, result);
@@ -231,7 +232,7 @@ HWY_MATH_INLINE T HannWindow(const D df, const T n, const float length) {
     const T lengthV = Set(df, length);
     auto mask = Abs(n) > Set(df, length);
     const T piMulSize = Set(df, M_PI / size);
-    T res = hwy::HWY_NAMESPACE::Cos(df, Mul(piMulSize, n));
+    T res = hwy::HWY_NAMESPACE::sleef::CosFast(df, Mul(piMulSize, n));
     res = Mul(Mul(res, res), ApproximateReciprocal(sizeV));
     res = IfThenZeroElse(mask, res);
     return res;
