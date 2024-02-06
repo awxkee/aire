@@ -106,13 +106,13 @@ namespace aire {
 
                                 T max = srcLocal[x];
 
-                                for (int n = -mSize; n < mSize; ++n) {
+                                for (int n = -mSize; n <= mSize; ++n) {
                                     std::vector<int> sub = kernel[n + mSize];
                                     int nSize = sub.size() / 2;
 
                                     int m = -nSize;
 
-                                    for (; m < nSize; ++m) {
+                                    for (; m <= nSize; ++m) {
                                         float kernelItem = sub[n + nSize];
                                         int newX = x + m;
                                         int newY = y + n;

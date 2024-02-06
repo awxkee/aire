@@ -7,6 +7,8 @@
 #include "base/Threshold.h"
 #include "base/Erosion.h"
 #include "base/Vibrance.h"
+#include "base/Convolve2D3x3.h"
+#include "base/Grain.h"
 #include "color/Adjustments.h"
 #include "MathUtils.hpp"
 
@@ -361,10 +363,86 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_colorMatrixImpl(JNIEnv *env, job
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::colorMatrix(input.data(),
+                                                                          stride,
+                                                                          width,
+                                                                          height,
+                                                                          colorMatrix);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_embossImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat intensity) {
+    Eigen::Matrix3f colorMatrix;
+    colorMatrix << intensity * -2, -intensity, 0, -intensity, 1, intensity, 0, intensity, intensity * 2;
+    std::vector<AcquirePixelFormat> formats;
+    try {
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [colorMatrix](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::Convolve2D3x3 convolve2D(colorMatrix);
+                                                        convolve2D.convolve(input.data(),
+                                                                          stride,
+                                                                          width,
+                                                                          height);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_grainImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat intensity) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [intensity](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::grain(input.data(),
                                                                          stride,
                                                                          width,
                                                                          height,
-                                                                          colorMatrix);
+                                                                         intensity);
                                                     }
                                                     return {
                                                             .data = input,

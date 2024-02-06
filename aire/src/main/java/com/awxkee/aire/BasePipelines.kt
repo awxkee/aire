@@ -25,6 +25,10 @@ interface BasePipelines {
 
     fun brightness(bitmap: Bitmap, bias: Float = 0.0f): Bitmap
 
+    fun emboss(bitmap: Bitmap, intensity: Float): Bitmap
+
+    fun grain(bitmap: Bitmap, intensity: Float = 0.75f): Bitmap
+
     /**
      * @param colorMatrix - Only 3x3 matrix allowed, some matrices are available in `ColorMatrices`
      */

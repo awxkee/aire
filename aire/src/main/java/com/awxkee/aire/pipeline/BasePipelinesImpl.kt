@@ -45,6 +45,18 @@ class BasePipelinesImpl : BasePipelines {
         return brightnessImpl(bitmap, bias)
     }
 
+    override fun emboss(bitmap: Bitmap, intensity: Float): Bitmap {
+        return embossImpl(bitmap, intensity)
+    }
+
+    override fun grain(bitmap: Bitmap, intensity: Float): Bitmap {
+        return grainImpl(bitmap, intensity)
+    }
+
+    private external fun grainImpl(bitmap: Bitmap, intensity: Float): Bitmap
+
+    private external fun embossImpl(bitmap: Bitmap, intensity: Float): Bitmap
+
     private external fun colorMatrixImpl(bitmap: Bitmap, colorMatrix: FloatArray): Bitmap
 
     private external fun contrastImpl(bitmap: Bitmap, gain: Float): Bitmap
