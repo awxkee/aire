@@ -21,7 +21,7 @@ static Eigen::Vector3f blendColor(const Eigen::Vector3f c, const Eigen::Vector3f
 
 inline __attribute__((flatten))
 static Eigen::Vector3f mix(const Eigen::Vector3f& x, const Eigen::Vector3f& y, float a) {
-    a = std::max(0.0f, std::min(1.0f, a));
+//    a = std::max(0.0f, std::min(1.0f, a));
     return x * (1.0f - a) + y * a;
 }
 
