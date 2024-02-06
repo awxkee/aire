@@ -1,6 +1,8 @@
 package com.awxkee.aire
 
 import androidx.annotation.Keep
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Keep
 object ColorMatrices {
@@ -40,6 +42,22 @@ object ColorMatrices {
 
     fun getTint(v: Float): FloatArray {
         return floatArrayOf(1 + v, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f + v)
+    }
+
+    fun hueRotation(radian: Float): FloatArray {
+        val cos = cos(radian)
+        val sin = sin(radian)
+        return floatArrayOf(
+            0.213f + (cos * 0.787f) - (sin * 0.213f),
+            (0.715f) - (cos * 0.715f) - (sin * 0.715f),
+            (0.072f) - (cos * 0.072f) + (sin * 0.928f),
+            (0.213f) - (cos * 0.213f) + (sin * 0.143f),
+            (0.715f) + (cos * 0.285f) + (sin * 0.140f),
+            (0.072f) - (cos * 0.072f) - (sin * 0.283f),
+            (0.213f) - (cos * 0.213f) - (sin * 0.787f),
+            (0.715f) - (cos * 0.715f) + (sin * 0.715f),
+            (0.072f) + (cos * 0.928f) + (sin * 0.072f)
+        )
     }
 
     object Assistance {

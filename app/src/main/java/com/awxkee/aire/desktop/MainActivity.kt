@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
 //                            imagesArray.add(bitmap)
 //                        }
 //
-//                        val glitch = Aire.saturation(bitmap, 2f)
+//                        val glitch = Aire.colorMatrix(bitmap, ColorMatrices.hueRotation((90).toFloat()))
 //                        scope.launch {
 //                            imagesArray.add(glitch)
 //                        }
