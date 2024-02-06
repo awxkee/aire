@@ -53,6 +53,18 @@ class BasePipelinesImpl : BasePipelines {
         return grainImpl(bitmap, intensity)
     }
 
+    override fun sharpness(bitmap: Bitmap, intensity: Float): Bitmap {
+        return sharpnessImpl(bitmap, intensity)
+    }
+
+    override fun unsharp(bitmap: Bitmap, intensity: Float): Bitmap {
+        return unsharpImpl(bitmap, intensity)
+    }
+
+    private external fun unsharpImpl(bitmap: Bitmap, intensity: Float = 1f): Bitmap
+
+    private external fun sharpnessImpl(bitmap: Bitmap, intensity: Float = 1f): Bitmap
+
     private external fun grainImpl(bitmap: Bitmap, intensity: Float): Bitmap
 
     private external fun embossImpl(bitmap: Bitmap, intensity: Float): Bitmap

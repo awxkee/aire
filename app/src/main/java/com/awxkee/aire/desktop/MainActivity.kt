@@ -49,18 +49,18 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-                            .scaleWith(0.8f)
-                        scope.launch {
-                            imagesArray.add(bitmap)
-                        }
-
-                            val time = measureTimeMillis {
-                                val glitch = Aire.grain(bitmap, 0.25f)
-                                scope.launch {
-                                    imagesArray.add(glitch)
-                                }
-                            }
+//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                            .scaleWith(0.3f)
+//                        scope.launch {
+//                            imagesArray.add(bitmap)
+//                        }
+//
+//                            val time = measureTimeMillis {
+//                                val glitch = Aire.unsharp(bitmap, 1f)
+//                                scope.launch {
+//                                    imagesArray.add(glitch)
+//                                }
+//                            }
 //                            Log.d("AireMedian",
 //                            "Tent blur radius ${radius} done in, ${time}ms"
 //                            )

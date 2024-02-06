@@ -9,6 +9,9 @@
 #include "base/Vibrance.h"
 #include "base/Convolve2D3x3.h"
 #include "base/Grain.h"
+#include "base/Sharpness.h"
+#include "base/Convolve2D.h"
+#include "blur/GaussBlur.h"
 #include "color/Adjustments.h"
 #include "MathUtils.hpp"
 
@@ -396,7 +399,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_embossImpl(JNIEnv *env, jobject 
                                                 bitmap,
                                                 formats,
                                                 true,
-                                                [colorMatrix](
+                                                [colorMatrix, intensity](
                                                         std::vector<uint8_t> &input, int stride,
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
@@ -443,6 +446,83 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_grainImpl(JNIEnv *env, jobject t
                                                                          width,
                                                                          height,
                                                                          intensity);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_sharpnessImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat intensity) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [intensity](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        std::vector<uint8_t > sharpen(stride * height);
+                                                        std::copy(input.begin(), input.end(), sharpen.begin());
+                                                        auto kernel = aire::generateSharpenKernel();
+                                                        aire::Convolve2D3x3 convolve2D(kernel);
+                                                        convolve2D.convolve(sharpen.data(),
+                                                                            stride,
+                                                                            width,
+                                                                            height);
+                                                        aire::applySharp(input.data(), sharpen.data(), stride, width, height, intensity);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_unsharpImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat intensity) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [intensity](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        std::vector<uint8_t > sharpen(stride * height);
+                                                        std::copy(input.begin(), input.end(), sharpen.begin());
+                                                        aire::gaussBlurU8(sharpen.data(), stride, width, height, 5, 4.f);
+                                                        aire::applyUnsharp(input.data(), sharpen.data(), stride, width, height, intensity);
                                                     }
                                                     return {
                                                             .data = input,

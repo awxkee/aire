@@ -7,15 +7,15 @@
 #include "Eigen/Eigen"
 
 namespace aire {
-    class Convolve2D3x3 {
+    class Convolve2D {
     public:
-        Convolve2D3x3(Eigen::Matrix3f matrix): matrix(matrix) {
+        Convolve2D(Eigen::MatrixXf matrix): matrix(matrix) {
 
         }
 
         void convolve(uint8_t *data, int stride, int width, int height);
 
     private:
-        const Eigen::Matrix3f matrix;
+        const Eigen::MatrixXf matrix;
     };
 }

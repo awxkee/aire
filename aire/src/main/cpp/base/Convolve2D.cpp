@@ -2,17 +2,16 @@
 // Created by Radzivon Bartoshyk on 06/02/2024.
 //
 
-#include "Convolve2D3x3.h"
+#include "Convolve2D.h"
 #include <vector>
 #include <thread>
 #include <algorithm>
-#include "color/Blend.h"
 
 namespace aire {
 
     using namespace std;
 
-    void Convolve2D3x3::convolve(uint8_t *data, int stride, int width, int height) {
+    void Convolve2D::convolve(uint8_t *data, int stride, int width, int height) {
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     height * width / (256 * 256)), 1, 12);
         vector<thread> workers;
@@ -29,15 +28,15 @@ namespace aire {
             }
             workers.emplace_back(
                     [start, end, width, height, this, &destination, data, stride]() {
-                        const Eigen::Matrix3f mt = this->matrix;
+                        const Eigen::MatrixXf mt = this->matrix;
                         for (int y = start; y < end; ++y) {
                             auto dst = reinterpret_cast<uint8_t *>(
                                     reinterpret_cast<uint8_t *>(destination.data()) + y * stride);
                             for (int x = 0; x < width; ++x) {
 
-                                Eigen::Matrix3f rLocal;
-                                Eigen::Matrix3f gLocal;
-                                Eigen::Matrix3f bLocal;
+                                Eigen::MatrixXf rLocal(this->matrix.rows(), this->matrix.cols());
+                                Eigen::MatrixXf gLocal(this->matrix.rows(), this->matrix.cols());
+                                Eigen::MatrixXf bLocal(this->matrix.rows(), this->matrix.cols());
 
                                 for (int j = -1; j <= 1; ++j) {
                                     auto src = reinterpret_cast<uint8_t *>(
@@ -72,7 +71,6 @@ namespace aire {
                         }
                     });
         }
-
         for (std::thread &thread: workers) {
             thread.join();
         }

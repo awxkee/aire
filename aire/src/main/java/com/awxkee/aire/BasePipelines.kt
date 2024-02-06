@@ -29,6 +29,10 @@ interface BasePipelines {
 
     fun grain(bitmap: Bitmap, intensity: Float = 0.75f): Bitmap
 
+    fun sharpness(bitmap: Bitmap, intensity: Float = 1f): Bitmap
+
+    fun unsharp(bitmap: Bitmap, intensity: Float = 1f): Bitmap
+
     /**
      * @param colorMatrix - Only 3x3 matrix allowed, some matrices are available in `ColorMatrices`
      */
