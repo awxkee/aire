@@ -39,9 +39,7 @@ namespace hwy::HWY_NAMESPACE {
         v2 = ConvertToFloat(du, low);
     }
 
-    template<class D, class VF, HWY_IF_F32_D(DFromV<VF>), HWY_IF_LANES_D(DFromV<VF>,
-                                                                         4), HWY_IF_U8_D(
-            D), HWY_IF_LANES_D(D, 16)>
+    template<class D, class VF, HWY_IF_F32_D(DFromV<VF>), HWY_IF_LANES_D(DFromV<VF>, 4), HWY_IF_U8_D(D), HWY_IF_LANES_D(D, 16)>
     HWY_API void ConvertToFloatVec16(D du, Vec<Rebind<uint8_t, D>> v, VF &v1, VF &v2, VF &v3, VF &v4) {
         const FixedTag<uint16_t, 8> vu16x8;
         const FixedTag<uint16_t, 4> vu16x4;

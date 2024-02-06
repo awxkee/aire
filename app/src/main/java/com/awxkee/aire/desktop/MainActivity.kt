@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.graphics.ColorUtils
 import com.awxkee.aire.Aire
 import com.awxkee.aire.BitmapScaleMode
+import com.awxkee.aire.ColorMatrices
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,27 +44,31 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-//                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.haze)
+//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                            .scaleWith(0.4f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
+//                        val glitch = Aire.brightness(bitmap, 0.3f)
+//                        scope.launch {
+//                            imagesArray.add(glitch)
+//                        }
+
 //                        var radius = 15
 //                        repeat(20) {
 //                            val time = measureTimeMillis {
-//                                val glitch =
-//                                    Aire.tentBlur(bitmap, radius)
+//                                val glitch = Aire.gaussianBlur(bitmap, radius, 7f)
 //                                scope.launch {
 //                                    imagesArray.add(glitch)
 //                                }
 //                            }
-//
-//                            Log.d(
-//                                "AireMedian",
-//                                "Tent blur radius ${radius} done in, ${time}ms"
+//                            Log.d("AireMedian",
+//                            "Tent blur radius ${radius} done in, ${time}ms"
 //                            )
 //                            radius += 3
+//                        }
+//
 //                        }
 //                        }
 //                        Log.d("AireMedian", "exec time $time")

@@ -14,5 +14,5 @@ namespace aire {
     void acesHill(uint8_t *data, int stride, int width, int height, float exposure);
     void monochrome(uint8_t *data, int stride, int width, int height, float colors[4], float exposure);
     void exposure(uint8_t *data, int stride, int width, int height, float exposure);
-    void whiteBalance(uint8_t *data, int stride, int width, int height, const float temperature = 5000, const float tint = 0.f);
+    void whiteBalance(uint8_t *data, int stride, int width, int height, const float temperature = 1.f, const float tint = 0.f);
 }

@@ -36,6 +36,7 @@
 #include "hwy/highway.h"
 #include <algorithm>
 #include "algo/fast_math-inl.h"
+#include "Eigen/Eigen"
 
 using namespace std;
 

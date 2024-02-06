@@ -7,6 +7,7 @@
 #include "base/Threshold.h"
 #include "base/Erosion.h"
 #include "base/Vibrance.h"
+#include "color/Adjustments.h"
 #include "MathUtils.hpp"
 
 //
@@ -234,6 +235,136 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_vibrancePipeline(JNIEnv *env, jo
                                                                        width,
                                                                        height,
                                                                        vibrance);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_contrastImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat gain) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [gain](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::adjustment(input.data(),
+                                                                         stride,
+                                                                         width,
+                                                                         height,
+                                                                         gain,
+                                                                         0.0f);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_brightnessImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat bias) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [bias](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::adjustment(input.data(),
+                                                                         stride,
+                                                                         width,
+                                                                         height,
+                                                                         1.0f,
+                                                                         bias);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_colorMatrixImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloatArray jColorMatrix) {
+    try {
+        jsize length = env->GetArrayLength(jColorMatrix);
+        if (length != 9) {
+            std::string msg = "Colors array must be exactly four elements";
+            throwException(env, msg);
+            return nullptr;
+        }
+
+        Eigen::Matrix3f colorMatrix;
+
+        jfloat *inputElements = env->GetFloatArrayElements(jColorMatrix, 0);
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                colorMatrix(i, j) = inputElements[i * 3 + j];
+            }
+        }
+        env->ReleaseFloatArrayElements(jColorMatrix, inputElements, 0);
+
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [colorMatrix](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::colorMatrix(input.data(),
+                                                                         stride,
+                                                                         width,
+                                                                         height,
+                                                                          colorMatrix);
                                                     }
                                                     return {
                                                             .data = input,

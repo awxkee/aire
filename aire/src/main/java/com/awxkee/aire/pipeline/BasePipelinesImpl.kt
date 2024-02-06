@@ -29,11 +29,35 @@ class BasePipelinesImpl : BasePipelines {
         return vibrancePipeline(bitmap, vibrance)
     }
 
+    override fun saturation(bitmap: Bitmap, saturation: Float): Bitmap {
+        return saturationImpl(bitmap, saturation)
+    }
+
+    override fun contrast(bitmap: Bitmap, gain: Float): Bitmap {
+        return contrastImpl(bitmap, gain)
+    }
+
+    override fun colorMatrix(bitmap: Bitmap, colorMatrix: FloatArray): Bitmap {
+        return colorMatrixImpl(bitmap, colorMatrix)
+    }
+
+    override fun brightness(bitmap: Bitmap, bias: Float): Bitmap {
+        return brightnessImpl(bitmap, bias)
+    }
+
+    private external fun colorMatrixImpl(bitmap: Bitmap, colorMatrix: FloatArray): Bitmap
+
+    private external fun contrastImpl(bitmap: Bitmap, gain: Float): Bitmap
+
+    private external fun brightnessImpl(bitmap: Bitmap, bias: Float): Bitmap
+
     private external fun grayscalePipeline(
         bitmap: Bitmap, rPrimary: Float,
         gPrimary: Float,
         bPrimary: Float
     ): Bitmap
+
+    private external fun saturationImpl(bitmap: Bitmap, saturation: Float): Bitmap
 
     private external fun vibrancePipeline(bitmap: Bitmap, vibrance: Float): Bitmap
 

@@ -16,7 +16,7 @@ namespace aire {
     using namespace hwy::HWY_NAMESPACE;
 
     void
-    getDarkChannel(const uint8_t *pSrc, std::vector<uint8_t> &tmp_vec, const int stride, const int width, const int height, int radius) {
+    getDarkChannel(const uint8_t *pSrc, std::vector<uint8_t> &tmpVec, const int stride, const int width, const int height, int radius) {
         const ScalableTag<uint8_t> du;
         using VU = Vec<decltype(du)>;
 
@@ -26,7 +26,7 @@ namespace aire {
             for (int j = 0; j < width; j++) {
                 uint8_t min_val = 255;
 
-                uint8_t *darkImage = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(tmp_vec.data()) + width * i);
+                uint8_t *darkImage = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(tmpVec.data()) + width * i);
 
                 for (int y = -radius; y <= radius; y++) {
                     const uint8_t *tmp = reinterpret_cast<const uint8_t *>(reinterpret_cast<const uint8_t *>(pSrc) + stride * clamp(y + i, 0, height - 1));
@@ -60,7 +60,7 @@ namespace aire {
         }
     }
 
-    void getTransmission(uint8_t *pSrc, std::vector<uint8_t> &tmp_vec, float m_AtmosLight,
+    void getTransmission(uint8_t *pSrc, std::vector<uint8_t> &tmp_vec, float mAtmosLight,
                          const int stride, const int width, const int height, float omega) {
         for (int y = 0; y < height; y++) {
             uint8_t *dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(pSrc) + stride * y);
@@ -69,12 +69,12 @@ namespace aire {
                 int pos = x * 4;
                 float r = dst[pos + 0], g = dst[pos + 1], b = dst[pos + 2];
                 float minColor = std::min({r, g, b});
-                float t0 = 1.0 - omega * (float(minColor) / float(m_AtmosLight));
-                float t = std::max(1.0f - omega * (float(darkImage[x]) / float(m_AtmosLight)), t0);
+                float t0 = 1.0 - omega * (float(minColor) / float(mAtmosLight));
+                float t = std::max(1.0f - omega * (float(darkImage[x]) / float(mAtmosLight)), t0);
 
-                dst[pos + 0] = std::clamp(static_cast<int>(((r - m_AtmosLight) / t + m_AtmosLight)), int(0), int(255));
-                dst[pos + 1] = std::clamp(static_cast<int>(((g - m_AtmosLight) / t + m_AtmosLight)), int(0), int(255));
-                dst[pos + 2] = std::clamp(static_cast<int>(((b - m_AtmosLight) / t + m_AtmosLight)), int(0), int(255));
+                dst[pos + 0] = std::clamp(static_cast<int>(((r - mAtmosLight) / t + mAtmosLight)), int(0), int(255));
+                dst[pos + 1] = std::clamp(static_cast<int>(((g - mAtmosLight) / t + mAtmosLight)), int(0), int(255));
+                dst[pos + 2] = std::clamp(static_cast<int>(((b - mAtmosLight) / t + mAtmosLight)), int(0), int(255));
             }
         }
     }

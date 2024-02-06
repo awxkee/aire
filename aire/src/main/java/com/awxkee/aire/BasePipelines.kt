@@ -18,4 +18,15 @@ interface BasePipelines {
     fun threshold(bitmap: Bitmap, @IntRange(from = 0, to = 255) level: Int): Bitmap
 
     fun vibrance(bitmap: Bitmap, vibrance: Float): Bitmap
+
+    fun saturation(bitmap: Bitmap, saturation: Float = 1f): Bitmap
+
+    fun contrast(bitmap: Bitmap, gain: Float = 1.0f): Bitmap
+
+    fun brightness(bitmap: Bitmap, bias: Float = 0.0f): Bitmap
+
+    /**
+     * @param colorMatrix - Only 3x3 matrix allowed, some matrices are available in `ColorMatrices`
+     */
+    fun colorMatrix(bitmap: Bitmap, colorMatrix: FloatArray): Bitmap
 }
