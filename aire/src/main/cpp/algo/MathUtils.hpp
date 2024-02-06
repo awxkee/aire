@@ -57,6 +57,11 @@ private:
     double mY1;
 };
 
+template<class T>
+static inline T min3(T a, T b, T c) {
+    return std::min(a, std::min(b, c));
+}
+
 static inline int min3(int a, int b, int c) {
     return std::min(a, std::min(b, c));
 }

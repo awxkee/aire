@@ -45,25 +45,25 @@ class MainActivity : ComponentActivity() {
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.haze)
-//                                .scaleWith(0.1f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
-////                        repeat(12) {
-//                        val time = measureTimeMillis {
-//                            val glitch =
-//                                Aire.monochrome(bitmap, color = floatArrayOf(0f, 0f, 0.7f, 1f))
-//                            scope.launch {
-//                                imagesArray.add(glitch)
+//                        var radius = 15
+//                        repeat(20) {
+//                            val time = measureTimeMillis {
+//                                val glitch =
+//                                    Aire.tentBlur(bitmap, radius)
+//                                scope.launch {
+//                                    imagesArray.add(glitch)
+//                                }
 //                            }
-//                        }
 //
 //                            Log.d(
 //                                "AireMedian",
-//                                "Rescale done in, ${time}ms"
+//                                "Tent blur radius ${radius} done in, ${time}ms"
 //                            )
-////                            radius += 3
+//                            radius += 3
 //                        }
 //                        }
 //                        Log.d("AireMedian", "exec time $time")

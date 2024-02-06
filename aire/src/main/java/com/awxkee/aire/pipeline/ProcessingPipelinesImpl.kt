@@ -12,11 +12,11 @@ class ProcessingPipelinesImpl: ProcessingPipelines {
         return removeShadowsPipelines(bitmap, kernelSize)
     }
 
-//    override fun dehaze(bitmap: Bitmap): Bitmap {
-//        return dehazeImpl(bitmap)
-//    }
+    override fun dehaze(bitmap: Bitmap, radius: Int, omega: Float): Bitmap {
+        return dehazeImpl(bitmap, radius, omega)
+    }
 
     private external fun removeShadowsPipelines(bitmap: Bitmap,  kernelSize: Int): Bitmap
 
-    private external fun dehazeImpl(bitmap: Bitmap): Bitmap
+    private external fun dehazeImpl(bitmap: Bitmap, radius: Int, omega: Float): Bitmap
 }

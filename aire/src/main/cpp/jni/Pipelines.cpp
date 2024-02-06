@@ -2,7 +2,7 @@
 #include "JNIUtils.h"
 #include "AcquireBitmapPixels.h"
 #include "pipelines/RemoveShadows.h"
-#include "pipelines/MobileDehaze.h"
+#include "pipelines/DehazeDarkChannel.h"
 
 //
 // Created by Radzivon Bartoshyk on 02/02/2024.
@@ -53,7 +53,8 @@ Java_com_awxkee_aire_pipeline_ProcessingPipelinesImpl_removeShadowsPipelines(JNI
 
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_awxkee_aire_pipeline_ProcessingPipelinesImpl_dehazeImpl(JNIEnv *env, jobject thiz, jobject bitmap) {
+Java_com_awxkee_aire_pipeline_ProcessingPipelinesImpl_dehazeImpl(JNIEnv *env, jobject thiz,
+                                                                 jobject bitmap, jint radius, jfloat omega) {
     try {
         std::vector<AcquirePixelFormat> formats;
         formats.insert(formats.begin(), APF_RGBA8888);
@@ -61,13 +62,13 @@ Java_com_awxkee_aire_pipeline_ProcessingPipelinesImpl_dehazeImpl(JNIEnv *env, jo
                                                 bitmap,
                                                 formats,
                                                 true,
-                                                [](
+                                                [radius, omega](
                                                         std::vector<uint8_t> &input, int stride,
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::dehaze(input.data(), stride,
-                                                                     width, height);
+                                                                     width, height, radius, omega);
                                                     }
                                                     return {
                                                             .data = input,

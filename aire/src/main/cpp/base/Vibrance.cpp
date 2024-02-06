@@ -5,6 +5,7 @@
 #include "Vibrance.h"
 #include <algorithm>
 #include "fast_math-inl.h"
+#include "MathUtils.hpp"
 
 namespace aire {
     void vibrance(uint8_t *pixels, int stride, int width, int height, float vibrance) {
@@ -18,8 +19,8 @@ namespace aire {
                 int blue = data[2];
 
                 int avgIntensity = (red + green + blue) / 3;
-                int mx = std::max({red, green, blue});
-                int vibranceBoost = std::clamp((mx - avgIntensity) * vibrance / 100, -255.f, 255.f);
+                int mx = max3(red, green, blue);
+                int vibranceBoost = std::clamp((float(mx) - avgIntensity) * vibrance, -255.f, 255.f);
 
                 data[0] = std::clamp(red + vibranceBoost, 0, 255);
                 data[1] = std::clamp(green + vibranceBoost, 0, 255);

@@ -22,7 +22,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         pipelines/RemoveShadows.cpp blur/FastBilateral.cpp color/Gamut.cpp base/Convolve1D.cpp
         effect/FractalGlassEffect.cpp effect/WaterEffect.cpp jni/ScalePipelines.cpp jni/ToneMappingPipelines.cpp
         effect/PerlinDistortion.cpp base/Vibrance.cpp algo/sleef-hwy.cpp conversion/yuv/YuvConverter.cpp
-        jni/YuvPipelines.cpp pipelines/MobileDehaze.cpp)
+        jni/YuvPipelines.cpp pipelines/DehazeDarkChannel.cpp)
 
 add_library(libhwy STATIC IMPORTED)
 
