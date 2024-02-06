@@ -70,7 +70,7 @@ namespace aire {
 
                 Eigen::Vector3f letf = {SRGBToLinear(rgb[0]), SRGBToLinear(rgb[1]), SRGBToLinear(rgb[2])};
 
-                float luma = letf.dot(lumaPrimaries);
+                float luma = LinearSRGBTosRGB(letf.dot(lumaPrimaries));
                 Eigen::Vector3f grayscale = {luma, luma, luma};
                 rgb = (mix(grayscale, rgb, saturation) * 255.f).array().max(0.f).min(255.f);
 

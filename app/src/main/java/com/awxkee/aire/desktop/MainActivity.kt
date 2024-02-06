@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
 //                            imagesArray.add(bitmap)
 //                        }
 //
-//                        val glitch = Aire.brightness(bitmap, 0.3f)
+//                        val glitch = Aire.saturation(bitmap, 2f)
 //                        scope.launch {
 //                            imagesArray.add(glitch)
 //                        }
