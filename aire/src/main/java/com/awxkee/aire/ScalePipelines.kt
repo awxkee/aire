@@ -7,6 +7,7 @@ interface ScalePipelines {
         bitmap: Bitmap,
         dstWidth: Int,
         dstHeight: Int,
-        scaleMode: BitmapScaleMode
+        scaleMode: BitmapScaleMode,
+        antialias: Boolean,
     ): Bitmap
 }

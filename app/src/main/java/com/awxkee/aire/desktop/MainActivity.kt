@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
+import android.os.FileUtils
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,13 +24,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.graphics.BitmapCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.scale
 import com.awxkee.aire.Aire
 import com.awxkee.aire.BitmapScaleMode
 import com.awxkee.aire.ColorMatrices
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.util.UUID
 import kotlin.system.measureTimeMillis
 
@@ -44,15 +49,9 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                            .scaleWith(0.4f)
+//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.lin)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
-//                        }
-//
-//                        val glitch = Aire.colorMatrix(bitmap, ColorMatrices.hueRotation((90).toFloat()))
-//                        scope.launch {
-//                            imagesArray.add(glitch)
 //                        }
 
 //                        var radius = 15
@@ -131,6 +130,13 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+
+fun Bitmap.scaleTo(width: Int, height: Int) = Bitmap.createScaledBitmap(
+    this,
+    width.toInt(),
+    height.toInt(),
+    false
+)
 
 fun Bitmap.scaleWith(scale: Float) = Bitmap.createScaledBitmap(
     this,

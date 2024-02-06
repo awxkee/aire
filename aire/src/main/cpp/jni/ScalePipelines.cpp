@@ -2,6 +2,8 @@
 #include "scale/XScaler.h"
 #include "JNIUtils.h"
 #include "AcquireBitmapPixels.h"
+#include "conversion/RGBAlpha.h"
+#include "blur/GaussBlur.h"
 
 //
 // Created by Radzivon Bartoshyk on 04/02/2024.
@@ -9,7 +11,8 @@
 
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject thiz, jobject bitmap, jint dstWidth, jint dstHeight, jint scaleMode) {
+Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject thiz, jobject bitmap, jint dstWidth,
+                                                           jint dstHeight, jint scaleMode, jboolean antialias) {
     try {
         if (dstWidth < 0 || dstHeight < 0) {
             std::string msg("Width and height must be > but received (" + std::to_string(dstWidth) + ", " + std::to_string(dstHeight) + ")");
@@ -22,7 +25,7 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                 bitmap,
                                                 formats,
                                                 true,
-                                                [dstHeight, dstWidth, scaleMode](
+                                                [dstHeight, dstWidth, scaleMode, antialias](
                                                         std::vector<uint8_t> &input, int stride,
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
@@ -33,6 +36,21 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                         int dstStride = lineWidth + padding;
 
                                                         std::vector<uint8_t> output(dstStride * dstHeight);
+
+                                                        float ratio = dstWidth / width;
+                                                        if (antialias) {
+                                                            if (ratio < 0.5f) {
+                                                                if (scaleMode == bilinear || scaleMode == nearest) {
+                                                                    aire::gaussBlurU8(reinterpret_cast<uint8_t *>(input.data()),
+                                                                                      stride,
+                                                                                      width, height, 1, 1.5f);
+                                                                } else {
+                                                                    aire::gaussBlurU8(reinterpret_cast<uint8_t *>(input.data()),
+                                                                                      stride,
+                                                                                      width, height, 2, 1.55f);
+                                                                }
+                                                            }
+                                                        }
 
                                                         aire::scaleImageU8(
                                                                 reinterpret_cast<const uint8_t *>(input.data()),
