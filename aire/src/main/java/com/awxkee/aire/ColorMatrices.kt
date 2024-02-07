@@ -77,25 +77,25 @@ object ColorMatrices {
         0.1f, 0.8f, 0.2f,
         0.1f, 0.2f, 1.1f
     )
-    
+
     val COLORFUL_SWIRL = floatArrayOf(
         0.6f, 0.4f, 0.1f,
         0.1f, 0.7f, 0.4f,
         0.2f, 0.1f, 0.8f
     )
-    
+
     val SOFT_SPRING_LIGHT = floatArrayOf(
         1.1f, 0.1f, 0.1f,
         0.1f, 1.1f, 0.1f,
         0.1f, 0.1f, 1.1f
     )
-    
+
     val AUTUMN_TONES = floatArrayOf(
         0.9f, 0.3f, 0.1f,
         0.2f, 0.8f, 0.2f,
         0.1f, 0.1f, 0.8f
     )
-    
+
     val LAVENDER_DREAM = floatArrayOf(
         0.8f, 0.2f, 0.2f,
         0.1f, 0.7f, 0.3f,
@@ -125,26 +125,25 @@ object ColorMatrices {
         0.2f, 0.7f, 0.1f,
         0.1f, 0.2f, 0.8f
     )
-    
+
     val FANTASY_LANDSCAPE = floatArrayOf(
         0.8f, 0.3f, 0.2f,
         0.1f, 0.8f, 0.2f,
         0.1f, 0.2f, 0.9f
     )
-    
+
     val COLOR_EXPLOSION = floatArrayOf(
         1.0f, 0.5f, 0.2f,
         0.2f, 0.8f, 0.3f,
         0.1f, 0.2f, 1.0f
     )
-    
+
     val ELECTRIC_GRADIENT = floatArrayOf(
         1.0f, 0.1f, 0.1f,
         0.1f, 1.0f, 0.1f,
         0.1f, 0.1f, 1.0f
     )
 
-    
     val CARAMEL_DARKNESS = floatArrayOf(
         0.8f, 0.3f, 0.2f,
         0.1f, 0.7f, 0.1f,
@@ -192,7 +191,7 @@ object ColorMatrices {
         0.5f, 0.2f, 0.5f,
         0.1f, 0.8f, 0.1f
     )
-    
+
     fun getTemperature(v: Float): FloatArray {
         return floatArrayOf(1 + v, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f - v)
     }

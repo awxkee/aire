@@ -4,6 +4,10 @@ import android.graphics.Bitmap
 import com.awxkee.aire.EffectsPipelines
 
 class EffectsPipelineImpl : EffectsPipelines {
+    override fun bokeh(bitmap: Bitmap, radius: Int, angle: Float, sides: Int): Bitmap {
+        return bokehImpl(bitmap, radius, angle, sides)
+    }
+
     override fun marble(
         bitmap: Bitmap,
         intensity: Float,
@@ -44,6 +48,8 @@ class EffectsPipelineImpl : EffectsPipelines {
     override fun crystallize(bitmap: Bitmap, numClusters: Int, strokeColor: Int): Bitmap {
         return crystallizeImpl(bitmap, numClusters, strokeColor)
     }
+
+    private external fun bokehImpl(bitmap: Bitmap, radius: Int, angle: Float, sides: Int): Bitmap
 
     private external fun perlinDistortionImpl(
         bitmap: Bitmap,

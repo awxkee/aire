@@ -11,4 +11,5 @@ namespace aire {
     std::vector<std::vector<float>> generateTentFilterNormalized(int N);
     std::vector<float> generate1DTentFilterKernelNormalized(int size);
     void tentBlur(uint8_t *data, int stride, int width, int height, int radius);
+    void tentBlurF16(uint16_t *data, int stride, int width, int height, int radius);
 }

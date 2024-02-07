@@ -23,11 +23,12 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         effect/FractalGlassEffect.cpp effect/WaterEffect.cpp jni/ScalePipelines.cpp jni/ToneMappingPipelines.cpp
         effect/PerlinDistortion.cpp base/Vibrance.cpp algo/sleef-hwy.cpp conversion/yuv/YuvConverter.cpp
         jni/YuvPipelines.cpp pipelines/DehazeDarkChannel.cpp color/Adjustments.cpp base/Convolve2D3x3.cpp
-        base/Grain.cpp base/Sharpness.cpp base/Convolve2D.cpp base/LUT8.cpp)
+        base/Grain.cpp base/Sharpness.cpp base/Convolve2D.cpp base/LUT8.cpp
+        hwy/aligned_allocator.cc hwy/nanobenchmark.cc hwy/per_target.cc hwy/print.cc hwy/targets.cc
+        hwy/timer.cc
+        base/Convolve1Db16.cpp)
 
 add_library(libhwy STATIC IMPORTED)
-
-set_target_properties(${CMAKE_PROJECT_NAME} libhwy PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libhwy.a)
 
 add_definitions(-DHWY_COMPILE_ONLY_STATIC -DJC_VORONOI_IMPLEMENTATION)
 
@@ -47,6 +48,5 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${C
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
         android
-        libhwy
         log
         -ljnigraphics)

@@ -49,19 +49,30 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                            .scaleWith(0.3f)
+//                        val bitmap =
+//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                                .scaleWith(0.4f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
+//                        val time = measureTimeMillis {
+//                            val glitch = Aire.dilate(bitmap, 9)
+//                            scope.launch {
+//                                imagesArray.add(glitch)
+//                            }
+//                        }
+
+//                        var radius = 5
+//                        repeat(25) {
 //                            val time = measureTimeMillis {
-//                                val glitch = Aire.gamma(bitmap, 1.02f)
+//                                val glitch = Aire.bokeh(bitmap, radius)
 //                                scope.launch {
 //                                    imagesArray.add(glitch)
 //                                }
 //                            }
-////
+//                            Log.d("AireMedian", "Radius ${radius} exec time $time")
+//                            radius += 3
 //                        }
 //                        }
 //                        Log.d("AireMedian", "exec time $time")

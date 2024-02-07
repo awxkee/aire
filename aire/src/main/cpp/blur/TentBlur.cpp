@@ -3,150 +3,12 @@
 //
 
 #include "TentBlur.h"
+#include "base/Convolve1D.h"
+#include "base/Convolve1Db16.h"
 #include <vector>
 #include "jni/JNIUtils.h"
 #include <thread>
 #include <algorithm>
-
-#undef HWY_TARGET_INCLUDE
-#define HWY_TARGET_INCLUDE "blur/TentBlur.cpp"
-
-#include "hwy/foreach_target.h"
-#include "hwy/highway.h"
-#include "algo/support-inl.h"
-#include "Eigen/Eigen"
-#include "base/Convolve1D.h"
-
-using namespace std;
-
-HWY_BEFORE_NAMESPACE();
-namespace aire::HWY_NAMESPACE {
-
-    using namespace hwy;
-    using namespace hwy::HWY_NAMESPACE;
-
-    template<class V>
-    void
-    tentBlurPass(V *data, V *transient, int y, int stride, int width, int height, int radius,
-                 std::vector<std::vector<float>> &kernel, float scale) {
-
-        const FixedTag<uint8_t, 4> du8;
-        const FixedTag<uint8_t, 16> du8x16;
-        const FixedTag<float32_t, 4> df32;
-        using VU = Vec<decltype(du8)>;
-        using VF = Vec<decltype(df32)>;
-
-        auto dst = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(transient) +
-                                         y * stride);
-
-        const VF vScale = Set(df32, scale);
-        const VF revertScale = ApproximateReciprocal(vScale);
-
-        int halfKernel = kernel.size() / 2;
-
-        const VF zeros = Zero(df32);
-
-        for (int x = 0; x < width; ++x) {
-            VF store = zeros;
-
-            for (int j = -halfKernel; j <= halfKernel; ++j) {
-                int py = clamp(y + j, 0, height - 1);
-                int i = -halfKernel;
-
-                for (; i + 4 <= halfKernel && x + i + 4 < width; i += 4) {
-                    int px = clamp(x + i, 0, width - 1);
-                    auto mSrc = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) +
-                                                      py * stride);
-
-                    int srcX = px * 4;
-
-                    VF v1, v2, v3, v4;
-                    auto pu = LoadU(du8x16, &mSrc[srcX]);
-                    ConvertToFloatVec16(du8x16, pu, v1, v2, v3, v4);
-
-                    float weight = kernel[j + halfKernel][i + halfKernel];
-                    store = Add(store, Mul(Mul(v1, vScale),
-                                           Set(df32, weight)));
-
-                    weight = kernel[j + halfKernel][i + halfKernel + 1];
-                    store = Add(store, Mul(Mul(v2, vScale),
-                                           Set(df32, weight)));
-
-                    weight = kernel[j + halfKernel][i + halfKernel + 2];
-                    store = Add(store, Mul(Mul(v3, vScale),
-                                           Set(df32, weight)));
-
-                    weight = kernel[j + halfKernel][i + halfKernel + 3];
-                    store = Add(store, Mul(Mul(v4, vScale),
-                                           Set(df32, weight)));
-                }
-
-                for (; i <= halfKernel; ++i) {
-                    int px = clamp(x + i, 0, width - 1);
-                    auto mSrc = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) +
-                                                      py * stride);
-
-                    int srcX = px * 4;
-
-                    VF vuPixels = ConvertToFloat(df32, LoadU(du8, &mSrc[srcX]));
-
-                    float weight = kernel[j + halfKernel][i + halfKernel];
-                    store = Add(store, Mul(Mul(vuPixels, vScale),
-                                           Set(df32, weight)));
-                }
-            }
-
-            store = Mul(store, revertScale);
-            VU pixels = DemoteToU8(du8, store);
-            StoreU(pixels, du8, dst);
-            dst += 4;
-        }
-    }
-
-    void tentBlurHWY(uint8_t *data, int stride, int width, int height, int radius, float scale) {
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    height * width / (256 * 256)), 1, 12);
-        vector<thread> workers;
-
-        int segmentHeight = height / threadCount;
-        auto kernel = generateTentFilterNormalized(radius);
-
-        std::vector<uint8_t> transient(stride * height);
-
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, width, height, stride, data, radius, &transient, &kernel, scale]() {
-                        for (int y = start; y < end; ++y) {
-                            tentBlurPass(data, transient.data(), y,
-                                         stride, width, height, radius, kernel, scale);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
-        }
-
-        workers.clear();
-
-        std::copy(transient.begin(), transient.end(), data);
-    }
-
-    template
-    void
-    tentBlurPass(uint8_t *data, uint8_t *transient, int y, int stride, int width, int height,
-                 int radius,
-                 std::vector<std::vector<float>> &kernel, float scale);
-}
-
-HWY_AFTER_NAMESPACE();
-
-#if HWY_ONCE
 
 namespace aire {
 
@@ -208,16 +70,14 @@ namespace aire {
         return tentFilter;
     }
 
-    HWY_EXPORT(tentBlurHWY);
-
     void tentBlur(uint8_t *data, int stride, int width, int height, int radius) {
-//        HWY_DYNAMIC_DISPATCH(tentBlurHWY)(data, stride, width, height, radius,
-//                                          float(1.f / (pow(2.0f, 8.0f) - 1)));
-
         auto gen1DKernel = generate1DTentFilterKernelNormalized(2 * radius + 1);
-
         convolve1D(data, stride, width, height, gen1DKernel, gen1DKernel);
     }
-}
 
-#endif
+    void tentBlurF16(uint16_t *data, int stride, int width, int height, int radius) {
+        auto gen1DKernel = generate1DTentFilterKernelNormalized(2 * radius + 1);
+        Convolve1Db16 convolution(gen1DKernel, gen1DKernel);
+        convolution.convolve(data, stride, width, height);
+    }
+}

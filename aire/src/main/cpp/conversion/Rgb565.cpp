@@ -172,7 +172,7 @@ namespace aire::HWY_NAMESPACE {
         const VU16 redBytes = Set(du16, 0b1111100000000000);
         const VU16 greenBytes = Set(du16, 0b11111100000);
         const VU16 blueBytes = Set(du16, 0b11111);
-        const VF16 bgPixel = Set(df16, float16_t(1.0));
+        const VF16 bgPixel = Set(df16, 1.0);
         const VF max8BitColors = ApproximateReciprocal(Set(df, 255));
 
         for (; x + pixels < width; x += pixels) {

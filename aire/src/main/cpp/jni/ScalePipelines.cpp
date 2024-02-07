@@ -37,6 +37,12 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
 
                                                         std::vector<uint8_t> output(dstStride * dstHeight);
 
+                                                        aire::UnpremultiplyRGBA(reinterpret_cast<uint8_t *>(input.data()),
+                                                                                stride,
+                                                                                reinterpret_cast<uint8_t *>(input.data()),
+                                                                                stride,
+                                                                                width, height);
+
                                                         float ratio = dstWidth / width;
                                                         if (antialias) {
                                                             if (ratio < 0.5f) {
@@ -63,6 +69,12 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                                 static_cast<XSampler>(scaleMode)
                                                         );
 
+                                                        aire::PremultiplyRGBA(reinterpret_cast<uint8_t *>(output.data()),
+                                                                              dstStride,
+                                                                              reinterpret_cast<uint8_t *>(output.data()),
+                                                                              dstStride,
+                                                                              dstWidth, dstHeight);
+
                                                         return {
                                                                 .data = output,
                                                                 .stride = dstStride,
@@ -77,6 +89,21 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                         int dstStride = lineWidth + padding;
 
                                                         std::vector<uint8_t> output(dstStride * dstHeight);
+
+                                                        float ratio = dstWidth / width;
+                                                        if (antialias) {
+                                                            if (ratio < 0.5f) {
+                                                                if (scaleMode == bilinear || scaleMode == nearest) {
+                                                                    aire::gaussBlurF16(reinterpret_cast<uint16_t *>(input.data()),
+                                                                                       stride,
+                                                                                       width, height, 1, 1.5f);
+                                                                } else {
+                                                                    aire::gaussBlurF16(reinterpret_cast<uint16_t *>(input.data()),
+                                                                                       stride,
+                                                                                       width, height, 2, 1.55f);
+                                                                }
+                                                            }
+                                                        }
 
                                                         aire::scaleImageFloat16(
                                                                 reinterpret_cast<const uint16_t *>(input.data()),

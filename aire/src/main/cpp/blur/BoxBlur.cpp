@@ -4,7 +4,7 @@
 
 
 #include "algo/support-inl.h"
-
+#include "base/Convolve1Db16.h"
 #include "BoxBlur.h"
 #include <vector>
 #include <algorithm>
@@ -20,6 +20,12 @@ namespace aire {
     void boxBlurU8(uint8_t *data, int stride, int width, int height, int radius) {
         const auto kernel = generateBoxKernel(radius);
         convolve1D(data, stride, width, height, kernel, kernel);
+    }
+
+    void boxBlurF16(uint16_t *data, int stride, int width, int height, int radius) {
+        const auto kernel = generateBoxKernel(radius);
+        Convolve1Db16 convolution(kernel, kernel);
+        convolution.convolve(data, stride, width, height);
     }
 
     std::vector<float> generateBoxKernel(int radius) {

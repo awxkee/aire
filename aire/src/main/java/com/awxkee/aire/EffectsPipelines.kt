@@ -4,6 +4,14 @@ import android.graphics.Bitmap
 import android.graphics.Color
 
 interface EffectsPipelines {
+
+    fun bokeh(
+        bitmap: Bitmap,
+        radius: Int,
+        angle: Float = Math.PI.toFloat() / 4f,
+        sides: Int = 6
+    ): Bitmap
+
     fun marble(
         bitmap: Bitmap,
         intensity: Float = 0.02f,

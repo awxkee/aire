@@ -38,6 +38,44 @@ static std::vector<std::vector<int>> getStructuringKernel(int size) {
     return std::move(kernel);
 }
 
+static std::vector<std::vector<int>> getBokehEffect(int radius, float startAngle, int sides) {
+    std::vector<std::vector<int>> kernel(2 * radius + 1, std::vector<int>(2 * radius + 1, 1));
+    int diameter = (radius * 2) + 1;
+    float startRadians = startAngle;
+    float endRadians = M_PI * 2 + startAngle;
+
+    float previousX = radius + sin(startRadians) * (radius - 0.01);
+    float previousY = radius + cos(startRadians) * (radius - 0.01);
+
+    float angle = ((M_PI * 2.0f) / float(sides));
+
+    for (float radian = startRadians; radian <= endRadians; radian += angle) {
+        float x = radius + sin(radian) * (radius - 0.01);
+        float y = radius + cos(radian) * (radius - 0.01);
+
+        if (previousX != -1) {
+            float deltaX = 1.0 / std::max(std::abs(previousX - x), std::abs(previousY - y));
+
+            for (float t = 0; t <= 1; t += deltaX) {
+                float newX = previousX + t * (x - previousX);
+                float newY = previousY + t * (y - previousY);
+
+                int coordX = round(newX);
+                int coordY = round(newY);
+
+                if (coordX >= 0 && coordX < diameter && coordY >= 0 && coordY < diameter) {
+                    kernel[coordY][coordX] = 0;
+                }
+            }
+        }
+
+        previousX = x;
+        previousY = y;
+    }
+
+    return kernel;
+}
+
 class LowPassFilter {
 public:
     LowPassFilter(double cutoff) {

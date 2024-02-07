@@ -36,6 +36,7 @@ namespace aire {
 
     void adjustment(uint8_t *data, int stride, int width, int height, float gain, float bias) {
         const Eigen::Vector3f fBias = {bias, bias, bias};
+        const Eigen::Vector3f balance = {0.5f, 0.5f, 0.5f};
         for (int y = 0; y < height; ++y) {
             auto pixels = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
@@ -45,7 +46,7 @@ namespace aire {
                 rgb << pixels[0], pixels[1], pixels[2];
                 rgb /= 255.f;
 
-                rgb = gain * rgb + fBias;
+                rgb = gain * (rgb - balance) + balance + fBias;
                 rgb = (rgb * 255.f).array().max(0.f).min(255.f);
 
                 pixels[0] = rgb.x();

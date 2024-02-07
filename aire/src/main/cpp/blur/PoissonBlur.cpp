@@ -4,6 +4,7 @@
 
 #include "PoissonBlur.h"
 #include "base/Convolve1D.h"
+#include "base/Convolve1Db16.h"
 #include <vector>
 #include <random>
 
@@ -11,6 +12,12 @@ namespace aire {
     void poissonBlur(uint8_t *data, int stride, int width, int height, int radius) {
         auto kernel = generatePoissonBlur(radius);
         convolve1D(data, stride, width, height, kernel, kernel);
+    }
+
+    void poissonBlurF16(uint16_t *data, int stride, int width, int height, int radius) {
+        auto kernel = generatePoissonBlur(radius);
+        Convolve1Db16 convolution(kernel, kernel);
+        convolution.convolve(data, stride, width, height);
     }
 
     std::vector<float> generatePoissonBlur(int radius) {
