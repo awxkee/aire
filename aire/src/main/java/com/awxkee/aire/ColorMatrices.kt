@@ -98,6 +98,36 @@ object ColorMatrices {
         0.1f, 0.2f, 0.9f
     )
 
+    val CYBERPUNK = floatArrayOf(
+        0.8f, 0.2f, 0.5f,
+        0.1f, 0.9f, 0.3f,
+        0.1f, 0.3f, 0.9f
+    )
+
+    val DARKNESS = floatArrayOf(
+        0.7f, 0.1f, 0.1f,
+        0.1f, 0.7f, 0.1f,
+        0.1f, 0.1f, 0.7f
+    )
+
+    val LEMONADE_LIGHT = floatArrayOf(
+        1.0f, 0.3f, 0.1f,
+        0.1f, 1.0f, 0.1f,
+        0.2f, 0.2f, 1.0f
+    )
+
+    val SPECTRAL_FIRE = floatArrayOf(
+        0.9f, 0.2f, 0.1f,
+        0.1f, 0.8f, 0.2f,
+        0.1f, 0.2f, 0.9f
+    )
+
+    val RETRO_VINTAGE = floatArrayOf(
+        0.9f, 0.1f, 0.1f,
+        0.1f, 0.8f, 0.1f,
+        0.1f, 0.1f, 0.9f
+    )
+
     fun getTemperature(v: Float): FloatArray {
         return floatArrayOf(1 + v, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f - v)
     }
