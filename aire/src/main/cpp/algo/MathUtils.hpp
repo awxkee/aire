@@ -38,7 +38,6 @@ static std::vector<std::vector<int>> getStructuringKernel(int size) {
     return std::move(kernel);
 }
 
-#include "Eigen/Eigen"
 #include <queue>
 
 static double distance(const Eigen::Vector2f &p1, const Eigen::Vector2f &p2) {
