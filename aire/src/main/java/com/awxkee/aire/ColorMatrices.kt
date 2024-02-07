@@ -36,6 +36,42 @@ object ColorMatrices {
         0.046605557f, -0.0851233f, 0.5241648f
     )
 
+    val PASTEL = floatArrayOf(
+        0.9f, 0.3f, 0.1f,
+        0.2f, 0.7f, 0.2f,
+        0.1f, 0.2f, 0.8f
+    )
+
+    val ORANGE_HAZE = floatArrayOf(
+        0.6f, 0.3f, 0.1f,
+        0.1f, 0.4f, 0.5f,
+        0.1f, 0.1f, 0.7f
+    )
+
+    val PINK_DREAM = floatArrayOf(
+        1.1f, 0.1f, 0.1f,
+        0.1f, 0.8f, 0.1f,
+        0.2f, 0.2f, 1.1f
+    )
+
+    val GOLDEN_HOUR = floatArrayOf(
+        1.2f, 0.5f, 0.1f,
+        0.1f, 0.8f, 0.2f,
+        0.1f, 0.1f, 1.0f
+    )
+
+    val HOT_SUMMER = floatArrayOf(
+        1.2f, 0.2f, 0.1f,
+        0.1f, 1.1f, 0.1f,
+        0.1f, 0.2f, 1.0f
+    )
+
+    val PURPLE_MIST = floatArrayOf(
+        0.7f, 0.3f, 0.8f,
+        0.3f, 0.6f, 0.2f,
+        0.1f, 0.1f, 1.0f
+    )
+
     fun getTemperature(v: Float): FloatArray {
         return floatArrayOf(1 + v, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f - v)
     }
