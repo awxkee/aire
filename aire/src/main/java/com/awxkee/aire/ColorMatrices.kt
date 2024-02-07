@@ -104,12 +104,6 @@ object ColorMatrices {
         0.1f, 0.3f, 0.9f
     )
 
-    val DARKNESS = floatArrayOf(
-        0.7f, 0.1f, 0.1f,
-        0.1f, 0.7f, 0.1f,
-        0.1f, 0.1f, 0.7f
-    )
-
     val LEMONADE_LIGHT = floatArrayOf(
         1.0f, 0.3f, 0.1f,
         0.1f, 1.0f, 0.1f,
@@ -120,12 +114,6 @@ object ColorMatrices {
         0.9f, 0.2f, 0.1f,
         0.1f, 0.8f, 0.2f,
         0.1f, 0.2f, 0.9f
-    )
-
-    val RETRO_VINTAGE = floatArrayOf(
-        0.9f, 0.1f, 0.1f,
-        0.1f, 0.8f, 0.1f,
-        0.1f, 0.1f, 0.9f
     )
 
     val NIGHT_MAGIC = floatArrayOf(
