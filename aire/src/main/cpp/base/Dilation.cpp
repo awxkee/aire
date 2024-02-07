@@ -66,7 +66,7 @@ namespace aire {
                                     int newY = y + j;
                                     auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(pixels) + newY * stride);
                                     if (newY >= 0 && newY < height) {
-                                        for (; i + 16 < nSize && x + i + 16 < width; i += 16) {
+                                        for (; i + nSize + 16 < nSize && x + i + 16 < width; i += 16) {
                                             VU8x16 r, g, b, a;
                                             int newX = (clamp(x + i, 0, width - 1)) * 4;
                                             LoadInterleaved4(du8x16, &src[newX], r, g, b, a);
@@ -101,7 +101,7 @@ namespace aire {
                                                     MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, LowerHalf(a)), vKernel)), 0));
                                         }
 
-                                        for (; i + 4 < nSize && x + i + 4 < width; i += 4) {
+                                        for (; i + nSize + 4 < nSize && x + i + 4 < width; i += 4) {
                                             VU8x4 r, g, b, a;
                                             int newX = (clamp(x + i, 0, width - 1)) * 4;
                                             auto vKernel = LoadU(di32x4, &sub[i + nSize]);
