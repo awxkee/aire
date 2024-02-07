@@ -38,27 +38,63 @@ static std::vector<std::vector<int>> getStructuringKernel(int size) {
     return std::move(kernel);
 }
 
+#include "Eigen/Eigen"
+#include <queue>
+
+static double distance(const Eigen::Vector2f &p1, const Eigen::Vector2f &p2) {
+    return sqrt(pow(p2.x() - p1.x(), 2) + pow(p2.y() - p1.y(), 2));
+}
+
+static void floodFill(std::vector<std::vector<int>>& grid, int startX, int startY, int target, int replacement) {
+    int rows = grid.size();
+    if (rows == 0) return;
+    int cols = grid[0].size();
+    if (cols == 0) return;
+
+    if (startX < 0 || startX >= rows || startY < 0 || startY >= cols)
+        return;
+
+    std::queue<std::pair<int, int>> pointsQueue;
+    pointsQueue.push({startX, startY});
+
+    while (!pointsQueue.empty()) {
+        auto [x, y] = pointsQueue.front();
+        pointsQueue.pop();
+
+        if (x < 0 || x >= rows || y < 0 || y >= cols || grid[x][y] != target)
+            continue;
+
+        grid[x][y] = replacement;
+
+        pointsQueue.push({x + 1, y});
+        pointsQueue.push({x - 1, y});
+        pointsQueue.push({x, y + 1});
+        pointsQueue.push({x, y - 1});
+    }
+}
+
+
 static std::vector<std::vector<int>> getBokehEffect(int radius, float startAngle, int sides) {
     std::vector<std::vector<int>> kernel(2 * radius + 1, std::vector<int>(2 * radius + 1, 1));
     int diameter = (radius * 2) + 1;
     float startRadians = startAngle;
     float endRadians = M_PI * 2 + startAngle;
 
-    float previousX = radius + sin(startRadians) * (radius - 0.01);
-    float previousY = radius + cos(startRadians) * (radius - 0.01);
+    float previousX = -1;
+    float previousY = -1;
 
     float angle = ((M_PI * 2.0f) / float(sides));
 
-    for (float radian = startRadians; radian <= endRadians; radian += angle) {
-        float x = radius + sin(radian) * (radius - 0.01);
-        float y = radius + cos(radian) * (radius - 0.01);
+    for (float radian = startRadians; radian < endRadians + 2; radian += angle) {
+        float x = float(radius) + sin(radian) * (radius - 0.01f);
+        float y = float(radius) + cos(radian) * (radius - 0.01f);
 
         if (previousX != -1) {
             float deltaX = 1.0 / std::max(std::abs(previousX - x), std::abs(previousY - y));
 
-            for (float t = 0; t <= 1; t += deltaX) {
-                float newX = previousX + t * (x - previousX);
-                float newY = previousY + t * (y - previousY);
+            for (float t = 0; t < 1; t += deltaX) {
+                float newX = lerp(previousX, x, t);
+                float newY = lerp(previousY, y, t);
 
                 int coordX = round(newX);
                 int coordY = round(newY);
@@ -73,6 +109,28 @@ static std::vector<std::vector<int>> getBokehEffect(int radius, float startAngle
         previousY = y;
     }
 
+    floodFill(kernel, 0, 0, 1, 0);
+
+//    std::queue<std::pair<int, int>> q;
+//    q.push({0, 0});
+//
+//    while (!q.empty()) {
+//        int row = q.front().first;
+//        int col = q.front().second;
+//        q.pop();
+//
+//        // Check if current cell is within bounds and has oldColor
+//        if (row < 0 || row >= diameter || col < 0 || col >= diameter || kernel[row][col] != 1) continue;
+//
+//        // Fill current cell with newColor
+//        kernel[row][col] = 0;
+//
+//        // Add adjacent cells to the queue
+//        q.push({row - 1, col}); // Up
+//        q.push({row + 1, col}); // Down
+//        q.push({row, col - 1}); // Left
+//        q.push({row, col + 1}); // Right
+//    }
     return kernel;
 }
 

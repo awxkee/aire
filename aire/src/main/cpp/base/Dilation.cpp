@@ -117,22 +117,23 @@ namespace aire {
                                         }
 
                                         for (; i < nSize; ++i) {
-                                            int newX = x + i;
+                                            int newX = clamp(x + i, 0, width - 1);
+                                            const auto kern = sub[i + nSize];
                                             if (newX >= 0 && newX < width) {
                                                 newX *= 4;
-                                                const uint8_t itemR = src[newX] * sub[i + nSize];
+                                                const uint8_t itemR = src[newX] * kern;
                                                 if (itemR > maxR) {
                                                     maxR = itemR;
                                                 }
-                                                const uint8_t itemG = src[newX + 1] * sub[i + nSize];
+                                                const uint8_t itemG = src[newX + 1] * kern;
                                                 if (itemG > maxG) {
                                                     maxG = itemG;
                                                 }
-                                                const uint8_t itemB = src[newX + 2] * sub[i + nSize];
+                                                const uint8_t itemB = src[newX + 2] * kern;
                                                 if (itemB > maxB) {
                                                     maxB = itemB;
                                                 }
-                                                const uint8_t itemA = src[newX + 3] * sub[i + nSize];
+                                                const uint8_t itemA = src[newX + 3] * kern;
                                                 if (itemA > maxA) {
                                                     maxA = itemA;
                                                 }
