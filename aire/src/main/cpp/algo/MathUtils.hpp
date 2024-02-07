@@ -40,10 +40,6 @@ static std::vector<std::vector<int>> getStructuringKernel(int size) {
 
 #include <queue>
 
-static double distance(const Eigen::Vector2f &p1, const Eigen::Vector2f &p2) {
-    return sqrt(pow(p2.x() - p1.x(), 2) + pow(p2.y() - p1.y(), 2));
-}
-
 static void floodFill(std::vector<std::vector<int>>& grid, int startX, int startY, int target, int replacement) {
     int rows = grid.size();
     if (rows == 0) return;
