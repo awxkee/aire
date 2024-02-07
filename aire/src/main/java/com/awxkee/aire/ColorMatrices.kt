@@ -128,6 +128,27 @@ object ColorMatrices {
         0.1f, 0.1f, 0.9f
     )
 
+    val NIGHT_MAGIC = floatArrayOf(
+        0.7f, 0.1f, 0.2f,
+        0.2f, 0.7f, 0.1f,
+        0.1f, 0.2f, 0.8f
+    )
+    val FANTASY_LANDSCAPE = floatArrayOf(
+        0.8f, 0.3f, 0.2f,
+        0.1f, 0.8f, 0.2f,
+        0.1f, 0.2f, 0.9f
+    )
+    val COLOR_EXPLOSION = floatArrayOf(
+        1.0f, 0.5f, 0.2f,
+        0.2f, 0.8f, 0.3f,
+        0.1f, 0.2f, 1.0f
+    )
+    val ELECTRIC_GRADIENT = floatArrayOf(
+        1.0f, 0.1f, 0.1f,
+        0.1f, 1.0f, 0.1f,
+        0.1f, 0.1f, 1.0f
+    )
+
     fun getTemperature(v: Float): FloatArray {
         return floatArrayOf(1 + v, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f - v)
     }
