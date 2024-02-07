@@ -61,6 +61,12 @@ class BasePipelinesImpl : BasePipelines {
         return unsharpImpl(bitmap, intensity)
     }
 
+    override fun gamma(bitmap: Bitmap, gamma: Float): Bitmap {
+        return gammaImpl(bitmap, gamma)
+    }
+
+    private external fun gammaImpl(bitmap: Bitmap, gamma: Float): Bitmap
+
     private external fun unsharpImpl(bitmap: Bitmap, intensity: Float = 1f): Bitmap
 
     private external fun sharpnessImpl(bitmap: Bitmap, intensity: Float = 1f): Bitmap

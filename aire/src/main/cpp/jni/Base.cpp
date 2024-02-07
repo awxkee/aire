@@ -11,6 +11,7 @@
 #include "base/Grain.h"
 #include "base/Sharpness.h"
 #include "base/Convolve2D.h"
+#include "base/LUT8.h"
 #include "blur/GaussBlur.h"
 #include "color/Adjustments.h"
 #include "MathUtils.hpp"
@@ -523,6 +524,45 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_unsharpImpl(JNIEnv *env, jobject
                                                         std::copy(input.begin(), input.end(), sharpen.begin());
                                                         aire::gaussBlurU8(sharpen.data(), stride, width, height, 5, 4.f);
                                                         aire::applyUnsharp(input.data(), sharpen.data(), stride, width, height, intensity);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_gammaImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat gamma) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [gamma](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        const int TABLE_SIZE = 256;
+                                                        uint8_t lookupTable[TABLE_SIZE];
+                                                        for (int i = 0; i < 256; ++i) {
+                                                            lookupTable[i] = std::clamp(std::pow(float(i), gamma), 0.f, 255.f);
+                                                        }
+                                                        const aire::LUT8 lut(lookupTable);
+                                                        lut.apply(input.data(), stride, width, height);
                                                     }
                                                     return {
                                                             .data = input,

@@ -23,7 +23,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         effect/FractalGlassEffect.cpp effect/WaterEffect.cpp jni/ScalePipelines.cpp jni/ToneMappingPipelines.cpp
         effect/PerlinDistortion.cpp base/Vibrance.cpp algo/sleef-hwy.cpp conversion/yuv/YuvConverter.cpp
         jni/YuvPipelines.cpp pipelines/DehazeDarkChannel.cpp color/Adjustments.cpp base/Convolve2D3x3.cpp
-        base/Grain.cpp base/Sharpness.cpp base/Convolve2D.cpp)
+        base/Grain.cpp base/Sharpness.cpp base/Convolve2D.cpp base/LUT8.cpp)
 
 add_library(libhwy STATIC IMPORTED)
 

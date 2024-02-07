@@ -56,17 +56,12 @@ class MainActivity : ComponentActivity() {
 //                        }
 //
 //                            val time = measureTimeMillis {
-//                                val glitch = Aire.unsharp(bitmap, 1f)
+//                                val glitch = Aire.gamma(bitmap, 1.02f)
 //                                scope.launch {
 //                                    imagesArray.add(glitch)
 //                                }
 //                            }
-//                            Log.d("AireMedian",
-//                            "Tent blur radius ${radius} done in, ${time}ms"
-//                            )
-//                            radius += 3
-//                        }
-//
+////
 //                        }
 //                        }
 //                        Log.d("AireMedian", "exec time $time")

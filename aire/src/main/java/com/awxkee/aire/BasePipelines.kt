@@ -33,6 +33,8 @@ interface BasePipelines {
 
     fun unsharp(bitmap: Bitmap, intensity: Float = 1f): Bitmap
 
+    fun gamma(bitmap: Bitmap, gamma: Float = 1f): Bitmap
+
     /**
      * @param colorMatrix - Only 3x3 matrix allowed, some matrices are available in `ColorMatrices`
      */

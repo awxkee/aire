@@ -9,7 +9,6 @@
 
 namespace aire {
     Eigen::Matrix3f generateSharpenKernel();
-    Eigen::MatrixXf generateUnsharpKernel();
     void applySharp(uint8_t *src, uint8_t *sharpenMask, int stride, int width, int height, const float intensity);
     void applyUnsharp(uint8_t *src, uint8_t *sharpenMask, int stride, int width, int height, const float intensity);
 }

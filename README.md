@@ -27,3 +27,4 @@ Aire.gaussianBlur(bitmap, ...)
 - [x] Brightness
 - [x] Sharp
 - [x] Unsharp
+- [x] Gamma
