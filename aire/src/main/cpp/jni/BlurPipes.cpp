@@ -1,8 +1,8 @@
-#include <jni.h>
-
 //
 // Created by Radzivon Bartoshyk on 01/02/2024.
 //
+
+#include <jni.h>
 
 #include "JNIUtils.h"
 #include "AcquireBitmapPixels.h"

@@ -1,3 +1,7 @@
+//
+// Created by Radzivon Bartoshyk on 03/02/2024.
+//
+
 #include <jni.h>
 #include "effect/MarbleEffect.h"
 #include "JNIUtils.h"
@@ -10,10 +14,6 @@
 #include "base/Dilation.h"
 #include "color/ConvolveToneMapper.h"
 #include "MathUtils.hpp"
-
-//
-// Created by Radzivon Bartoshyk on 03/02/2024.
-//
 
 extern "C"
 JNIEXPORT jobject JNICALL

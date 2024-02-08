@@ -14,10 +14,8 @@ namespace aire {
     using namespace aire::HWY_NAMESPACE;
 
     template<class D, HWY_IF_U8_D(D), typename T = TFromD<D>>
-    void
-    grayscaleHWY(D du, T *pixels, T *destination, int stride, int width, int height,
-                 const float rPrimary,
-                 const float gPrimary, const float bPrimary) {
+    void grayscaleHWY(D du, T *pixels, T *destination, int stride, int width, int height,
+                      const float rPrimary, const float gPrimary, const float bPrimary) {
         const FixedTag<uint32_t, 4> du32x4;
         const FixedTag<float32_t, 4> dfx4;
         using VF = Vec<decltype(dfx4)>;

@@ -1,12 +1,13 @@
+//
+// Created by Radzivon Bartoshyk on 04/02/2024.
+//
+
 #include <jni.h>
 #include "color/ConvolveToneMapper.h"
 #include "color/Adjustments.h"
 #include <jni.h>
 #include "AcquireBitmapPixels.h"
 #include "JNIUtils.h"
-//
-// Created by Radzivon Bartoshyk on 04/02/2024.
-//
 
 extern "C"
 JNIEXPORT jobject JNICALL

@@ -40,7 +40,7 @@ static std::vector<std::vector<int>> getStructuringKernel(int size) {
 
 #include <queue>
 
-static void floodFill(std::vector<std::vector<int>>& grid, int startX, int startY, int target, int replacement) {
+static void floodFill(std::vector<std::vector<int>> &grid, int startX, int startY, int target, int replacement) {
     int rows = grid.size();
     if (rows == 0) return;
     int cols = grid[0].size();
@@ -105,28 +105,14 @@ static std::vector<std::vector<int>> getBokehEffect(int radius, float startAngle
     }
 
     floodFill(kernel, 0, 0, 1, 0);
-
-//    std::queue<std::pair<int, int>> q;
-//    q.push({0, 0});
-//
-//    while (!q.empty()) {
-//        int row = q.front().first;
-//        int col = q.front().second;
-//        q.pop();
-//
-//        // Check if current cell is within bounds and has oldColor
-//        if (row < 0 || row >= diameter || col < 0 || col >= diameter || kernel[row][col] != 1) continue;
-//
-//        // Fill current cell with newColor
-//        kernel[row][col] = 0;
-//
-//        // Add adjacent cells to the queue
-//        q.push({row - 1, col}); // Up
-//        q.push({row + 1, col}); // Down
-//        q.push({row, col - 1}); // Left
-//        q.push({row, col + 1}); // Right
-//    }
     return kernel;
+}
+
+static bool isSquareRootInteger(float N) {
+    if (N < 0)
+        return false;
+    float squareRootN = sqrt(N);
+    return std::pow(static_cast<int>(squareRootN), 2) == N;
 }
 
 class LowPassFilter {

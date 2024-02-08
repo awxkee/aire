@@ -13,7 +13,7 @@ interface BasePipelines {
 
     fun erode(bitmap: Bitmap, kernelSize: Int): Bitmap
 
-    fun dilate(bitmap: Bitmap, kernelSize: Int): Bitmap
+    fun dilate(bitmap: Bitmap, kernel: FloatArray): Bitmap
 
     fun threshold(bitmap: Bitmap, @IntRange(from = 0, to = 255) level: Int): Bitmap
 
@@ -34,6 +34,13 @@ interface BasePipelines {
     fun unsharp(bitmap: Bitmap, intensity: Float = 1f): Bitmap
 
     fun gamma(bitmap: Bitmap, gamma: Float = 1f): Bitmap
+
+    fun getStructuringKernel(kernelSize: Int): FloatArray {
+        val kern = FloatArray(kernelSize * kernelSize) {
+            1f
+        }
+        return kern
+    }
 
     /**
      * @param colorMatrix - Only 3x3 matrix allowed, some matrices are available in `ColorMatrices`

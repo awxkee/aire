@@ -1,13 +1,13 @@
+//
+// Created by Radzivon Bartoshyk on 04/02/2024.
+//
+
 #include <jni.h>
 #include "scale/XScaler.h"
 #include "JNIUtils.h"
 #include "AcquireBitmapPixels.h"
 #include "conversion/RGBAlpha.h"
 #include "blur/GaussBlur.h"
-
-//
-// Created by Radzivon Bartoshyk on 04/02/2024.
-//
 
 extern "C"
 JNIEXPORT jobject JNICALL

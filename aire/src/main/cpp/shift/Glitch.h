@@ -2,8 +2,7 @@
 // Created by Radzivon Bartoshyk on 01/02/2024.
 //
 
-#ifndef AIREDESKTOP_GLITCH_H
-#define AIREDESKTOP_GLITCH_H
+#pragma once
 
 #include <cstdint>
 #include <vector>
@@ -14,6 +13,3 @@ namespace aire {
                       float channelsShiftY, float corruptionSize, int corruptionCount,
                       float cShiftX, float cShiftY);
 }
-
-
-#endif //AIREDESKTOP_GLITCH_H

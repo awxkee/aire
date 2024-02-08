@@ -6,6 +6,7 @@
 #include <vector>
 #include <thread>
 #include <algorithm>
+#include "hwy/highway.h"
 
 namespace aire {
 
@@ -30,8 +31,7 @@ namespace aire {
                     [start, end, width, height, this, &destination, data, stride]() {
                         const Eigen::MatrixXf mt = this->matrix;
                         for (int y = start; y < end; ++y) {
-                            auto dst = reinterpret_cast<uint8_t *>(
-                                    reinterpret_cast<uint8_t *>(destination.data()) + y * stride);
+                            auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination.data()) + y * stride);
                             for (int x = 0; x < width; ++x) {
 
                                 Eigen::MatrixXf rLocal(this->matrix.rows(), this->matrix.cols());
@@ -39,10 +39,9 @@ namespace aire {
                                 Eigen::MatrixXf bLocal(this->matrix.rows(), this->matrix.cols());
 
                                 for (int j = -1; j <= 1; ++j) {
-                                    auto src = reinterpret_cast<uint8_t *>(
-                                            reinterpret_cast<uint8_t *>(data) +
-                                            clamp(y + j, 0, height - 1) * stride);
-                                    for (int i = -1; i <= 1; ++i) {
+                                    auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + clamp(y + j, 0, height - 1) * stride);
+                                    int i = -1;
+                                    for (; i <= 1; ++i) {
                                         int px = clamp(x + i, 0, width - 1) * 4;
                                         rLocal(j + 1, i + 1) = src[px];
                                         gLocal(j + 1, i + 1) = src[px + 1];

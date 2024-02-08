@@ -176,41 +176,75 @@ namespace aire {
             workers.emplace_back(
                     [start, end, width, height, pixels, destination, &kernel]() {
                         for (int y = start; y < end; ++y) {
+                            const FixedTag<uint8_t, 16> du8x16;
+                            const FixedTag<uint8_t, 8> du8x8;
+                            const FixedTag<uint8_t, 4> du8x4;
+                            const FixedTag<int16_t, 8> di16x8;
+                            const FixedTag<int16_t, 4> di16x4;
+                            const FixedTag<int32_t, 4> di32x4;
+                            const FixedTag<int8_t, 4> di8x4;
+                            using VU8x16 = Vec<decltype(du8x16)>;
+                            using VU8x4 = Vec<decltype(du8x4)>;
+
                             auto dst = reinterpret_cast<T *>(
                                     reinterpret_cast<uint8_t *>(destination) + y * width);
                             for (int x = 0; x < width; ++x) {
                                 int mSize = kernel.size() / 2;
 
-                                auto srcLocal = reinterpret_cast<T *>(
-                                        reinterpret_cast<uint8_t *>(pixels) +
-                                        y * width);
+                                auto srcLocal = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(pixels) + y * width);
 
-                                T max = srcLocal[x];
-
-                                for (int n = -mSize; n <= mSize; ++n) {
-                                    std::vector<int> sub = kernel[n + mSize];
+                                int px = x;
+                                int maxValue = srcLocal[px];
+                                for (int j = -mSize; j < mSize; ++j) {
+                                    std::vector<int> sub = kernel[j + mSize];
                                     int nSize = sub.size() / 2;
+                                    int i = -nSize;
+                                    int newY = y + j;
+                                    auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(pixels) + newY * width);
+                                    if (newY >= 0 && newY < height) {
+                                        for (; i + nSize + 16 < nSize && x + i + 16 < width; i += 16) {
+                                            VU8x16 r;
+                                            int newX = (clamp(x + i, 0, width - 1));
+                                            r = LoadU(du8x16, &src[newX]);
+                                            auto lowR = PromoteLowerTo(di16x8, r);
 
-                                    int m = -nSize;
+                                            auto vKernelHigh = LoadU(di32x4, &sub[i + nSize]);
+                                            auto vKernelLow = LoadU(di32x4, &sub[i + nSize + 4]);
 
-                                    for (; m <= nSize; ++m) {
-                                        float kernelItem = sub[n + nSize];
-                                        int newX = x + m;
-                                        int newY = y + n;
-                                        if (newX >= 0 && newX < width && newY >= 0 &&
-                                            newY < height) {
-                                            auto src = reinterpret_cast<T *>(
-                                                    reinterpret_cast<uint8_t *>(pixels) +
-                                                    newY * width);
-                                            T vl = src[newX] * kernelItem;
-                                            if (vl > max) {
-                                                max = vl;
+                                            auto vKernel = Combine(di16x8, DemoteTo(di16x4, vKernelHigh), DemoteTo(di16x4, vKernelLow));
+
+                                            maxValue = std::max(int(maxValue), (int) ExtractLane(
+                                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, UpperHalf(du8x8, r)), vKernel)), 0));
+
+                                            vKernelHigh = LoadU(di32x4, &sub[i + nSize + 8]);
+                                            vKernelLow = LoadU(di32x4, &sub[i + nSize + 12]);
+
+                                            vKernel = Combine(di16x8, DemoteTo(di16x4, vKernelHigh), DemoteTo(di16x4, vKernelLow));
+
+                                            maxValue = std::max(int(maxValue), (int) ExtractLane(
+                                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, LowerHalf(r)), vKernel)), 0));
+                                        }
+
+                                        for (; i + nSize + 4 < nSize && x + i + 4 < width; i += 4) {
+                                            int newX = (clamp(x + i, 0, width - 1));
+                                            auto vKernel = LoadU(di32x4, &sub[i + nSize]);
+                                            VU8x4 r = LoadU(du8x4, reinterpret_cast<uint8_t *>(src) + newX);
+                                            maxValue = std::max(int(maxValue), ExtractLane(
+                                                    MaxOfLanes(di32x4, Mul(PromoteTo(di32x4, r), vKernel)), 0));
+                                        }
+
+                                        for (; i < nSize; ++i) {
+                                            int newX = clamp(x + i, 0, width - 1);
+                                            const auto kern = sub[i + nSize];
+                                            if (newX >= 0 && newX < width) {
+                                                const uint8_t itemR = src[newX] * kern;
+                                                maxValue = std::max(itemR, uint8_t (maxValue));
                                             }
                                         }
                                     }
                                 }
 
-                                dst[x] = max;
+                                dst[px] = maxValue;
                             }
                         }
                     });

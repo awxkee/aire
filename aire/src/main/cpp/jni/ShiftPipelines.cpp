@@ -1,13 +1,13 @@
+//
+// Created by Radzivon Bartoshyk on 01/02/2024.
+//
+
 #include "JNIUtils.h"
 #include "AcquireBitmapPixels.h"
 #include "shift/TiltShift.h"
 #include "blur/GaussBlur.h"
 #include "shift/Glitch.h"
 #include "shift/WindStagger.h"
-
-//
-// Created by Radzivon Bartoshyk on 01/02/2024.
-//
 
 extern "C"
 JNIEXPORT jobject JNICALL

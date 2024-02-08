@@ -1,12 +1,12 @@
+//
+// Created by Radzivon Bartoshyk on 02/02/2024.
+//
+
 #include <jni.h>
 #include "JNIUtils.h"
 #include "AcquireBitmapPixels.h"
 #include "pipelines/RemoveShadows.h"
 #include "pipelines/DehazeDarkChannel.h"
-
-//
-// Created by Radzivon Bartoshyk on 02/02/2024.
-//
 
 extern "C"
 JNIEXPORT jobject JNICALL
@@ -15,9 +15,9 @@ Java_com_awxkee_aire_pipeline_ProcessingPipelinesImpl_removeShadowsPipelines(JNI
                                                                              jobject bitmap,
                                                                              jint kernelSize) {
     try {
-        if (kernelSize < 3 || kernelSize > 7) {
+        if (kernelSize < 3 || kernelSize > 9) {
             std::string message =
-                    "Kernel size must be in 3..7 but received " + std::to_string(kernelSize);
+                    "Kernel size must be in 3..9 but received " + std::to_string(kernelSize);
             throw AireError(message);
         }
         std::vector<AcquirePixelFormat> formats;

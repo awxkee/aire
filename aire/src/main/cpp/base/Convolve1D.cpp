@@ -78,10 +78,8 @@ namespace aire {
     }
 
     void
-    convolve1DVerticalPass(std::vector<uint8_t> &transient,
-                           uint8_t *data, int stride,
-                           int y, int width,
-                           int height,
+    convolve1DVerticalPass(std::vector<uint8_t> &transient, uint8_t *data, int stride,
+                           int y, int width, int height,
                            const vector<float> &kernel) {
         const int iRadius = ceil((kernel.size()) / 2);
 
@@ -123,7 +121,7 @@ namespace aire {
         }
     }
 
-    void convolve1D(uint8_t *data, int stride, int width, int height, const std::vector<float>& horizontal, const std::vector<float> &vertical) {
+    void convolve1D(uint8_t *data, int stride, int width, int height, const std::vector<float> &horizontal, const std::vector<float> &vertical) {
 
         std::vector<uint8_t> transient(stride * height);
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),

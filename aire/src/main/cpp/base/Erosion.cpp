@@ -13,7 +13,7 @@ namespace aire {
 
     template<class T>
     void erodeRGBA(T *pixels, T *destination, int stride, int width, int height,
-                    std::vector<std::vector<int>> &kernel) {
+                   std::vector<std::vector<int>> &kernel) {
 
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     height * width / (256 * 256)), 1, 12);
@@ -73,7 +73,7 @@ namespace aire {
 
     template<class T>
     void erode(T *pixels, T *destination, int width, int height,
-                std::vector<std::vector<int>> &kernel) {
+               std::vector<std::vector<int>> &kernel) {
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     height * width / (256 * 256)), 1, 12);
         vector<thread> workers;
@@ -133,9 +133,9 @@ namespace aire {
 
     template void
     erode(uint8_t *pixels, uint8_t *destination, int width, int height,
-           std::vector<std::vector<int>> &kernel);
+          std::vector<std::vector<int>> &kernel);
 
     template
     void erodeRGBA(uint8_t *pixels, uint8_t *destination, int stride, int width, int height,
-                    std::vector<std::vector<int>> &kernel);
+                   std::vector<std::vector<int>> &kernel);
 }

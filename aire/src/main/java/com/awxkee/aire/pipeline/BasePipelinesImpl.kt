@@ -17,8 +17,8 @@ class BasePipelinesImpl : BasePipelines {
         return erodePipeline(bitmap, kernelSize)
     }
 
-    override fun dilate(bitmap: Bitmap, kernelSize: Int): Bitmap {
-        return dilatePipeline(bitmap, kernelSize)
+    override fun dilate(bitmap: Bitmap, kernel: FloatArray): Bitmap {
+        return dilatePipeline(bitmap, kernel)
     }
 
     override fun threshold(bitmap: Bitmap, level: Int): Bitmap {
@@ -93,7 +93,7 @@ class BasePipelinesImpl : BasePipelines {
 
     private external fun erodePipeline(bitmap: Bitmap, kernelSize: Int): Bitmap
 
-    private external fun dilatePipeline(bitmap: Bitmap, kernelSize: Int): Bitmap
+    private external fun dilatePipeline(bitmap: Bitmap, kernel: FloatArray): Bitmap
 
     private external fun thresholdPipeline(bitmap: Bitmap, level: Int): Bitmap
 }

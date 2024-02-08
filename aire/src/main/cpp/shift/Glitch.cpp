@@ -32,8 +32,7 @@ namespace aire {
             if (currentSourceY < 0 || currentSourceY >= height) {
                 continue;
             }
-            auto dst = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(transient.data()) +
-                                             currentSourceY * stride);
+            auto dst = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(transient.data()) + currentSourceY * stride);
             auto src = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             for (int x = 0; x < width; ++x) {
                 int currentSourceX = x + shiftX;
@@ -52,9 +51,7 @@ namespace aire {
         std::uniform_int_distribution<> startY(0, height - 1);
         std::uniform_int_distribution<> length(1, width - 1);
 
-        std::uniform_int_distribution<> randomHeight(1,
-                                                     std::max(int(ceil(height * corruptionSize)),
-                                                              2));
+        std::uniform_int_distribution<> randomHeight(1, std::max(int(ceil(height * corruptionSize)), 2));
 
         int corruptionShiftX = width * cShiftX;
         int corruptionShiftY = height * cShiftY;

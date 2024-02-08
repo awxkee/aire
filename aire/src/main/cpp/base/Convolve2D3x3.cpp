@@ -31,8 +31,7 @@ namespace aire {
                     [start, end, width, height, this, &destination, data, stride]() {
                         const Eigen::Matrix3f mt = this->matrix;
                         for (int y = start; y < end; ++y) {
-                            auto dst = reinterpret_cast<uint8_t *>(
-                                    reinterpret_cast<uint8_t *>(destination.data()) + y * stride);
+                            auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination.data()) + y * stride);
                             for (int x = 0; x < width; ++x) {
 
                                 Eigen::Matrix3f rLocal;
@@ -40,9 +39,7 @@ namespace aire {
                                 Eigen::Matrix3f bLocal;
 
                                 for (int j = -1; j <= 1; ++j) {
-                                    auto src = reinterpret_cast<uint8_t *>(
-                                            reinterpret_cast<uint8_t *>(data) +
-                                            clamp(y + j, 0, height - 1) * stride);
+                                    auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + clamp(y + j, 0, height - 1) * stride);
                                     for (int i = -1; i <= 1; ++i) {
                                         int px = clamp(x + i, 0, width - 1) * 4;
                                         rLocal(j + 1, i + 1) = src[px];

@@ -1,3 +1,7 @@
+//
+// Created by Radzivon Bartoshyk on 02/02/2024.
+//
+
 #include <jni.h>
 #include "JNIUtils.h"
 #include "AcquireBitmapPixels.h"
@@ -15,10 +19,6 @@
 #include "blur/GaussBlur.h"
 #include "color/Adjustments.h"
 #include "MathUtils.hpp"
-
-//
-// Created by Radzivon Bartoshyk on 02/02/2024.
-//
 
 extern "C"
 JNIEXPORT jobject JNICALL
@@ -63,25 +63,37 @@ extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_awxkee_aire_pipeline_BasePipelinesImpl_dilatePipeline(JNIEnv *env, jobject thiz,
                                                                jobject bitmap,
-                                                               jint kernelSize) {
+                                                               jfloatArray kernel) {
     try {
-        if (kernelSize <= 0) {
-            std::string msg("Kernel size must be >= 1");
-            throw AireError(msg);
+        jsize length = env->GetArrayLength(kernel);
+        if (!isSquareRootInteger(length)) {
+            std::string msg = "Matrix must be square";
+            throwException(env, msg);
+            return nullptr;
         }
+
+        int size = std::sqrt(length);
+
+        std::vector<std::vector<int>> matrix(size, std::vector<int>(size));
+        jfloat *inputElements = env->GetFloatArrayElements(kernel, 0);
+        for (int j = 0; j < size; ++j) {
+            for (int i = 0; i < size; ++i) {
+                matrix[j][i] = inputElements[j*size + i];
+            }
+        }
+        env->ReleaseFloatArrayElements(kernel, inputElements, 0);
+
         std::vector<AcquirePixelFormat> formats;
         formats.insert(formats.begin(), APF_RGBA8888);
         jobject newBitmap = AcquireBitmapPixels(env,
                                                 bitmap,
                                                 formats,
                                                 true,
-                                                [kernelSize](
+                                                [&matrix](
                                                         std::vector<uint8_t> &input, int stride,
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-                                                        auto kernel = getStructuringKernel(
-                                                                kernelSize);
 
                                                         std::vector<uint8_t> output(
                                                                 stride * height);
@@ -91,7 +103,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_dilatePipeline(JNIEnv *env, jobj
                                                                          stride,
                                                                          width,
                                                                          height,
-                                                                         kernel);
+                                                                         matrix);
 
                                                         input = output;
                                                     }

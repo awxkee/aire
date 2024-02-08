@@ -12,7 +12,7 @@ namespace aire {
     void grain(uint8_t *data, int stride, int width, int height, float intensity) {
         default_random_engine generator;
         generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
-        normal_distribution<double> distribution(0, 127 * intensity);
+        normal_distribution<float> distribution(0, 127.f * intensity);
 
         for (int y = 0; y < height; ++y) {
             auto dst = reinterpret_cast<uint8_t *>(
