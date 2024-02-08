@@ -50,18 +50,18 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-                        val bitmap =
-                            BitmapFactory.decodeResource(resources, R.drawable.shadows)
-                        scope.launch {
-                            imagesArray.add(bitmap)
-                        }
-
-                        val time = measureTimeMillis {
-                            val glitch = Aire.dilate(bitmap, Aire.getStructuringKernel(7))
-                            scope.launch {
-                                imagesArray.add(glitch)
-                            }
-                        }
+//                        val bitmap =
+//                            BitmapFactory.decodeResource(resources, R.drawable.shadows)
+//                        scope.launch {
+//                            imagesArray.add(bitmap)
+//                        }
+//
+//                        val time = measureTimeMillis {
+//                            val glitch = Aire.dilate(bitmap, Aire.getStructuringKernel(7))
+//                            scope.launch {
+//                                imagesArray.add(glitch)
+//                            }
+//                        }
 
 //                        var radius = 5
 //                        repeat(25) {
