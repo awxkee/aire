@@ -43,8 +43,7 @@ namespace aire {
                     for (int i = -radius; i <= radius; ++i) {
                         int posX = clamp(x + i, 0, width - 1) * 4;
                         int posY = clamp(y + i, 0, height - 1);
-                        auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) +
-                                                               posY * stride);
+                        auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + posY * stride);
                         uint8_t r = src[posX];
                         uint8_t g = src[posX + 1];
                         uint8_t b = src[posX + 2];

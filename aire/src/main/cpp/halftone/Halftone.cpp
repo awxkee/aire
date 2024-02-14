@@ -11,8 +11,7 @@ namespace aire {
                                     int lineSize, int lineSpacing, V lineColor, V alpha) {
         for (int y = 0; y < height; y += lineSize + lineSpacing) {
             for (int j = y; j < lineSize + y && j < height; ++j) {
-                auto dst = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data.data()) +
-                                                 j * stride);
+                auto dst = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data.data()) + j * stride);
                 for (int x = 0; x < width; ++x) {
                     int ps = x * 4;
                     dst[ps] = lineColor;

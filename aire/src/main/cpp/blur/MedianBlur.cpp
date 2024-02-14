@@ -99,7 +99,6 @@ namespace aire {
                                     reinterpret_cast<uint8_t *>(transient.data()) + y);
                             for (int x = 0; x < width; ++x) {
                                 if (selector == MEDIAN_QUICK_SELECT || selector == MEDIAN_WIRTH) {
-
                                     for (int j = -radius; j <= radius; ++j) {
                                         for (int i = -radius; i <= radius; ++i) {
                                             uint8_t *src = reinterpret_cast<uint8_t *>(
@@ -111,14 +110,12 @@ namespace aire {
                                     }
 
                                     if (selector == MEDIAN_QUICK_SELECT) {
-                                        reinterpret_cast<uint8_t *>(dst)[0] = QuickSelect(mStore,
-                                                                                          N);
+                                        reinterpret_cast<uint8_t *>(dst)[0] = QuickSelect(mStore, N);
                                     } else if (selector == MEDIAN_WIRTH) {
-                                        reinterpret_cast<uint8_t *>(dst)[0] = wirthMedian(mStore,
-                                                                                          N);
+                                        reinterpret_cast<uint8_t *>(dst)[0] = wirthMedian(mStore, N);
                                     }
                                 } else {
-                                    std::vector<uint8_t> store(0);
+                                    std::vector<uint8_t> store(N);
 
                                     for (int j = -radius; j <= radius; ++j) {
                                         for (int i = -radius; i <= radius; ++i) {
@@ -126,7 +123,7 @@ namespace aire {
                                                     reinterpret_cast<uint8_t *>(data) +
                                                     clamp(y + j, 0, height - 1) * width);
                                             int pos = clamp((x + i), 0, width - 1);
-                                            store.insert(store.end(), src[pos]);
+                                            store[(i + radius) * length + (j + radius)] = src[pos];
                                         }
                                     }
                                     reinterpret_cast<uint8_t *>(dst)[0] = getMedian(store);

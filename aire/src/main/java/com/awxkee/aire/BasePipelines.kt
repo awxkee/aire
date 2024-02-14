@@ -35,6 +35,23 @@ interface BasePipelines {
 
     fun gamma(bitmap: Bitmap, gamma: Float = 1f): Bitmap
 
+    fun toPNG(
+        bitmap: Bitmap,
+        maxColors: Int,
+        quantize: AireQuantize = AireQuantize.XIAOLING_WU,
+        dithering: AirePaletteDithering = AirePaletteDithering.JARVIS_JUDICE_NINKE,
+        colorMapper: AireColorMapper = AireColorMapper.KD_TREE,
+        @IntRange(from = 0, to = 9) compressionLevel: Int = 7,
+    ): ByteArray
+
+    fun palette(
+        bitmap: Bitmap,
+        maxColors: Int,
+        quantize: AireQuantize = AireQuantize.XIAOLING_WU,
+        dithering: AirePaletteDithering = AirePaletteDithering.JARVIS_JUDICE_NINKE,
+        colorMapper: AireColorMapper = AireColorMapper.KD_TREE,
+    ): Bitmap
+
     fun getStructuringKernel(kernelSize: Int): FloatArray {
         val kern = FloatArray(kernelSize * kernelSize) {
             1f

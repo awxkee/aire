@@ -11,14 +11,21 @@
 #include "base/Threshold.h"
 #include "base/Erosion.h"
 #include "base/Vibrance.h"
-#include "base/Convolve2D3x3.h"
+#include "base/Convolve2D.h"
 #include "base/Grain.h"
 #include "base/Sharpness.h"
 #include "base/Convolve2D.h"
 #include "base/LUT8.h"
+#include "algo/MedianCut.h"
 #include "blur/GaussBlur.h"
 #include "color/Adjustments.h"
+#include "conversion/RGBAlpha.h"
 #include "MathUtils.hpp"
+#include "Eigen/Eigen"
+#include "base/PNGEncoder.h"
+#include "algo/WuQuantizer.h"
+#include "base/RemapPalette.h"
+#include "EigenUtils.h"
 
 extern "C"
 JNIEXPORT jobject JNICALL
@@ -78,7 +85,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_dilatePipeline(JNIEnv *env, jobj
         jfloat *inputElements = env->GetFloatArrayElements(kernel, 0);
         for (int j = 0; j < size; ++j) {
             for (int i = 0; i < size; ++i) {
-                matrix[j][i] = inputElements[j*size + i];
+                matrix[j][i] = inputElements[j * size + i];
             }
         }
         env->ReleaseFloatArrayElements(kernel, inputElements, 0);
@@ -417,11 +424,11 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_embossImpl(JNIEnv *env, jobject 
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-                                                        aire::Convolve2D3x3 convolve2D(colorMatrix);
+                                                        aire::Convolve2D convolve2D(colorMatrix);
                                                         convolve2D.convolve(input.data(),
-                                                                          stride,
-                                                                          width,
-                                                                          height);
+                                                                            stride,
+                                                                            width,
+                                                                            height);
                                                     }
                                                     return {
                                                             .data = input,
@@ -455,10 +462,10 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_grainImpl(JNIEnv *env, jobject t
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::grain(input.data(),
-                                                                         stride,
-                                                                         width,
-                                                                         height,
-                                                                         intensity);
+                                                                    stride,
+                                                                    width,
+                                                                    height,
+                                                                    intensity);
                                                     }
                                                     return {
                                                             .data = input,
@@ -491,10 +498,10 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_sharpnessImpl(JNIEnv *env, jobje
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-                                                        std::vector<uint8_t > sharpen(stride * height);
+                                                        std::vector<uint8_t> sharpen(stride * height);
                                                         std::copy(input.begin(), input.end(), sharpen.begin());
                                                         auto kernel = aire::generateSharpenKernel();
-                                                        aire::Convolve2D3x3 convolve2D(kernel);
+                                                        aire::Convolve2D convolve2D(kernel);
                                                         convolve2D.convolve(sharpen.data(),
                                                                             stride,
                                                                             width,
@@ -532,7 +539,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_unsharpImpl(JNIEnv *env, jobject
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-                                                        std::vector<uint8_t > sharpen(stride * height);
+                                                        std::vector<uint8_t> sharpen(stride * height);
                                                         std::copy(input.begin(), input.end(), sharpen.begin());
                                                         aire::gaussBlurU8(sharpen.data(), stride, width, height, 5, 4.f);
                                                         aire::applyUnsharp(input.data(), sharpen.data(), stride, width, height, intensity);
@@ -585,6 +592,180 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_gammaImpl(JNIEnv *env, jobject t
                                                     };
                                                 });
         return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+enum AireQuantize {
+    AIRE_QUANTIZE_MEDIAN_CUT = 1,
+    AIRE_QUANTIZE_XIAOLING_WU = 2
+};
+
+#include <android/bitmap.h>
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_toPNGImpl(JNIEnv *env,
+                                                          jobject thiz,
+                                                          jobject bitmap,
+                                                          jint maxColors,
+                                                          jint aireQuantize,
+                                                          jint ditheringStrategy,
+                                                          jint mappingStrategy,
+                                                          jint compressionLevel) {
+    try {
+        if (maxColors < 2) {
+            std::string msg("Max colors must be at least 2, but was received " + std::to_string(maxColors));
+            throw AireError(msg);
+        }
+
+        if (compressionLevel < 0 || compressionLevel > 9) {
+            std::string msg("Compression level is expected to in 0...9 but received: " + std::to_string(compressionLevel));
+            throw AireError(msg);
+        }
+        aire::RemapDithering dithering = static_cast<aire::RemapDithering>(ditheringStrategy);
+        AireQuantize quantize = static_cast<AireQuantize>(aireQuantize);
+        aire::RemapMappingStrategy strategy = static_cast<aire::RemapMappingStrategy>(mappingStrategy);
+        std::vector<uint8_t> compressedData;
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        AcquireBitmapPixels(env,
+                            bitmap,
+                            formats,
+                            false,
+                            [&compressedData, maxColors, quantize, dithering, strategy, compressionLevel](
+                                    std::vector<uint8_t> &input, int stride,
+                                    int width, int height,
+                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                if (fmt == APF_RGBA8888) {
+                                    std::vector<Eigen::Vector4i> palette;
+                                    uint32_t colors = maxColors;
+                                    std::vector<uint8_t > original(input.size());
+
+                                    aire::UnpremultiplyRGBA(input.data(), stride, original.data(), stride, width, height);
+
+                                    switch (quantize) {
+                                        case AIRE_QUANTIZE_MEDIAN_CUT: {
+                                            aire::Palette cut(reinterpret_cast<uint32_t *>(original.data()), width * height);
+                                            cut.medianCut(maxColors, [&palette](const aire::Cube &cube) {
+                                                auto clr = cube.getAverageRGBA();
+                                                palette.push_back(unpackRGBA(clr));
+                                            });
+                                        }
+                                            break;
+                                        case AIRE_QUANTIZE_XIAOLING_WU: {
+                                            aire::WuQuantizer wuQuantizer(original.data(), stride, width, height);
+                                            palette = wuQuantizer.quantizeImage(colors, 15, 15);
+                                        }
+                                            break;
+                                    }
+
+                                    aire::RemapPalette remapPalette(palette, original.data(), stride, width, height, dithering, strategy);
+                                    if (maxColors > 255 || dithering != aire::Remap_Dither_Skip) {
+                                        std::vector<uint8_t> remapped = remapPalette.remap();
+                                        aire::PNGEncoder encoder(remapped.data(), stride, width, height);
+                                        encoder.setCompressionLevel(compressionLevel);
+                                        auto output = encoder.getPNGData();
+                                        compressedData.resize(output.size());
+                                        std::copy(output.begin(), output.end(), compressedData.begin());
+                                    } else {
+                                        std::vector<uint8_t> remapped = remapPalette.indexed();
+                                        aire::PNGEncoder encoder(remapped.data(), stride, width, height);
+                                        encoder.setCompressionLevel(compressionLevel);
+                                        auto output = encoder.encode(palette);
+                                        compressedData.resize(output.size());
+                                        std::copy(output.begin(), output.end(), compressedData.begin());
+                                    }
+                                }
+                                return {
+                                        .data = input,
+                                        .stride = stride,
+                                        .width = width,
+                                        .height = height,
+                                        .pixelFormat = fmt
+                                };
+                            });
+
+        jbyteArray byteArray = env->NewByteArray((jsize) compressedData.size());
+        char *memBuf = (char *) ((void *) compressedData.data());
+        env->SetByteArrayRegion(byteArray, 0, (jint) compressedData.size(),
+                                reinterpret_cast<const jbyte *>(memBuf));
+        compressedData.clear();
+        return byteArray;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_paletteImpl(JNIEnv *env, jobject thiz, jobject bitmap,
+                                                            jint maxColors, jint aireQuantize,
+                                                            jint ditheringStrategy,
+                                                            jint mappingStrategy) {
+    try {
+        if (maxColors < 2) {
+            std::string msg("Max colors must be at least 2, but was received " + std::to_string(maxColors));
+            throw AireError(msg);
+        }
+        aire::RemapDithering dithering = static_cast<aire::RemapDithering>(ditheringStrategy);
+        aire::RemapMappingStrategy strategy = static_cast<aire::RemapMappingStrategy>(mappingStrategy);
+        AireQuantize quantize = static_cast<AireQuantize>(aireQuantize);
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        auto bmp = AcquireBitmapPixels(env,
+                                       bitmap,
+                                       formats,
+                                       false,
+                                       [maxColors, quantize, dithering, strategy](
+                                               std::vector<uint8_t> &input, int stride,
+                                               int width, int height,
+                                               AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                           if (fmt == APF_RGBA8888) {
+                                               std::vector<Eigen::Vector4i> palette;
+
+                                               uint32_t colors = maxColors;
+                                               switch (quantize) {
+                                                   case AIRE_QUANTIZE_MEDIAN_CUT: {
+                                                       aire::Palette cut(reinterpret_cast<uint32_t *>(input.data()), width * height);
+                                                       cut.medianCut(maxColors, [&palette](const aire::Cube &cube) {
+                                                           auto clr = cube.getAverageRGBA();
+                                                           palette.push_back(unpackRGBA(clr));
+                                                       });
+                                                   }
+                                                       break;
+                                                   case AIRE_QUANTIZE_XIAOLING_WU: {
+                                                       aire::WuQuantizer wuQuantizer(input.data(), stride, width, height);
+                                                       palette = wuQuantizer.quantizeImage(colors, 15, 15);
+                                                   }
+                                                       break;
+                                               }
+                                               aire::RemapPalette remapPalette(palette, input.data(),
+                                                                               stride, width, height,
+                                                                               dithering, strategy);
+                                               std::vector<uint8_t> remapped = remapPalette.remap();
+                                               return {
+                                                       .data = std::move(remapped),
+                                                       .stride = stride,
+                                                       .width = width,
+                                                       .height = height,
+                                                       .pixelFormat = fmt
+                                               };
+                                           }
+                                           return {
+                                                   .data = input,
+                                                   .stride = stride,
+                                                   .width = width,
+                                                   .height = height,
+                                                   .pixelFormat = fmt
+                                           };
+                                       });
+        return bmp;
     } catch (AireError &err) {
         std::string msg = err.what();
         throwException(env, msg);

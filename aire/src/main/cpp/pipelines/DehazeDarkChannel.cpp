@@ -35,7 +35,7 @@ namespace aire {
                     for (; x + lanes <= radius && x + j + lanes < width; x += lanes) {
                         int pos = clamp(x + j, 0, width - 1) * 4;
                         VU r, g, b, a;
-                        LoadInterleaved4(du, &tmp[pos], r, g,b,a);
+                        LoadInterleaved4(du, &tmp[pos], r, g, b, a);
                         uint8_t possibleR = ExtractLane(MinOfLanes(du, r), 0);
                         uint8_t possibleG = ExtractLane(MinOfLanes(du, r), 0);
                         uint8_t possibleB = ExtractLane(MinOfLanes(du, r), 0);
@@ -72,9 +72,13 @@ namespace aire {
                 float t0 = 1.0 - omega * (float(minColor) / float(mAtmosLight));
                 float t = std::max(1.0f - omega * (float(darkImage[x]) / float(mAtmosLight)), t0);
 
-                dst[pos + 0] = std::clamp(static_cast<int>(((r - mAtmosLight) / t + mAtmosLight)), int(0), int(255));
-                dst[pos + 1] = std::clamp(static_cast<int>(((g - mAtmosLight) / t + mAtmosLight)), int(0), int(255));
-                dst[pos + 2] = std::clamp(static_cast<int>(((b - mAtmosLight) / t + mAtmosLight)), int(0), int(255));
+                Eigen::Vector3f color = {r, g, b};
+                color = ((color.array() - mAtmosLight) / t + mAtmosLight).max(0.f).min(255.f);
+                Eigen::Vector3i dest = color.cast<int>();
+
+                dst[pos + 0] = dest.x();
+                dst[pos + 1] = dest.y();
+                dst[pos + 2] = dest.z();
             }
         }
     }

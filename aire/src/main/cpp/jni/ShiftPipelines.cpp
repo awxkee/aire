@@ -35,7 +35,8 @@ Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_tiltShiftImpl(JNIEnv *env, jobje
                                                                           stride, width,
                                                                           height, radius,
                                                                           sigma);
-                                                        aire::tiltShift(output.data(), input.data(),
+                                                        aire::tiltShift(output.data(),
+                                                                        input.data(),
                                                                         blurred,
                                                                         stride, width,
                                                                         height,

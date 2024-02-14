@@ -6,6 +6,7 @@
 
 #include "ToneMapper.h"
 #include <fast_math-inl.h>
+#include "Eigen/Eigen"
 
 namespace aire {
     template<typename D>
@@ -29,9 +30,11 @@ namespace aire {
         }
 
         HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) override {
-            r = ACESFilm(r * exposure);
-            g = ACESFilm(g * exposure);
-            b = ACESFilm(b * exposure);
+            Eigen::Vector3f vec = {r, g, b};
+            vec = ACESFilm(vec * exposure);
+            r = vec.x();
+            g = vec.y();
+            b = vec.z();
         }
 
     private:
@@ -56,6 +59,15 @@ namespace aire {
             constexpr float d = 0.59f;
             constexpr float e = 0.14f;
             return std::clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.f, 1.0f);
+        }
+
+        Eigen::Vector3f ACESFilm(Eigen::Vector3f x) {
+            constexpr float a = 2.51f;
+            constexpr float b = 0.03f;
+            constexpr float c = 2.43f;
+            constexpr float d = 0.59f;
+            constexpr float e = 0.14f;
+            return ((x.array() * (a * x.array() + b)) / (x.array() * (c * x.array() + d) + e)).max(0.f).min(1.0f);
         }
     };
 }

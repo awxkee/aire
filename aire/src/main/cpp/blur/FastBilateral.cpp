@@ -48,13 +48,13 @@ namespace aire {
         for (std::size_t x = 0; x < width; ++x) {
             const std::size_t small_x = static_cast<std::size_t> (static_cast<float> (x) / sigma_s_ + 0.5f) + padding_xy;
             for (std::size_t y = 0; y < height; ++y) {
-                const float z = reinterpret_cast<PointT *>(reinterpret_cast<uint8_t *>(output.data()) + y * stride)[x*channels + channel] - base_min;
+                const float z = reinterpret_cast<PointT *>(reinterpret_cast<uint8_t *>(output.data()) + y * stride)[x * channels + channel] - base_min;
 
                 const std::size_t small_y = static_cast<std::size_t> (static_cast<float> (y) / sigma_s_ + 0.5f) + padding_xy;
                 const std::size_t small_z = static_cast<std::size_t> (static_cast<float> (z) / sigma_r_ + 0.5f) + padding_z;
 
                 Eigen::Vector2f &d = data(small_x, small_y, small_z);
-                d[0] += reinterpret_cast<PointT *>(reinterpret_cast<uint8_t *>(output.data()) + y * stride)[x*channels + channel];
+                d[0] += reinterpret_cast<PointT *>(reinterpret_cast<uint8_t *>(output.data()) + y * stride)[x * channels + channel];
                 d[1] += 1.0f;
             }
         }
@@ -87,11 +87,11 @@ namespace aire {
 
             for (std::size_t x = 0; x < width; x++)
                 for (std::size_t y = 0; y < height; y++) {
-                    const float z = reinterpret_cast<PointT *>(reinterpret_cast<uint8_t *>(output.data()) + y * stride)[x*channels + channel] - base_min;
+                    const float z = reinterpret_cast<PointT *>(reinterpret_cast<uint8_t *>(output.data()) + y * stride)[x * channels + channel] - base_min;
                     const Eigen::Vector2f D = data.trilinear_interpolation(static_cast<float> (x) / sigma_s_ + padding_xy,
                                                                            static_cast<float> (y) / sigma_s_ + padding_xy,
                                                                            z / sigma_r_ + padding_z);
-                    reinterpret_cast<PointT *>(reinterpret_cast<uint8_t *>(output.data()) + y * stride)[x*channels + channel] = D[0];
+                    reinterpret_cast<PointT *>(reinterpret_cast<uint8_t *>(output.data()) + y * stride)[x * channels + channel] = D[0];
                 }
         } else {
             for (std::size_t x = 0; x < width; ++x)
@@ -100,7 +100,7 @@ namespace aire {
                     const Eigen::Vector2f D = data.trilinear_interpolation(static_cast<float> (x) / sigma_s_ + padding_xy,
                                                                            static_cast<float> (y) / sigma_s_ + padding_xy,
                                                                            z / sigma_r_ + padding_z);
-                    reinterpret_cast<PointT *>(reinterpret_cast<uint8_t *>(output.data()) + y * stride)[x*channels + channel] = D[0] / D[1];
+                    reinterpret_cast<PointT *>(reinterpret_cast<uint8_t *>(output.data()) + y * stride)[x * channels + channel] = D[0] / D[1];
                 }
         }
         std::copy(output.begin(), output.end(), input);

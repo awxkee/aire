@@ -1,6 +1,10 @@
 package com.awxkee.aire.pipeline
 
 import android.graphics.Bitmap
+import androidx.annotation.IntRange
+import com.awxkee.aire.AireColorMapper
+import com.awxkee.aire.AirePaletteDithering
+import com.awxkee.aire.AireQuantize
 import com.awxkee.aire.BasePipelines
 
 class BasePipelinesImpl : BasePipelines {
@@ -64,6 +68,51 @@ class BasePipelinesImpl : BasePipelines {
     override fun gamma(bitmap: Bitmap, gamma: Float): Bitmap {
         return gammaImpl(bitmap, gamma)
     }
+
+    override fun toPNG(
+        bitmap: Bitmap,
+        maxColors: Int,
+        quantize: AireQuantize,
+        dithering: AirePaletteDithering,
+        colorMapper: AireColorMapper,
+        @IntRange(from = 0.toLong(), to = 9.toLong()) compressionLevel: Int
+    ): ByteArray {
+        return toPNGImpl(
+            bitmap,
+            maxColors,
+            quantize.value,
+            dithering.value,
+            colorMapper.value,
+            compressionLevel
+        )
+    }
+
+    override fun palette(
+        bitmap: Bitmap,
+        maxColors: Int,
+        quantize: AireQuantize,
+        dithering: AirePaletteDithering,
+        colorMapper: AireColorMapper
+    ): Bitmap {
+        return paletteImpl(bitmap, maxColors, quantize.value, dithering.value, colorMapper.value)
+    }
+
+    private external fun paletteImpl(
+        bitmap: Bitmap,
+        maxColors: Int,
+        quantize: Int,
+        dithering: Int,
+        mappingStrategy: Int,
+    ): Bitmap
+
+    private external fun toPNGImpl(
+        bitmap: Bitmap,
+        maxColors: Int,
+        quantize: Int,
+        dithering: Int,
+        mappingStrategy: Int,
+        compressionLevel: Int,
+    ): ByteArray
 
     private external fun gammaImpl(bitmap: Bitmap, gamma: Float): Bitmap
 

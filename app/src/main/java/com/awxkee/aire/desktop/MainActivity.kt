@@ -28,6 +28,9 @@ import androidx.core.graphics.BitmapCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.scale
 import com.awxkee.aire.Aire
+import com.awxkee.aire.AireColorMapper
+import com.awxkee.aire.AirePaletteDithering
+import com.awxkee.aire.AireQuantize
 import com.awxkee.aire.BitmapScaleMode
 import com.awxkee.aire.ColorMatrices
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
@@ -50,19 +53,23 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-//                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.shadows)
-//                        scope.launch {
-//                            imagesArray.add(bitmap)
-//                        }
-//
-//                        val time = measureTimeMillis {
-//                            val glitch = Aire.dilate(bitmap, Aire.getStructuringKernel(7))
-//                            scope.launch {
-//                                imagesArray.add(glitch)
-//                            }
-//                        }
+                        val bitmap =
+                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+                                .scaleWith(0.5f)
+                        scope.launch {
+                            imagesArray.add(bitmap)
+                        }
 
+                        val kdTime = measureTimeMillis {
+                            val palette = Aire.poissonBlur(
+                                bitmap,
+                                75,
+                            )
+
+                            scope.launch {
+                                imagesArray.add(palette)
+                            }
+                        }
 //                        var radius = 5
 //                        repeat(25) {
 //                            val time = measureTimeMillis {

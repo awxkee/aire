@@ -23,10 +23,6 @@ namespace aire {
     using namespace aire::HWY_NAMESPACE;
 
     void convolveToneMapper(uint8_t *data, int stride, int width, int height, ToneMapper<FixedTag<float32_t, 4>> *toneMapper) {
-        const float rPrimary = 0.299f;
-        const float gPrimary = 0.587f;
-        const float bPrimary = 0.114f;
-
         const FixedTag<uint8_t, 4> du;
         const FixedTag<uint32_t, 4> du32x4;
         const FixedTag<float32_t, 4> dfx4;
@@ -160,8 +156,7 @@ namespace aire {
                 processed[2] = (rgb[2] < 0.5 ? (2.0 * rgb[2] * filter[2]) : (1.0 - 2.0 * (1.0 - rgb[2]) * (1.0 - filter[2])));
 
                 Eigen::Vector3f rs = mix(rgb, processed, tmpr);
-                rs *= 255.f;
-                rs = rs.array().max(0.f).min(255.f);
+                rs = (rs * 255.f).array().max(0.f).min(255.f);
 
                 pixels[0] = rs.x();
                 pixels[1] = rs.y();

@@ -22,8 +22,7 @@ namespace aire {
                 rgb << pixels[0], pixels[1], pixels[2];
                 rgb /= 255.f;
 
-                rgb = matrix * rgb;
-                rgb = (rgb * 255.f).array().max(0.f).min(255.f);
+                rgb = (matrix * rgb * 255.f).array().max(0.f).min(255.f);
 
                 pixels[0] = rgb.x();
                 pixels[1] = rgb.y();

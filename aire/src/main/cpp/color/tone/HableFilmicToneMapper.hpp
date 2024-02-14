@@ -7,6 +7,7 @@
 #include "ToneMapper.h"
 #include <fast_math-inl.h>
 #include <algorithm>
+#include "Eigen/Eigen"
 
 namespace aire {
     template<typename D>
@@ -19,6 +20,11 @@ namespace aire {
         HWY_FAST_MATH_INLINE TFromD<D> hable(TFromD<D> x) {
             const float A = 0.15, B = 0.50, C = 0.10, D1 = 0.20, E = 0.02, F = 0.30;
             return ((x * (A * x + (C * B)) + (D1 * E)) / (x * (A * x + B) + (D1 * F))) - E / F;
+        }
+
+        HWY_FAST_MATH_INLINE Eigen::Vector3f hable(Eigen::Vector3f x) {
+            const float A = 0.15, B = 0.50, C = 0.10, D1 = 0.20, E = 0.02, F = 0.30;
+            return ((x.array() * (A * x.array() + (C * B)) + (D1 * E)) / (x.array() * (A * x.array() + B) + (D1 * F))) - E / F;
         }
 
         HWY_FAST_MATH_INLINE V hable(V v) {
@@ -45,9 +51,11 @@ namespace aire {
         }
 
         HWY_FAST_MATH_INLINE void Execute(TFromD<D> &r, TFromD<D> &g, TFromD<D> &b) override {
-            r = hable(r*exposure);
-            g = hable(g*exposure);
-            b = hable(b*exposure);
+            Eigen::Vector3f vec = {r, g, b};
+            vec = hable(vec * exposure);
+            r = vec.x();
+            g = vec.y();
+            b = vec.z();
         }
 
     };

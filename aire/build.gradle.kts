@@ -29,7 +29,7 @@ android {
         externalNativeBuild {
             cmake {
                 ndkVersion = "26.1.10909125"
-                cppFlags.add ("-std=c++20")
+                cppFlags.add ("-std=c++20 -stdlib=libc++")
 //                abiFilters += setOf("armeabi-v7a")
 
                 abiFilters += setOf("armeabi-v7a", "arm64-v8a", "x86_64", "x86")

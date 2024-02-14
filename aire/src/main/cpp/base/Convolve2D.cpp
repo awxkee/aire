@@ -6,13 +6,33 @@
 #include <vector>
 #include <thread>
 #include <algorithm>
+#include "FF2DWorkspace.h"
 #include "hwy/highway.h"
+#include "algo/support-inl.h"
 
 namespace aire {
 
+    using namespace hwy;
     using namespace std;
+    using namespace hwy::HWY_NAMESPACE;
 
-    void Convolve2D::convolve(uint8_t *data, int stride, int width, int height) {
+    void Convolve2D::applyChannel(FF2DWorkspace *workspace,
+                                  uint8_t *data, const int stride, const int chanIndex, const int width,
+                                  const int height) {
+        const auto src = workspace->getOutput();
+        for (int y = 0; y < height; y++) {
+            auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
+            for (int x = 0; x < width; ++x) {
+                int dxR = matrix.cols();
+                int dyR = matrix.rows();
+                auto r = src[(y + dyR) * workspace->getDstWidth() + (x + dxR)];
+                dst[chanIndex] = std::clamp(r * 255.0, 0.0, 255.0);
+                dst += 4;
+            }
+        }
+    }
+
+    void Convolve2D::bruteForceConvolve(uint8_t *data, int stride, int width, int height) {
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     height * width / (256 * 256)), 1, 12);
         vector<thread> workers;
@@ -30,42 +50,37 @@ namespace aire {
             workers.emplace_back(
                     [start, end, width, height, this, &destination, data, stride]() {
                         const Eigen::MatrixXf mt = this->matrix;
+
+                        const FixedTag<uint8_t, 4> du8;
+                        const FixedTag<float32_t, 4> dfx4;
+                        using VF = Vec<decltype(dfx4)>;
+                        const VF zeros = Zero(dfx4);
+                        const auto max255 = Set(dfx4, 255.0f);
+                        const auto revertScale = ApproximateReciprocal(max255);
+
                         for (int y = start; y < end; ++y) {
                             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination.data()) + y * stride);
                             for (int x = 0; x < width; ++x) {
 
-                                Eigen::MatrixXf rLocal(this->matrix.rows(), this->matrix.cols());
-                                Eigen::MatrixXf gLocal(this->matrix.rows(), this->matrix.cols());
-                                Eigen::MatrixXf bLocal(this->matrix.rows(), this->matrix.cols());
+                                VF store = zeros;
 
-                                for (int j = -1; j <= 1; ++j) {
+                                const int ySize = this->matrix.rows() / 2;
+                                const int xSize = this->matrix.cols() / 2;
+
+                                for (int j = -ySize; j <= ySize; ++j) {
                                     auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + clamp(y + j, 0, height - 1) * stride);
-                                    int i = -1;
-                                    for (; i <= 1; ++i) {
+                                    int i = -xSize;
+                                    for (; i <= xSize; ++i) {
                                         int px = clamp(x + i, 0, width - 1) * 4;
-                                        rLocal(j + 1, i + 1) = src[px];
-                                        gLocal(j + 1, i + 1) = src[px + 1];
-                                        bLocal(j + 1, i + 1) = src[px + 2];
+                                        auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                                        auto weight = Set(dfx4, matrix(j + ySize,i + xSize));
+                                        store = Add(store, Mul(Mul(pixels, revertScale), weight));
                                     }
                                 }
 
-                                rLocal /= 255.f;
-                                gLocal /= 255.f;
-                                bLocal /= 255.f;
-
-                                float r = (rLocal.cwiseProduct(mt).sum()) * 255.f;
-                                float g = (gLocal.cwiseProduct(mt).sum()) * 255.f;
-                                float b = (bLocal.cwiseProduct(mt).sum()) * 255.f;
-
-                                auto src = reinterpret_cast<uint8_t *>(
-                                        reinterpret_cast<uint8_t *>(data) +
-                                        clamp(y, 0, height - 1) * stride);
-
                                 int px = x * 4;
-                                dst[px] = clamp(r, 0.f, 255.f);
-                                dst[px + 1] = clamp(g, 0.f, 255.f);
-                                dst[px + 2] = clamp(b, 0.f, 255.f);
-                                dst[px + 3] = src[px + 3];
+
+                                StoreU(DemoteToU8(du8, Clamp(Round(Mul(store, max255)), zeros, max255)), du8, &dst[px]);
                             }
                         }
                     });
@@ -75,5 +90,58 @@ namespace aire {
         }
 
         std::copy(destination.begin(), destination.end(), data);
+    }
+
+    void Convolve2D::fftConvolve(uint8_t *data, int stride, int width, int height) {
+        std::vector<double> rV(width * height, 0.0);
+        std::vector<double> gV(width * height, 0.0);
+        std::vector<double> bV(width * height, 0.0);
+        std::vector<double> aV(width * height, 0.0);
+
+        for (int y = 0; y < height; y++) {
+            auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
+            for (int x = 0; x < width; ++x) {
+                rV[y * width + x] = dst[0] / 255.0;
+                gV[y * width + x] = dst[1] / 255.0;
+                bV[y * width + x] = dst[2] / 255.0;
+                aV[y * width + x] = dst[3] / 255.0;
+                dst += 4;
+            }
+        }
+
+        std::vector<double> kernel(matrix.rows() * matrix.cols());
+        for (int y = 0; y < matrix.rows(); y++) {
+            for (int x = 0; x < matrix.cols(); ++x) {
+                kernel[y * matrix.rows() + x] = matrix(y, x);
+            }
+        }
+
+        std::unique_ptr<FF2DWorkspace> workspace = std::make_unique<FF2DWorkspace>(height, width,
+                                                                                   matrix.rows(), matrix.cols());
+        workspace->convolveWorkspace(rV.data(), kernel.data());
+        rV.clear();
+        applyChannel(workspace.get(), data, stride, 0, width, height);
+
+        workspace->convolveWorkspace(gV.data(), kernel.data());
+        gV.clear();
+        applyChannel(workspace.get(), data, stride, 1, width, height);
+
+        workspace->convolveWorkspace(bV.data(), kernel.data());
+        bV.clear();
+        applyChannel(workspace.get(), data, stride, 2, width, height);
+
+        workspace->convolveWorkspace(aV.data(), kernel.data());
+        aV.clear();
+        applyChannel(workspace.get(), data, stride, 3, width, height);
+
+        workspace.reset();
+    }
+
+    void Convolve2D::convolve(uint8_t *data, int stride, int width, int height) {
+        if (this->matrix.rows() < 7 && this->matrix.cols() < 7) {
+            this->bruteForceConvolve(data, stride, width, height);
+            return;
+        }
+        fftConvolve(data, stride, width, height);
     }
 }

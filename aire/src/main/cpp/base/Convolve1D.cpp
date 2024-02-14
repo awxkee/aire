@@ -122,7 +122,6 @@ namespace aire {
     }
 
     void convolve1D(uint8_t *data, int stride, int width, int height, const std::vector<float> &horizontal, const std::vector<float> &vertical) {
-
         std::vector<uint8_t> transient(stride * height);
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     height * width / (256 * 256)), 1, 12);

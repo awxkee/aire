@@ -49,10 +49,10 @@ namespace aire {
                     b = LinearSRGBTosRGB(b);
                 }
                 Eigen::Vector3f vec3 = {r, g, b};
-                auto result = conversionMatrix * vec3;
-                dst[0] = clamp(result.x() * 255.f, 0.f, 255.f);
-                dst[1] = clamp(result.y() * 255.f, 0.f, 255.f);
-                dst[2] = clamp(result.z() * 255.f, 0.f, 255.f);
+                auto result = (conversionMatrix * vec3 * 255.f).array().max(0.f).min(255.f);
+                dst[0] = result.x();
+                dst[1] = result.y();
+                dst[2] = result.z();
                 src += 3;
                 dst += 4;
             }

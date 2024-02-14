@@ -41,7 +41,6 @@ namespace aire {
                         const FixedTag<int16_t, 8> di16x8;
                         const FixedTag<int16_t, 4> di16x4;
                         const FixedTag<int32_t, 4> di32x4;
-                        const FixedTag<int8_t, 4> di8x4;
                         using VU8x16 = Vec<decltype(du8x16)>;
                         using VU8x4 = Vec<decltype(du8x4)>;
 

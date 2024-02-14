@@ -79,7 +79,7 @@ namespace aire::HWY_NAMESPACE {
                       int width,
                       int height,
                       int pixelSize) {
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
+        const int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     width * height / (256 * 256)), 1, 12);
         vector<thread> workers;
 

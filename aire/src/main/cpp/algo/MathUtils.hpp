@@ -5,6 +5,7 @@
 #pragma once
 
 #include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -37,8 +38,6 @@ static std::vector<std::vector<int>> getStructuringKernel(int size) {
     std::vector<std::vector<int>> kernel(size, std::vector<int>(size, 1));
     return std::move(kernel);
 }
-
-#include <queue>
 
 static void floodFill(std::vector<std::vector<int>> &grid, int startX, int startY, int target, int replacement) {
     int rows = grid.size();
@@ -145,4 +144,9 @@ static inline int min3(int a, int b, int c) {
 
 static inline int max3(int a, int b, int c) {
     return std::max(a, std::max(b, c));
+}
+
+inline
+static uint32_t packRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    return ((uint32_t)a << 24) | ((uint32_t)b << 16) | ((uint32_t)g << 8) | (uint32_t)r;
 }

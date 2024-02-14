@@ -7,23 +7,18 @@
 #include "base/Convolve1Db16.h"
 #include <vector>
 #include "jni/JNIUtils.h"
+#include "Eigen/Eigen"
 #include <thread>
 #include <algorithm>
+#include "base/Convolve2D.h"
 
 namespace aire {
 
-    std::vector<std::vector<float>> generateTentFilterNormalized(int N) {
+    Eigen::MatrixXf generateTentFilterNormalized(int N) {
         auto kernel = generateTentFilter(N);
-        float kernelSum = 0.f;
-        for (const auto &row: kernel) {
-            for (float value: row) {
-                kernelSum += value;
-            }
-        }
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                kernel[i][j] /= kernelSum;
-            }
+        float kernelSum = kernel.sum();
+        if (kernelSum != 0.f) {
+            kernel /= kernelSum;
         }
         return kernel;
     }
@@ -51,19 +46,19 @@ namespace aire {
         return kernel;
     }
 
-    std::vector<std::vector<float>> generateTentFilter(int N) {
+    Eigen::MatrixXf generateTentFilter(int N) {
         if (N % 2 == 0 || N < 1) {
             throw AireError(
                     "Invalid filter size. Please use an odd positive integer for N, but received: " +
                     std::to_string(N));
         }
 
-        std::vector<std::vector<float>> tentFilter(N, std::vector<float>(N, 0.0f));
+        Eigen::MatrixXf tentFilter(N, N);
         float peakValue = 1.0f / ((N / 2) + 1);
         for (int i = 0; i < N; ++i) {
             for (int j = 0; j < N; ++j) {
                 float distanceToCenter = std::min({i, j, N - 1 - i, N - 1 - j});
-                tentFilter[i][j] = peakValue * (1.0f - (distanceToCenter / (N / 2.0f)));
+                tentFilter(i, j) = peakValue * (1.0f - (distanceToCenter / (N / 2.0f)));
             }
         }
 
@@ -71,8 +66,14 @@ namespace aire {
     }
 
     void tentBlur(uint8_t *data, int stride, int width, int height, int radius) {
-        auto gen1DKernel = generate1DTentFilterKernelNormalized(2 * radius + 1);
-        convolve1D(data, stride, width, height, gen1DKernel, gen1DKernel);
+        if (radius <= 8) {
+            auto gen1DKernel = generate1DTentFilterKernelNormalized(2 * radius + 1);
+            convolve1D(data, stride, width, height, gen1DKernel, gen1DKernel);
+        } else {
+            auto kernel = generateTentFilter(2 * radius + 1);
+            aire::Convolve2D convolution(kernel);
+            convolution.convolve(data, stride, width, height);
+        }
     }
 
     void tentBlurF16(uint16_t *data, int stride, int width, int height, int radius) {

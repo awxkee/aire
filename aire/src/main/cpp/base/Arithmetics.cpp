@@ -92,8 +92,7 @@ namespace aire {
         const auto low = Set(du32x1, value);
         const auto high = Set(du32x4, value);
         for (int y = 0; y < height; ++y) {
-            auto src = reinterpret_cast<uint32_t *>(reinterpret_cast<uint8_t *>(destination) +
-                                                    y * stride);
+            auto src = reinterpret_cast<uint32_t *>(reinterpret_cast<uint8_t *>(destination) + y * stride);
             int x = 0;
             for (; x + 4 < width; x += 4) {
                 StoreU(high, du32x4, src);

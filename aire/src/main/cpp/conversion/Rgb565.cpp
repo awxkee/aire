@@ -85,7 +85,7 @@ namespace aire::HWY_NAMESPACE {
         using VU8x16 = Vec<decltype(du8x16)>;
 
         int x = 0;
-        int pixels = 16;
+        const int pixels = 16;
 
         auto src = reinterpret_cast<const uint8_t *>(source);
         auto dst = reinterpret_cast<uint16_t *>(destination);

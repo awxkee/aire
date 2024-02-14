@@ -139,8 +139,7 @@ float as_float(const uint x) {
     return *(float *) &x;
 }
 
-uint16_t float_to_half(
-        const float x) {
+uint16_t float_to_half(const float x) {
     half f(x);
     return f.data_;
 }

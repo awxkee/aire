@@ -17,12 +17,16 @@ namespace aire {
                 auto mask = reinterpret_cast<uint8_t *>(
                         reinterpret_cast<uint8_t *>(sharpenMask) + y * stride);
                 int px = x * 4;
-                float srcR = dst[px] / 255.f;
-                float srcG = dst[px + 1] / 255.f;
-                float srcB = dst[px + 2] / 255.f;
-                dst[px] = clamp((srcR - intensity * (srcR - mask[px] / 255.f)) * 255.f, 0.f, 255.f);
-                dst[px + 1] = clamp((srcG - intensity * (srcG - mask[px + 1] / 255.f)) * 255.f, 0.f, 255.f);
-                dst[px + 2] = clamp((srcB - intensity * (srcB - mask[px + 2] / 255.f)) * 255.f, 0.f, 255.f);
+                Eigen::Vector4f color = {dst[px], dst[px + 1], dst[px + 2], dst[px + 3]};
+                Eigen::Vector4f maskColor = {mask[px], mask[px + 1], mask[px + 2], mask[px + 3]};
+                color /= 255.f;
+                maskColor /= 255.f;
+                Eigen::Vector4f diff = (color - maskColor) * intensity;
+                Eigen::Array4i final = ((color - diff) * 255.f).array().max(0.f).min(255.f).cast<int>();
+                dst[px] = final.x();
+                dst[px + 1] = final.y();
+                dst[px + 2] = final.z();
+                dst[px + 3] = final.w();
             }
         }
     }
@@ -35,12 +39,16 @@ namespace aire {
                 auto mask = reinterpret_cast<uint8_t *>(
                         reinterpret_cast<uint8_t *>(sharpenMask) + y * stride);
                 int px = x * 4;
-                float srcR = dst[px] / 255.f;
-                float srcG = dst[px + 1] / 255.f;
-                float srcB = dst[px + 2] / 255.f;
-                dst[px] = clamp((srcR - intensity * (srcR - mask[px] / 255.f)) * 255.f, 0.f, 255.f);
-                dst[px + 1] = clamp((srcG - intensity * (srcG - mask[px + 1] / 255.f)) * 255.f, 0.f, 255.f);
-                dst[px + 2] = clamp((srcB - intensity * (srcB - mask[px + 2] / 255.f)) * 255.f, 0.f, 255.f);
+                Eigen::Vector4f color = {dst[px], dst[px + 1], dst[px + 2], dst[px + 3]};
+                Eigen::Vector4f maskColor = {mask[px], mask[px + 1], mask[px + 2], mask[px + 3]};
+                color /= 255.f;
+                maskColor /= 255.f;
+                Eigen::Vector4f diff = (color - maskColor) * intensity;
+                Eigen::Array4i final = ((color - diff) * 255.f).array().max(0.f).min(255.f).cast<int>();
+                dst[px] = final.x();
+                dst[px + 1] = final.y();
+                dst[px + 2] = final.z();
+                dst[px + 3] = final.w();
             }
         }
     }

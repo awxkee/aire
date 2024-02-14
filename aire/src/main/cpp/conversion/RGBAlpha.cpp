@@ -11,6 +11,7 @@ using namespace std;
 
 #include "hwy/foreach_target.h"
 #include "hwy/highway.h"
+#include "Eigen/Eigen"
 
 HWY_BEFORE_NAMESPACE();
 
@@ -111,9 +112,11 @@ namespace aire::HWY_NAMESPACE {
 
             for (; x < width; ++x) {
                 uint8_t alpha = mSrc[3];
-                mDst[0] = (min(mSrc[0], alpha) * 255 + alpha / 2) / alpha;
-                mDst[1] = (min(mSrc[1], alpha) * 255 + alpha / 2) / alpha;
-                mDst[2] = (min(mSrc[2], alpha) * 255 + alpha / 2) / alpha;
+                Eigen::Vector3i color = {mSrc[0], mSrc[1], mSrc[2]};
+                color = (color.array().min(alpha) * 255 + alpha / 2) / alpha;
+                mDst[0] = color.x();
+                mDst[1] = color.y();
+                mDst[2] = color.z();
                 mDst[3] = alpha;
                 mSrc += 4;
                 mDst += 4;
@@ -178,9 +181,11 @@ namespace aire::HWY_NAMESPACE {
 
             for (; x < width; ++x) {
                 uint8_t alpha = mSrc[3];
-                mDst[0] = (mSrc[0] * alpha + 127) / 255;
-                mDst[1] = (mSrc[1] * alpha + 127) / 255;
-                mDst[2] = (mSrc[2] * alpha + 127) / 255;
+                Eigen::Vector3i color = {mSrc[0], mSrc[1], mSrc[2]};
+                color = (color.array() * alpha + 127) / 255;
+                mDst[0] = color.x();
+                mDst[1] = color.y();
+                mDst[2] = color.z();
                 mDst[3] = alpha;
                 mSrc += 4;
                 mDst += 4;

@@ -22,18 +22,27 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         pipelines/RemoveShadows.cpp blur/FastBilateral.cpp color/Gamut.cpp base/Convolve1D.cpp
         effect/FractalGlassEffect.cpp effect/WaterEffect.cpp jni/ScalePipelines.cpp jni/ToneMappingPipelines.cpp
         effect/PerlinDistortion.cpp base/Vibrance.cpp algo/sleef-hwy.cpp conversion/yuv/YuvConverter.cpp
-        jni/YuvPipelines.cpp pipelines/DehazeDarkChannel.cpp color/Adjustments.cpp base/Convolve2D3x3.cpp
+        jni/YuvPipelines.cpp pipelines/DehazeDarkChannel.cpp color/Adjustments.cpp
         base/Grain.cpp base/Sharpness.cpp base/Convolve2D.cpp base/LUT8.cpp
         hwy/aligned_allocator.cc hwy/nanobenchmark.cc hwy/per_target.cc hwy/print.cc hwy/targets.cc
         hwy/timer.cc
-        base/Convolve1Db16.cpp)
+        base/Convolve1Db16.cpp algo/MedianCut.cpp vendor/spng/spng.c base/PNGEncoder.cpp base/RemapPalette.cpp
+        algo/WuQuantizer.cpp)
 
-add_library(libhwy STATIC IMPORTED)
+add_library(libfft STATIC IMPORTED)
+set_target_properties(${CMAKE_PROJECT_NAME} libfft PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libfftw3.a)
+
+add_library(libzlibng STATIC IMPORTED)
+set_target_properties(${CMAKE_PROJECT_NAME} libzlibng PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libz.a)
 
 add_definitions(-DHWY_COMPILE_ONLY_STATIC -DJC_VORONOI_IMPLEMENTATION)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if (ANDROID_ABI STREQUAL arm64-v8a)
+
+endif ()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -ffast-math -funroll-loops")
@@ -44,9 +53,11 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif ()
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/algo ${CMAKE_SOURCE_DIR}/conversion
-        ${CMAKE_SOURCE_DIR}/eigen ${CMAKE_SOURCE_DIR}/eigen/Core)
+        ${CMAKE_SOURCE_DIR}/eigen ${CMAKE_SOURCE_DIR}/eigen/Core ${CMAKE_SOURCE_DIR}/vendor)
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
         android
         log
+        libfft
+        libzlibng
         -ljnigraphics)

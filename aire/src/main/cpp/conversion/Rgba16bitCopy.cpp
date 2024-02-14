@@ -74,8 +74,8 @@ namespace coder::HWY_NAMESPACE {
         auto src = reinterpret_cast<const uint8_t *>(source);
         auto dst = reinterpret_cast<uint8_t *>(destination);
 
-        int threadCount = clamp(min(static_cast<int>(thread::hardware_concurrency()),
-                                    width * height / (256 * 256)), 1, 12);
+        const int threadCount = clamp(min(static_cast<int>(thread::hardware_concurrency()),
+                                          width * height / (256 * 256)), 1, 12);
         vector<thread> workers;
 
         int segmentHeight = height / threadCount;
