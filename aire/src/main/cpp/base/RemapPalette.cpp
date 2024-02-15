@@ -7,7 +7,6 @@
 #include "EigenUtils.h"
 #include "KDColorTree.hpp"
 #include <exception>
-#include "OctTree.h"
 #include "NearestColorSearch.hpp"
 
 namespace aire {

@@ -5,10 +5,6 @@
 
 #pragma once
 
-#include "glm/glm.hpp"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_common.hpp"
 #include "Eigen/Eigen"
 
 static const Eigen::Vector2f IlluminantD65 = {0.31272, 0.32903};

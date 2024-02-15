@@ -69,6 +69,10 @@ class BasePipelinesImpl : BasePipelines {
         return gammaImpl(bitmap, gamma)
     }
 
+    override fun crop(bitmap: Bitmap, baseX: Int, baseY: Int, width: Int, height: Int): Bitmap {
+        return cropImpl(bitmap, baseX, baseY, width, height)
+    }
+
     override fun toPNG(
         bitmap: Bitmap,
         maxColors: Int,
@@ -96,6 +100,42 @@ class BasePipelinesImpl : BasePipelines {
     ): Bitmap {
         return paletteImpl(bitmap, maxColors, quantize.value, dithering.value, colorMapper.value)
     }
+
+    override fun rotate(
+        bitmap: Bitmap, angle: Float, anchorPointX: Int,
+        anchorPointY: Int, newWidth: Int, newHeight: Int
+    ): Bitmap {
+        return rotateImpl(bitmap, angle, anchorPointX, anchorPointY, newWidth, newHeight)
+    }
+
+    override fun warpAffine(
+        bitmap: Bitmap,
+        transform: FloatArray,
+        newWidth: Int,
+        newHeight: Int
+    ): Bitmap {
+        return warpAffineImpl(bitmap, transform, newWidth, newHeight)
+    }
+
+    private external fun warpAffineImpl(
+        bitmap: Bitmap,
+        transform: FloatArray,
+        newWidth: Int,
+        newHeight: Int
+    ): Bitmap
+
+    private external fun rotateImpl(
+        bitmap: Bitmap, angle: Float, anchorPointX: Int,
+        anchorPointY: Int, newWidth: Int, newHeight: Int
+    ): Bitmap
+
+    private external fun cropImpl(
+        bitmap: Bitmap,
+        baseX: Int,
+        baseY: Int,
+        width: Int,
+        height: Int
+    ): Bitmap
 
     private external fun paletteImpl(
         bitmap: Bitmap,

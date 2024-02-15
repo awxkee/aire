@@ -3,6 +3,7 @@ package com.awxkee.aire.desktop
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Matrix
 import android.os.Bundle
 import android.os.FileUtils
 import android.util.Log
@@ -53,23 +54,31 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-//                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                                .scaleWith(0.5f)
-//                        scope.launch {
-//                            imagesArray.add(bitmap)
-//                        }
-//
-//                        val kdTime = measureTimeMillis {
-//                            val palette = Aire.poissonBlur(
-//                                bitmap,
-//                                75,
-//                            )
-//
-//                            scope.launch {
-//                                imagesArray.add(palette)
-//                            }
-//                        }
+                        val bitmap =
+                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+                                .scaleWith(0.5f)
+                        scope.launch {
+                            imagesArray.add(bitmap)
+                        }
+
+                        val kdTime = measureTimeMillis {
+                            val matrix = Matrix()
+                            matrix.setScale(1/1.2f, 1/1.2f)
+                            val array = FloatArray(9)
+                            matrix.getValues(array)
+                            val palette = Aire.rotate(
+                                bitmap,
+                                (Math.PI / 3.0).toFloat(),
+                                bitmap.width / 2,
+                                bitmap.height / 2,
+                                bitmap.height,
+                                bitmap.width
+                            )
+
+                            scope.launch {
+                                imagesArray.add(palette)
+                            }
+                        }
 //                        var radius = 5
 //                        repeat(25) {
 //                            val time = measureTimeMillis {

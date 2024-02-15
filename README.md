@@ -28,6 +28,12 @@ Aire.gaussianBlur(bitmap, ...)
 - [x] Sharp
 - [x] Unsharp
 - [x] Gamma
+- [x] Crop
+- [x] Rotate
+- [x] Affine transform
+- [x] Vibrance
+- [x] Dilate
+- [x] Erode
 
 ## Effects:
 - [x] Bokeh

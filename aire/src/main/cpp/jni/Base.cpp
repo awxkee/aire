@@ -608,8 +608,7 @@ enum AireQuantize {
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_awxkee_aire_pipeline_BasePipelinesImpl_toPNGImpl(JNIEnv *env,
-                                                          jobject thiz,
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_toPNGImpl(JNIEnv *env, jobject thiz,
                                                           jobject bitmap,
                                                           jint maxColors,
                                                           jint aireQuantize,
@@ -643,7 +642,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_toPNGImpl(JNIEnv *env,
                                 if (fmt == APF_RGBA8888) {
                                     std::vector<Eigen::Vector4i> palette;
                                     uint32_t colors = maxColors;
-                                    std::vector<uint8_t > original(input.size());
+                                    std::vector<uint8_t> original(input.size());
 
                                     aire::UnpremultiplyRGBA(input.data(), stride, original.data(), stride, width, height);
 

@@ -19,3 +19,4 @@ local.properties
 /app/src/main/res/drawable-xxhdpi/test_png.png
 /app/release/output-metadata.json
 *.apk
+app-release.dm

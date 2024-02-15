@@ -19,12 +19,35 @@ namespace aire {
     void Convolve2D::applyChannel(FF2DWorkspace *workspace,
                                   uint8_t *data, const int stride, const int chanIndex, const int width,
                                   const int height) {
+
+        const FixedTag<float32_t, 4> dfx4;
+        const FixedTag<uint8_t , 4> du8x4;
+        using VF = Vec<decltype(dfx4)>;
+
+        const int dxR = matrix.cols();
+        const int dyR = matrix.rows();
+
+        const int dstWidth = workspace->getDstWidth();
+        const VF zeros = Zero(dfx4);
+        const VF max255 = Set(dfx4, 255);
+        const VF colorScale = ApproximateReciprocal(max255);
+
         const auto src = workspace->getOutput();
         for (int y = 0; y < height; y++) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
-            for (int x = 0; x < width; ++x) {
-                int dxR = matrix.cols();
-                int dyR = matrix.rows();
+            int x = 0;
+            for (; x + 4 < width && x + dxR + 4 < dstWidth; x += 4) {
+                auto vec = LoadU(dfx4, &src[(y + dyR) * dstWidth + (x + dxR)]);
+                vec = Clamp(Mul(vec, max255), zeros, max255);
+                auto target = DemoteToU8(du8x4, vec);
+                dst[chanIndex] = ExtractLane(vec, 0);
+                dst[chanIndex + 4] = ExtractLane(vec, 1);
+                dst[chanIndex + 8] = ExtractLane(vec, 2);
+                dst[chanIndex + 12] = ExtractLane(vec, 3);
+                dst += 4*4;
+            }
+
+            for (; x < width; ++x) {
                 auto r = src[(y + dyR) * workspace->getDstWidth() + (x + dxR)];
                 dst[chanIndex] = std::clamp(r * 255.0, 0.0, 255.0);
                 dst += 4;
@@ -73,7 +96,7 @@ namespace aire {
                                     for (; i <= xSize; ++i) {
                                         int px = clamp(x + i, 0, width - 1) * 4;
                                         auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
-                                        auto weight = Set(dfx4, matrix(j + ySize,i + xSize));
+                                        auto weight = Set(dfx4, matrix(j + ySize, i + xSize));
                                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
                                     }
                                 }
@@ -93,10 +116,10 @@ namespace aire {
     }
 
     void Convolve2D::fftConvolve(uint8_t *data, int stride, int width, int height) {
-        std::vector<double> rV(width * height, 0.0);
-        std::vector<double> gV(width * height, 0.0);
-        std::vector<double> bV(width * height, 0.0);
-        std::vector<double> aV(width * height, 0.0);
+        std::vector<float> rV(width * height, 0.0);
+        std::vector<float> gV(width * height, 0.0);
+        std::vector<float> bV(width * height, 0.0);
+        std::vector<float> aV(width * height, 0.0);
 
         for (int y = 0; y < height; y++) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
@@ -109,7 +132,7 @@ namespace aire {
             }
         }
 
-        std::vector<double> kernel(matrix.rows() * matrix.cols());
+        std::vector<float> kernel(matrix.rows() * matrix.cols());
         for (int y = 0; y < matrix.rows(); y++) {
             for (int x = 0; x < matrix.cols(); ++x) {
                 kernel[y * matrix.rows() + x] = matrix(y, x);

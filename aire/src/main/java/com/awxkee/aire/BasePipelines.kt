@@ -35,6 +35,22 @@ interface BasePipelines {
 
     fun gamma(bitmap: Bitmap, gamma: Float = 1f): Bitmap
 
+    fun crop(bitmap: Bitmap, baseX: Int, baseY: Int, width: Int, height: Int): Bitmap
+
+    fun rotate(
+        bitmap: Bitmap,
+        angle: Float,
+        anchorPointX: Int,
+        anchorPointY: Int,
+        newWidth: Int,
+        newHeight: Int
+    ): Bitmap
+
+    /**
+     * @param transform - 3D affine transform 3x3 float array
+     */
+    fun warpAffine(bitmap: Bitmap, transform: FloatArray, newWidth: Int, newHeight: Int): Bitmap
+
     fun toPNG(
         bitmap: Bitmap,
         maxColors: Int,

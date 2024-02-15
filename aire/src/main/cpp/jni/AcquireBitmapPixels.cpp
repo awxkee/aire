@@ -77,7 +77,7 @@ jobject AcquireBitmapPixels(JNIEnv *env, jobject bitmap,
         }
 
         vector<uint8_t> rgbaPixels(info.stride * info.height);
-        memcpy(rgbaPixels.data(), addr, info.stride * info.height);
+        std::copy(reinterpret_cast<uint8_t *>(addr), reinterpret_cast<uint8_t *>(addr) + info.stride * info.height, rgbaPixels.begin());
 
         if (AndroidBitmap_unlockPixels(env, bitmap) != 0) {
             string exc = "Unlocking pixels has failed";

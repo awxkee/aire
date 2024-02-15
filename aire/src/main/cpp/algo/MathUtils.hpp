@@ -133,6 +133,14 @@ private:
     double mY1;
 };
 
+static int computeStride(int width, int pixelSize, int components) {
+    int lineWidth = width * pixelSize * components;
+    int alignment = 64;
+    int padding = (alignment - (lineWidth % alignment)) % alignment;
+    int dstStride = lineWidth + padding;
+    return dstStride;
+}
+
 template<class T>
 static inline T min3(T a, T b, T c) {
     return std::min(a, std::min(b, c));
