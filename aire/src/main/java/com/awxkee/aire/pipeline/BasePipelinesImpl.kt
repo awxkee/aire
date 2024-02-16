@@ -117,6 +117,12 @@ class BasePipelinesImpl : BasePipelines {
         return warpAffineImpl(bitmap, transform, newWidth, newHeight)
     }
 
+    override fun toJPEG(bitmap: Bitmap, quality: Int): ByteArray {
+        return toJPEGImpl(bitmap, quality)
+    }
+
+    private external fun toJPEGImpl(bitmap: Bitmap, quality: Int): ByteArray
+
     private external fun warpAffineImpl(
         bitmap: Bitmap,
         transform: FloatArray,

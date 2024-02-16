@@ -32,3 +32,8 @@ static jint throwException(JNIEnv *env, std::string &msg) {
 #define LOG(severity, ...) ((void)__android_log_print(ANDROID_LOG_##severity, LOG_TAG, __VA_ARGS__))
 #define LOGE(...) LOG(ERROR, __VA_ARGS__)
 #define LOGV(...) LOG(VERBOSE, __VA_ARGS__)
+
+enum AireQuantize {
+    AIRE_QUANTIZE_MEDIAN_CUT = 1,
+    AIRE_QUANTIZE_XIAOLING_WU = 2
+};

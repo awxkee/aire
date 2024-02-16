@@ -68,6 +68,11 @@ interface BasePipelines {
         colorMapper: AireColorMapper = AireColorMapper.KD_TREE,
     ): Bitmap
 
+    /**
+     * Mozjpeg compression
+     */
+    fun toJPEG(bitmap: Bitmap, quality: Int = 76): ByteArray
+
     fun getStructuringKernel(kernelSize: Int): FloatArray {
         val kern = FloatArray(kernelSize * kernelSize) {
             1f

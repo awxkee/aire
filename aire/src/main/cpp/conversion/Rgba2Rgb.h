@@ -31,17 +31,15 @@
 
 #include <cstdint>
 
-namespace coder {
-    void rgb8bit2RGB(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int height,
-                     int width);
+namespace aire {
+    void rgb8bit2RGB(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int width,
+                     int height);
 
-    void Rgba16bit2RGB(const uint16_t *src, int srcStride, uint16_t *dst, int dstStride, int height,
-                       int width);
+    void rgb8bit2BGR(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int width,
+                     int height);
+
+    void Rgba16bit2RGB(const uint16_t *src, int srcStride, uint16_t *dst, int dstStride, int width,
+                       int height);
 }
-
-#if HAVE_NEON
-void rgba8bit2RgbNEON(const uint8_t* src, uint8_t* dst, int numPixels);
-void rgba16Bit2RgbNEON(const uint16_t* src, int srcStride, uint16_t* dst, int dstStride, int height, int width);
-#endif
 
 #endif //JXLCODER_RGBA2RGB_H

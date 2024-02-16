@@ -62,22 +62,18 @@ class MainActivity : ComponentActivity() {
 //                        }
 //
 //                        val kdTime = measureTimeMillis {
-//                            val matrix = Matrix()
-//                            matrix.setScale(1/1.2f, 1/1.2f)
-//                            val array = FloatArray(9)
-//                            matrix.getValues(array)
-//                            val palette = Aire.rotate(
-//                                bitmap,
-//                                (Math.PI / 3.0).toFloat(),
-//                                bitmap.width / 2,
-//                                bitmap.height / 2,
-//                                bitmap.height,
-//                                bitmap.width
-//                            )
 //
+//                            val compressed = Aire.toJPEG(bitmap, 61)
+//                            val bmp = BitmapFactory.decodeByteArray(compressed, 0, compressed.size)
+//
+//                            val bos = ByteArrayOutputStream()
+//                            bitmap.compress(Bitmap.CompressFormat.JPEG, 61, bos)
+//                            val bia = bos.toByteArray()
 //                            scope.launch {
-//                                imagesArray.add(palette)
+//                                imagesArray.add(bmp)
 //                            }
+//
+//                            Log.d("AireTest", "Compressed mozjpeg ${compressed.size/1024}kbytes vs regular ${bia.size/1024}")
 //                        }
 //                        var radius = 5
 //                        repeat(25) {

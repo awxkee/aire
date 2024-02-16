@@ -44,37 +44,44 @@ using namespace std;
 #include <android/log.h>
 
 HWY_BEFORE_NAMESPACE();
-namespace coder::HWY_NAMESPACE {
+namespace aire::HWY_NAMESPACE {
 
-    using hwy::HWY_NAMESPACE::LoadInterleaved4;
-    using hwy::HWY_NAMESPACE::StoreInterleaved3;
-    using hwy::HWY_NAMESPACE::ScalableTag;
-    using hwy::HWY_NAMESPACE::Vec;
+    using namespace hwy;
+    using namespace hwy::HWY_NAMESPACE;
 
+    template<class D>
     void
-    Rgba16bitToRGBC(const uint16_t *HWY_RESTRICT src, uint16_t *HWY_RESTRICT dst, int width) {
-        const ScalableTag<uint16_t> du16;
-        using V = Vec<decltype(du16)>;
+    RgbaToRGB(D du, const TFromD<D> *HWY_RESTRICT src, TFromD<D> *HWY_RESTRICT dst, const int width, const int *HWY_RESTRICT permuteMap) {
+        using V = Vec<decltype(du)>;
         int x = 0;
-        auto srcPixels = reinterpret_cast<const uint16_t *>(src);
-        auto dstPixels = reinterpret_cast<uint16_t *>(dst);
-        int pixels = du16.MaxLanes();
+        auto srcPixels = reinterpret_cast<const TFromD<D> *>(src);
+        auto dstPixels = reinterpret_cast<TFromD<D> *>(dst);
+        int pixels = du.MaxLanes();
+
+        int idx1 = permuteMap[0];
+        int idx2 = permuteMap[1];
+        int idx3 = permuteMap[2];
+
         for (; x + pixels < width; x += pixels) {
             V pixels1;
             V pixels2;
             V pixels3;
             V pixels4;
-            LoadInterleaved4(du16, srcPixels, pixels1, pixels2, pixels3, pixels4);
-            StoreInterleaved3(pixels1, pixels2, pixels3, du16, dstPixels);
+            LoadInterleaved4(du, srcPixels, pixels1, pixels2, pixels3, pixels4);
+
+            V map[3] = {pixels1, pixels2, pixels3};
+
+            StoreInterleaved3(map[idx1], map[idx2], map[idx3], du, dstPixels);
 
             srcPixels += 4 * pixels;
             dstPixels += 3 * pixels;
         }
 
         for (; x < width; ++x) {
-            dstPixels[0] = srcPixels[0];
-            dstPixels[1] = srcPixels[1];
-            dstPixels[2] = srcPixels[2];
+            TFromD<D> vec[3] = {srcPixels[0], srcPixels[1], srcPixels[2]};
+            dstPixels[0] = vec[idx1];
+            dstPixels[1] = vec[idx2];
+            dstPixels[2] = vec[idx3];
 
             srcPixels += 4;
             dstPixels += 3;
@@ -82,33 +89,29 @@ namespace coder::HWY_NAMESPACE {
     }
 
     void HRgba16bit2RGB(const uint16_t *HWY_RESTRICT src, int srcStride,
-                        uint16_t *HWY_RESTRICT dst, int dstStride, int height,
-                        int width) {
+                        uint16_t *HWY_RESTRICT dst, int dstStride, int width,
+                        int height, const int *HWY_RESTRICT permuteMap) {
         auto rgbaData = reinterpret_cast<const uint8_t *>(src);
         auto rgbData = reinterpret_cast<uint8_t *>(dst);
 
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    width * height / (256 * 256)), 1, 12);
-        vector<thread> workers;
+        const ScalableTag<uint16_t> du16;
 
-        int segmentHeight = height / threadCount;
-
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back([start, end, rgbaData, srcStride, dstStride, width, rgbData]() {
-                for (int y = start; y < end; ++y) {
-                    Rgba16bitToRGBC(reinterpret_cast<const uint16_t *>(rgbaData + srcStride * y),
-                                    reinterpret_cast<uint16_t *>(rgbData + dstStride * y), width);
-                }
-            });
+        for (int y = 0; y < height; ++y) {
+            RgbaToRGB(du16, reinterpret_cast<const uint16_t *>(rgbaData + srcStride * y),
+                      reinterpret_cast<uint16_t *>(rgbData + dstStride * y), width, permuteMap);
         }
+    }
 
-        for (std::thread &thread: workers) {
-            thread.join();
+    void rgb8bit2RGBH(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int width,
+                      int height, const int *HWY_RESTRICT permuteMap) {
+        auto rgbaData = reinterpret_cast<const uint8_t *>(src);
+        auto rgbData = reinterpret_cast<uint8_t *>(dst);
+
+        const ScalableTag<uint8_t> du8;
+
+        for (int y = 0; y < height; ++y) {
+            RgbaToRGB(du8, reinterpret_cast<const uint8_t *>(rgbaData + srcStride * y),
+                      reinterpret_cast<uint8_t *>(rgbData + dstStride * y), width, permuteMap);
         }
     }
 
@@ -117,13 +120,27 @@ HWY_AFTER_NAMESPACE();
 
 #if HWY_ONCE
 
-namespace coder {
-    HWY_EXPORT(Rgba16bitToRGBC);
+namespace aire {
     HWY_EXPORT(HRgba16bit2RGB);
     HWY_DLLEXPORT void Rgba16bit2RGB(const uint16_t *HWY_RESTRICT src, int srcStride,
-                                     uint16_t *HWY_RESTRICT dst, int dstStride, int height,
-                                     int width) {
-        HWY_DYNAMIC_DISPATCH(HRgba16bit2RGB)(src, srcStride, dst, dstStride, height, width);
+                                     uint16_t *HWY_RESTRICT dst, int dstStride, int width,
+                                     int height) {
+        const int permuteMap[3] = {0, 1, 2};
+        HWY_DYNAMIC_DISPATCH(HRgba16bit2RGB)(src, srcStride, dst, dstStride, width, height, permuteMap);
+    }
+
+    HWY_EXPORT(rgb8bit2RGBH);
+
+    void rgb8bit2RGB(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int width,
+                     int height) {
+        const int permuteMap[3] = {0, 1, 2};
+        HWY_DYNAMIC_DISPATCH(rgb8bit2RGBH)(src, srcStride, dst, dstStride, width, height, permuteMap);
+    }
+
+    void rgb8bit2BGR(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int width,
+                     int height) {
+        const int permuteMap[3] = {2, 1, 0};
+        HWY_DYNAMIC_DISPATCH(rgb8bit2RGBH)(src, srcStride, dst, dstStride, width, height, permuteMap);
     }
 }
 

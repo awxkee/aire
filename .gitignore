@@ -20,3 +20,4 @@ local.properties
 /app/release/output-metadata.json
 *.apk
 app-release.dm
+/app/release/release/output-metadata.json

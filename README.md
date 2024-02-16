@@ -5,6 +5,7 @@
 Image processing speed increased by [libhwy](https://github.com/google/highway)
 
 # Usage
+
 ```kotlin
 Aire.gaussianBlur(bitmap, ...)
 ```
@@ -12,6 +13,7 @@ Aire.gaussianBlur(bitmap, ...)
 # Done filters
 
 ## Blur:
+
 - [x] Gaussian Blur
 - [x] Stack Blur
 - [x] Poisson blur
@@ -22,6 +24,7 @@ Aire.gaussianBlur(bitmap, ...)
 - [x] Anisotropic Diffusion
 
 ## Base operations:
+
 - [x] Saturation
 - [x] Contrast
 - [x] Brightness
@@ -34,6 +37,25 @@ Aire.gaussianBlur(bitmap, ...)
 - [x] Vibrance
 - [x] Dilate
 - [x] Erode
+- [x] Scaling ( a lot of methods )
 
 ## Effects:
+
 - [x] Bokeh
+- [x] Fractal Effect
+- [x] Marble
+- [x] Oil
+- [x] Water effect
+- [x] Glitch
+- [x] Tilt Shift
+- [x] Wind Stagger
+
+## Postprocessing:
+
+- [x] Dehaze dark channel
+
+## Compression:
+
+- [x] Mozjpeg compression
+- [x] PNG Quantize
+- [x] Palette quantize
