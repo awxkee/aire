@@ -5,6 +5,10 @@
 #pragma once
 
 #include "Eigen/Eigen"
+#include <queue>
+#include <algorithm>
+
+using namespace std;
 
 inline
 static uint32_t packRGBA(Eigen::Vector4i color) {
@@ -90,4 +94,73 @@ static Eigen::Matrix<float, 4, 2> computeBoundingBox(const Eigen::Matrix3f& tran
     points.row(2) = corner3.hnormalized().head<2>();
     points.row(3) = corner4.hnormalized().head<2>();
     return points;
+}
+
+static void floodFill(Eigen::MatrixXi &grid, int startX, int startY, int target, int replacement) {
+    int rows = grid.size();
+    if (rows == 0) return;
+    int cols = grid.cols();
+    if (cols == 0) return;
+
+    if (startX < 0 || startX >= rows || startY < 0 || startY >= cols)
+        return;
+
+    std::queue<std::pair<int, int>> pointsQueue;
+    pointsQueue.push({startX, startY});
+
+    while (!pointsQueue.empty()) {
+        auto [x, y] = pointsQueue.front();
+        pointsQueue.pop();
+
+        if (x < 0 || x >= rows || y < 0 || y >= cols || grid(x, y) != target)
+            continue;
+
+        grid(x, y) = replacement;
+
+        pointsQueue.push({x + 1, y});
+        pointsQueue.push({x - 1, y});
+        pointsQueue.push({x, y + 1});
+        pointsQueue.push({x, y - 1});
+    }
+}
+
+
+static Eigen::MatrixXi getBokehEffect(int radius, float startAngle, int sides) {
+    Eigen::MatrixXi kernel(2 * radius + 1, 2 * radius + 1);
+    kernel = Eigen::MatrixXi::Ones(2 * radius + 1, 2 * radius + 1);
+    int diameter = (radius * 2) + 1;
+    float startRadians = startAngle;
+    float endRadians = M_PI * 2 + startAngle;
+
+    float previousX = -1;
+    float previousY = -1;
+
+    float angle = ((M_PI * 2.0f) / float(sides));
+
+    for (float radian = startRadians; radian < endRadians + 2; radian += angle) {
+        float x = float(radius) + sin(radian) * (radius - 0.01f);
+        float y = float(radius) + cos(radian) * (radius - 0.01f);
+
+        if (previousX != -1) {
+            float deltaX = 1.0 / std::max(std::abs(previousX - x), std::abs(previousY - y));
+
+            for (float t = 0; t < 1; t += deltaX) {
+                float newX = lerp(previousX, x, t);
+                float newY = lerp(previousY, y, t);
+
+                int coordX = round(newX);
+                int coordY = round(newY);
+
+                if (coordX >= 0 && coordX < diameter && coordY >= 0 && coordY < diameter) {
+                    kernel(coordY, coordX) = 0;
+                }
+            }
+        }
+
+        previousX = x;
+        previousY = y;
+    }
+
+    floodFill(kernel, 0, 0, 1, 0);
+    return kernel;
 }

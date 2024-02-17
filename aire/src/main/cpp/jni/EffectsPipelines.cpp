@@ -14,6 +14,7 @@
 #include "base/Dilation.h"
 #include "color/ConvolveToneMapper.h"
 #include "MathUtils.hpp"
+#include "EigenUtils.h"
 
 extern "C"
 JNIEXPORT jobject JNICALL
