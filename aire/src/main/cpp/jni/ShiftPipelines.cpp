@@ -45,7 +45,7 @@ Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_tiltShiftImpl(JNIEnv *env, jobje
                                                     }
                                                     blurred.clear();
                                                     return {
-                                                            .data = std::move(output),
+                                                            .data = output,
                                                             .stride = stride,
                                                             .width = width,
                                                             .height = height,

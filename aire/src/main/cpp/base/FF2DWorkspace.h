@@ -76,10 +76,10 @@ namespace aire {
             float *ptr, *ptr_end, *ptr2;
 
             // Reset the content of ws.in_src
-            for (ptr = in_src, ptr_end = in_src + h_fftw * w_fftw; ptr != ptr_end; ++ptr)
-                *ptr = 0.0;
-            for (ptr = in_kernel, ptr_end = in_kernel + h_fftw * w_fftw; ptr != ptr_end; ++ptr)
-                *ptr = 0.0;
+            for (ptr = in_src, ptr_end = in_src + h_fftw * w_fftw; ptr < ptr_end; ++ptr)
+                *ptr = 0.f;
+            for (ptr = in_kernel, ptr_end = in_kernel + h_fftw * w_fftw; ptr < ptr_end; ++ptr)
+                *ptr = 0.f;
 
             for (int i = 0; i < h_fftw; ++i)
                 for (int j = 0; j < w_fftw; ++j, ++ptr) {
@@ -123,14 +123,20 @@ namespace aire {
             fftwf_execute(p_back);
             // Scale the transform
 
-            float max = 0;
-            for (ptr = dst_fft, ptr_end = dst_fft + w_fftw * h_fftw; ptr != ptr_end; ++ptr)
-                if (max < *ptr) {
-                    max = *ptr;
-                }
+//            for (ptr = dst_fft, ptr_end = dst_fft + w_fftw * h_fftw; ptr < ptr_end; ++ptr)
+//                if (max < *ptr) {
+//                    max = *ptr;
+//                }
+//
+//            if (max != 0.f) {
+//                for (ptr = dst_fft, ptr_end = dst_fft + w_fftw * h_fftw; ptr < ptr_end; ++ptr)
+//                    *ptr /= max;
+//            }
 
-            for (ptr = dst_fft, ptr_end = dst_fft + w_fftw * h_fftw; ptr != ptr_end; ++ptr)
-                *ptr /= max;
+            const float normalizationFactor = float(h_fftw*w_fftw);
+
+            for (ptr = dst_fft, ptr_end = dst_fft + w_fftw * h_fftw; ptr < ptr_end; ++ptr)
+                *ptr /= normalizationFactor;
         }
 
 

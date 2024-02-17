@@ -32,7 +32,8 @@ namespace aire {
         const VF max255 = Set(dfx4, 255);
 
         const auto src = workspace->getOutput();
-        for (int y = 0; y < height; y++) {
+
+        for (int y = 0; y < height; ++y) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
             for (; x + 4 < width && x + dxR + 4 < dstWidth; x += 4) {
@@ -43,7 +44,7 @@ namespace aire {
                 dst[chanIndex + 4] = ExtractLane(vec, 1);
                 dst[chanIndex + 8] = ExtractLane(vec, 2);
                 dst[chanIndex + 12] = ExtractLane(vec, 3);
-                dst += 4*4;
+                dst += 16;
             }
 
             for (; x < width; ++x) {
@@ -115,19 +116,21 @@ namespace aire {
     }
 
     void Convolve2D::fftConvolve(uint8_t *data, int stride, int width, int height) {
-        std::vector<float> rV(width * height, 0.0);
-        std::vector<float> gV(width * height, 0.0);
-        std::vector<float> bV(width * height, 0.0);
-        std::vector<float> aV(width * height, 0.0);
+        std::vector<float> rV(width * height, 0.f);
+        std::vector<float> gV(width * height, 0.f);
+        std::vector<float> bV(width * height, 0.f);
+        std::vector<float> aV(width * height, 0.f);
 
         for (int y = 0; y < height; y++) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
             for (; x < width; ++x) {
-                rV[y * width + x] = dst[0] / 255.0;
-                gV[y * width + x] = dst[1] / 255.0;
-                bV[y * width + x] = dst[2] / 255.0;
-                aV[y * width + x] = dst[3] / 255.0;
+                Eigen::Vector4f color = {dst[0], dst[1], dst[2], dst[3]};
+                color /= 255.f;
+                rV[y * width + x] = color.x();
+                gV[y * width + x] = color.y();
+                bV[y * width + x] = color.z();
+                aV[y * width + x] = color.w();
                 dst += 4;
             }
         }
@@ -156,7 +159,6 @@ namespace aire {
         workspace->convolveWorkspace(aV.data(), kernel.data());
         aV.clear();
         applyChannel(workspace.get(), data, stride, 3, width, height);
-
         workspace.reset();
     }
 

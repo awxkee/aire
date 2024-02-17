@@ -55,16 +55,21 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                            BitmapFactory.decodeResource(resources, R.drawable.resized_test)
 //                                .scaleWith(0.5f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
 //                        val kdTime = measureTimeMillis {
-//                            val pl = Aire.scale(bitmap, 2147483647, 2147483647, BitmapScaleMode.Lanczos, true)
+//                            val pl = Aire.tiltShift(bitmap, radius = 9f, sigma = 6f)
 //                            scope.launch {
 //                                imagesArray.add(pl)
+//                            }
+//
+//                            val blurred = Aire.gaussianBlur(bitmap, radius = 9, sigma = 6f)
+//                            scope.launch {
+//                                imagesArray.add(blurred)
 //                            }
 //                        }
 //                        var radius = 5
