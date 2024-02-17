@@ -233,10 +233,6 @@ namespace aire {
     }
 
     void Convolve2D::convolve(uint8_t *data, int stride, int width, int height) {
-        if (this->matrix.rows() < 7 && this->matrix.cols() < 7) {
-            this->bruteForceConvolve(data, stride, width, height);
-            return;
-        }
-        fftConvolve(data, stride, width, height);
+        this->bruteForceConvolve(data, stride, width, height);
     }
 }

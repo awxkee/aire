@@ -10,11 +10,12 @@
 
 #include "hwy/highway.h"
 
-using namespace std;
-using namespace hwy;
-using namespace hwy::HWY_NAMESPACE;
-
 namespace aire {
+
+    using namespace std;
+    using namespace hwy;
+    using namespace hwy::HWY_NAMESPACE;
+
     template<class V>
     void
     bilateralBlurPass(V *data, V *transient, int y, int stride, int width, int height, float radius,

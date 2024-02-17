@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
 //                        }
 //
 //                        val kdTime = measureTimeMillis {
-//                            val blurred = Aire.gaussianBlur(bitmap, radius = 35, sigma = 35f)
+//                            val blurred = Aire.gaussianBlur(bitmap, 15, 5f)
 //                            scope.launch {
 //                                imagesArray.add(blurred)
 //                            }

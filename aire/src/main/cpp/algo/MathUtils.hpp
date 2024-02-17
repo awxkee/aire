@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <queue>
+#include "Eigen/Eigen"
 
 using namespace std;
 
@@ -39,10 +40,10 @@ static std::vector<std::vector<int>> getStructuringKernel(int size) {
     return std::move(kernel);
 }
 
-static void floodFill(std::vector<std::vector<int>> &grid, int startX, int startY, int target, int replacement) {
+static void floodFill(Eigen::MatrixXi &grid, int startX, int startY, int target, int replacement) {
     int rows = grid.size();
     if (rows == 0) return;
-    int cols = grid[0].size();
+    int cols = grid.cols();
     if (cols == 0) return;
 
     if (startX < 0 || startX >= rows || startY < 0 || startY >= cols)
@@ -55,10 +56,10 @@ static void floodFill(std::vector<std::vector<int>> &grid, int startX, int start
         auto [x, y] = pointsQueue.front();
         pointsQueue.pop();
 
-        if (x < 0 || x >= rows || y < 0 || y >= cols || grid[x][y] != target)
+        if (x < 0 || x >= rows || y < 0 || y >= cols || grid(x, y) != target)
             continue;
 
-        grid[x][y] = replacement;
+        grid(x, y) = replacement;
 
         pointsQueue.push({x + 1, y});
         pointsQueue.push({x - 1, y});
@@ -68,8 +69,9 @@ static void floodFill(std::vector<std::vector<int>> &grid, int startX, int start
 }
 
 
-static std::vector<std::vector<int>> getBokehEffect(int radius, float startAngle, int sides) {
-    std::vector<std::vector<int>> kernel(2 * radius + 1, std::vector<int>(2 * radius + 1, 1));
+static Eigen::MatrixXi getBokehEffect(int radius, float startAngle, int sides) {
+    Eigen::MatrixXi kernel(2 * radius + 1, 2 * radius + 1);
+    kernel = Eigen::MatrixXi::Ones(2 * radius + 1, 2 * radius + 1);
     int diameter = (radius * 2) + 1;
     float startRadians = startAngle;
     float endRadians = M_PI * 2 + startAngle;
@@ -94,7 +96,7 @@ static std::vector<std::vector<int>> getBokehEffect(int radius, float startAngle
                 int coordY = round(newY);
 
                 if (coordX >= 0 && coordX < diameter && coordY >= 0 && coordY < diameter) {
-                    kernel[coordY][coordX] = 0;
+                    kernel(coordY, coordX) = 0;
                 }
             }
         }
@@ -156,5 +158,5 @@ static inline int max3(int a, int b, int c) {
 
 inline
 static uint32_t packRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    return ((uint32_t)a << 24) | ((uint32_t)b << 16) | ((uint32_t)g << 8) | (uint32_t)r;
+    return ((uint32_t) a << 24) | ((uint32_t) b << 16) | ((uint32_t) g << 8) | (uint32_t) r;
 }

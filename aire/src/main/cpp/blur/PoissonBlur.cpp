@@ -55,14 +55,8 @@ namespace aire {
     }
 
     void poissonBlur(uint8_t *data, int stride, int width, int height, int radius) {
-        if (radius <= 8) {
-            auto kernel = generatePoissonBlur(radius);
-            convolve1D(data, stride, width, height, kernel, kernel);
-        } else {
-            auto kernel = generatePoissonBlur2D(2 * radius + 1);
-            aire::Convolve2D convolution(kernel);
-            convolution.convolve(data, stride, width, height);
-        }
+        auto kernel = generatePoissonBlur(radius);
+        convolve1D(data, stride, width, height, kernel, kernel);
     }
 
     std::vector<float> generatePoissonBlur(int radius) {

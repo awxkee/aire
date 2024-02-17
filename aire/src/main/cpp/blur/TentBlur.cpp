@@ -66,14 +66,8 @@ namespace aire {
     }
 
     void tentBlur(uint8_t *data, int stride, int width, int height, int radius) {
-        if (radius <= 8) {
-            auto gen1DKernel = generate1DTentFilterKernelNormalized(2 * radius + 1);
-            convolve1D(data, stride, width, height, gen1DKernel, gen1DKernel);
-        } else {
-            auto kernel = generateTentFilter(2 * radius + 1);
-            aire::Convolve2D convolution(kernel);
-            convolution.convolve(data, stride, width, height);
-        }
+        auto gen1DKernel = generate1DTentFilterKernelNormalized(2 * radius + 1);
+        convolve1D(data, stride, width, height, gen1DKernel, gen1DKernel);
     }
 
     void tentBlurF16(uint16_t *data, int stride, int width, int height, int radius) {

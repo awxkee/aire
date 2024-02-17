@@ -20,14 +20,8 @@ using namespace std;
 namespace aire {
 
     void boxBlurU8(uint8_t *data, int stride, int width, int height, int radius) {
-        if (radius <= 8) {
-            const auto kernel = generateBoxKernel(radius);
-            convolve1D(data, stride, width, height, kernel, kernel);
-        } else {
-            auto kernel = generateBoxKernel2D(2 * radius + 1);
-            aire::Convolve2D convolution(kernel);
-            convolution.convolve(data, stride, width, height);
-        }
+        const auto kernel = generateBoxKernel(radius);
+        convolve1D(data, stride, width, height, kernel, kernel);
     }
 
     void boxBlurF16(uint16_t *data, int stride, int width, int height, int radius) {

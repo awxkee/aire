@@ -32,14 +32,8 @@ namespace aire {
     }
 
     void gaussBlurU8(uint8_t *data, int stride, int width, int height, float radius, float sigma) {
-        if (radius <= 8) {
-            vector<float> kernel = compute1DGaussianKernel(radius * 2 + 1, sigma);
-            convolve1D(data, stride, width, height, kernel, kernel);
-        } else {
-            auto kernel = generate2DGaussianKernel(radius, sigma);
-            aire::Convolve2D convolution(kernel);
-            convolution.convolve(data, stride, width, height);
-        }
+        vector<float> kernel = compute1DGaussianKernel(radius * 2 + 1, sigma);
+        convolve1D(data, stride, width, height, kernel, kernel);
     }
 
     void gaussBlurF16(uint16_t *data, int stride, int width, int height, float radius, float sigma) {

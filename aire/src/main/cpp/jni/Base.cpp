@@ -79,11 +79,11 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_dilatePipeline(JNIEnv *env, jobj
 
         int size = std::sqrt(length);
 
-        std::vector<std::vector<int>> matrix(size, std::vector<int>(size));
+        Eigen::MatrixXi matrix(size, size);
         jfloat *inputElements = env->GetFloatArrayElements(kernel, 0);
         for (int j = 0; j < size; ++j) {
             for (int i = 0; i < size; ++i) {
-                matrix[j][i] = inputElements[j * size + i];
+                matrix(j, i) = inputElements[j * size + i];
             }
         }
         env->ReleaseFloatArrayElements(kernel, inputElements, 0);
@@ -99,17 +99,14 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_dilatePipeline(JNIEnv *env, jobj
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-
                                                         std::vector<uint8_t> output(
                                                                 stride * height);
-
                                                         aire::dilateRGBA(input.data(),
                                                                          output.data(),
                                                                          stride,
                                                                          width,
                                                                          height,
                                                                          matrix);
-
                                                         input = output;
                                                     }
                                                     return {
