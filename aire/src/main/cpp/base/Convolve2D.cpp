@@ -21,7 +21,7 @@ namespace aire {
                                   const int height) {
 
         const FixedTag<float32_t, 4> dfx4;
-        const FixedTag<uint8_t , 4> du8x4;
+        const FixedTag<uint8_t, 4> du8x4;
         using VF = Vec<decltype(dfx4)>;
 
         const int dxR = matrix.cols();
@@ -30,7 +30,6 @@ namespace aire {
         const int dstWidth = workspace->getDstWidth();
         const VF zeros = Zero(dfx4);
         const VF max255 = Set(dfx4, 255);
-        const VF colorScale = ApproximateReciprocal(max255);
 
         const auto src = workspace->getOutput();
         for (int y = 0; y < height; y++) {
@@ -123,7 +122,8 @@ namespace aire {
 
         for (int y = 0; y < height; y++) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
-            for (int x = 0; x < width; ++x) {
+            int x = 0;
+            for (; x < width; ++x) {
                 rV[y * width + x] = dst[0] / 255.0;
                 gV[y * width + x] = dst[1] / 255.0;
                 bV[y * width + x] = dst[2] / 255.0;

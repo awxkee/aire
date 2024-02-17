@@ -12,6 +12,10 @@
 #include "tone/HableFilmicToneMapper.hpp"
 #include "tone/AcesFilmicToneMapper.hpp"
 #include "tone/MonochromeToneMapper.hpp"
+#include "tone/MobiusToneMapper.hpp"
+#include "tone/UchimuraToneMapper.hpp"
+#include "tone/AldridgeToneMapper.hpp"
+#include "tone/DragoToneMapper.hpp"
 #include "algo/support-inl.h"
 #include "Eigen/Eigen"
 #include "color/Blend.h"
@@ -97,6 +101,31 @@ namespace aire {
 
     void acesFilm(uint8_t *data, int stride, int width, int height, float exposure) {
         AcesFilmicToneMapper<FixedTag<float32_t, 4>> toneMapper(exposure);
+        convolveToneMapper(data, stride, width, height, &toneMapper);
+    }
+
+    void mobius(uint8_t *data, int stride, int width, int height, float exposure, float transition, float peak) {
+        MobiusToneMapper<FixedTag<float32_t, 4>> toneMapper(exposure, transition, peak);
+        convolveToneMapper(data, stride, width, height, &toneMapper);
+    }
+
+    void aldridge(uint8_t *data, int stride, int width, int height, float exposure, float cutoff) {
+        AldridgeToneMapper<FixedTag<float32_t, 4>> toneMapper(exposure, cutoff);
+        convolveToneMapper(data, stride, width, height, &toneMapper);
+    }
+
+    void drago(uint8_t *data, int stride, int width, int height, float exposure, float sdrWhitePoint) {
+        const float rPrimary = 0.299f;
+        const float gPrimary = 0.587f;
+        const float bPrimary = 0.114f;
+
+        const float coeffs[3] = {rPrimary, gPrimary, bPrimary};
+        DragoToneMapper<FixedTag<float32_t, 4>> toneMapper(coeffs, exposure, sdrWhitePoint);
+        convolveToneMapper(data, stride, width, height, &toneMapper);
+    }
+
+    void uchimura(uint8_t *data, int stride, int width, int height, float exposure) {
+        UchimuraToneMapper<FixedTag<float32_t, 4>> toneMapper(exposure);
         convolveToneMapper(data, stride, width, height, &toneMapper);
     }
 

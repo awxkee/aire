@@ -150,7 +150,7 @@ namespace aire::HWY_NAMESPACE {
         if (v <= 0.045f) {
             return v / 12.92f;
         } else {
-            return pow((v + 0.055f) / 1.055f, 2.4f);
+            return std::pow((v + 0.055f) / 1.055f, 2.4f);
         }
     }
 
@@ -158,7 +158,7 @@ namespace aire::HWY_NAMESPACE {
         if (linear <= 0.0031308f) {
             return 12.92f * linear;
         } else {
-            return 1.055f * pow(linear, 1.0f / 2.4f) - 0.055f;
+            return 1.055f * std::pow(linear, 1.0f / 2.4f) - 0.055f;
         }
     }
 

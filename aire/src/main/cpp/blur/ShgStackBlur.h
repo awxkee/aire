@@ -7,6 +7,8 @@
 
 #include <cstdint>
 
-void shgStackBlur(uint8_t *data, int width, int height, int radius);
+namespace aire {
+    void shgStackBlur(uint8_t *data, int width, int height, int radius);
+}
 
 #endif //JXLCODER_SHGSTACKBLUR_H

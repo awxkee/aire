@@ -36,6 +36,30 @@ class TonePipelinesImpl : TonePipelines {
         return whiteBalanceImpl(bitmap, temperature, tint)
     }
 
+    override fun mobius(bitmap: Bitmap, exposure: Float, transition: Float, peak: Float): Bitmap {
+        return mobiusImpl(bitmap, exposure, transition, peak)
+    }
+
+    override fun uchimura(bitmap: Bitmap, exposure: Float): Bitmap {
+        return uchimuraImpl(bitmap, exposure)
+    }
+
+    override fun aldridge(bitmap: Bitmap, exposure: Float, cutoff: Float): Bitmap {
+        return aldridgeImpl(bitmap, exposure, cutoff)
+    }
+
+    override fun drago(bitmap: Bitmap, exposure: Float, sdrWhitePoint: Float): Bitmap {
+        return dragoImpl(bitmap, exposure, sdrWhitePoint)
+    }
+
+    private external fun dragoImpl(bitmap: Bitmap, exposure: Float, sdrWhitePoint: Float): Bitmap
+
+    private external fun aldridgeImpl(bitmap: Bitmap, exposure: Float, cutoff: Float): Bitmap
+
+    private external fun uchimuraImpl(bitmap: Bitmap, exposure: Float): Bitmap
+
+    private external fun mobiusImpl(bitmap: Bitmap, exposure: Float, transition: Float, peak: Float): Bitmap
+
     private external fun whiteBalanceImpl(bitmap: Bitmap, temperature: Float, tint: Float): Bitmap
 
     private external fun monochromeImpl(bitmap: Bitmap, color: FloatArray, exposure: Float): Bitmap

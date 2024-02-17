@@ -54,27 +54,19 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-//                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                                .scaleWith(0.5f)
-//                        scope.launch {
-//                            imagesArray.add(bitmap)
-//                        }
-//
-//                        val kdTime = measureTimeMillis {
-//
-//                            val compressed = Aire.toJPEG(bitmap, 61)
-//                            val bmp = BitmapFactory.decodeByteArray(compressed, 0, compressed.size)
-//
-//                            val bos = ByteArrayOutputStream()
-//                            bitmap.compress(Bitmap.CompressFormat.JPEG, 61, bos)
-//                            val bia = bos.toByteArray()
-//                            scope.launch {
-//                                imagesArray.add(bmp)
-//                            }
-//
-//                            Log.d("AireTest", "Compressed mozjpeg ${compressed.size/1024}kbytes vs regular ${bia.size/1024}")
-//                        }
+                        val bitmap =
+                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+                                .scaleWith(0.5f)
+                        scope.launch {
+                            imagesArray.add(bitmap)
+                        }
+
+                        val kdTime = measureTimeMillis {
+                            val pl = Aire.drago(bitmap, 1.0f)
+                            scope.launch {
+                                imagesArray.add(pl)
+                            }
+                        }
 //                        var radius = 5
 //                        repeat(25) {
 //                            val time = measureTimeMillis {

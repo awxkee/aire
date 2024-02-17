@@ -36,10 +36,9 @@ jobject AcquireBitmapPixels(JNIEnv *env, jobject bitmap,
             }
         }
         if (osVersion < 33) {
-            auto it = std::find_if(allowedFormats.begin(), allowedFormats.end(),
-                                   [](const AcquirePixelFormat &format) {
-                                       return format == APF_RGBA1010102;
-                                   });
+            auto it = std::find_if(allowedFormats.begin(), allowedFormats.end(), [](const AcquirePixelFormat &format) {
+                return format == APF_RGBA1010102;
+            });
             if (it != allowedFormats.end()) {
                 allowedFormats.erase(it);
             }

@@ -37,6 +37,7 @@ Aire.gaussianBlur(bitmap, ...)
 - [x] Vibrance
 - [x] Dilate
 - [x] Erode
+- [x] Exposure
 - [x] Scaling ( a lot of methods )
 
 ## Effects:
@@ -49,6 +50,7 @@ Aire.gaussianBlur(bitmap, ...)
 - [x] Glitch
 - [x] Tilt Shift
 - [x] Wind Stagger
+- [x] Monochrome
 
 ## Postprocessing:
 
@@ -58,4 +60,15 @@ Aire.gaussianBlur(bitmap, ...)
 
 - [x] Mozjpeg compression
 - [x] PNG Quantize
-- [x] Palette quantize
+- [x] Palette quantize]
+
+## Tone Mapping:
+- [x] Uchimura
+- [x] Hable
+- [x] Aces Filmic
+- [x] Aces Hill
+- [x] Hejl Burgess
+- [x] Logarithmic
+- [x] Mobius
+- [x] Aldridge
+- [x] Drago

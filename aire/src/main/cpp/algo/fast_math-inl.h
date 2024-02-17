@@ -121,6 +121,15 @@ namespace aire::HWY_NAMESPACE {
     }
 
     template<class DF, class V>
+    HWY_FAST_MATH_INLINE V
+    Log10f(const DF df, V x) {
+        const auto baseScalar = Set(df, 10.0f);
+        const auto base = Lognf(df, baseScalar);
+        const auto logNum = Lognf(df, x);
+        return Div(logNum, base);
+    }
+
+    template<class DF, class V>
     HWY_FAST_MATH_INLINE V Pow(const DF df, V val, V n) {
         return hwy::HWY_NAMESPACE::sleef::Exp(df, Mul(n, hwy::HWY_NAMESPACE::sleef::LogFast(df, val)));
     }

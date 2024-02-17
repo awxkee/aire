@@ -29,12 +29,18 @@ namespace aire {
                 auto sourceA = src[3];
                 auto newA = blurredA * fraction;
 
-                auto blendedR = blendColor(src[0] / 255.f, blurredSource[0] / 255.f, newA / 255.f);
-                auto blendedG = blendColor(src[1] / 255.f, blurredSource[1] / 255.f, newA / 255.f);
-                auto blendedB = blendColor(src[2] / 255.f, blurredSource[2] / 255.f, newA / 255.f);
-                dst[0] = std::clamp(blendedR * 255.f, 0.f, 255.f);
-                dst[1] = std::clamp(blendedG * 255.f, 0.f, 255.f);
-                dst[2] = std::clamp(blendedB * 255.f, 0.f, 255.f);
+                Eigen::Vector3f mSource = {src[0], src[1], src[2]};
+                mSource /= 255.f;
+                Eigen::Vector3f blurSource = {blurredSource[0], blurredSource[1], blurredSource[2]};
+                blurSource /= 255.f;
+                Eigen::Vector3f aSrc = {newA, newA, newA};
+                aSrc /= 255.f;
+                auto blended = blendColor(mSource, blurSource, aSrc);
+                auto cmp = (blended.array() * 255.f).min(255.f).max(0.f);
+
+                dst[0] = cmp.x();
+                dst[1] = cmp.y();
+                dst[2] = cmp.z();
                 dst[3] = sourceA;
                 src += 4;
                 dst += 4;

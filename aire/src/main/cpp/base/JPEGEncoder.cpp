@@ -95,7 +95,7 @@ namespace aire {
             throw AireError(msg);
         }
 
-        std::vector<uint8_t > output;
+        std::vector<uint8_t> output;
         jpeg_stdvector_dest(&cinfo, output);
 
         cinfo.image_width = width;

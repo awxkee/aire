@@ -32,7 +32,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_stackNativeBlurPipeline(JNIEnv *
                                                 [radius](std::vector<uint8_t> &input, int stride,
                                                          int width, int height,
                                                          AcquirePixelFormat fmt) -> BuiltImagePresentation {
-                                                    shgStackBlur(input.data(), width, height, radius);
+                                                    aire::shgStackBlur(input.data(), width, height, radius);
                                                     return {
                                                             .data = input,
                                                             .stride = stride,

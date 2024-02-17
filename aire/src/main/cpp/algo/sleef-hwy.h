@@ -793,12 +793,21 @@ HWY_INLINE Mask<D> SignBitMask(const D df, Vec<D> d) {
   return RebindMask(df, Eq(And(BitCast(di, d), Set(di, 0x80000000)), Set(di, 0x80000000)));
 }
 
+template<class DF, class V>
+HWY_INLINE V
+Log10f(const DF df, V x) {
+    const auto baseScalar = Set(df, 10.0f);
+    const auto base = LogFast(df, baseScalar);
+    const auto logNum = LogFast(df, x);
+    return Div(logNum, base);
+}
+
 // Zero out x when the sign bit of d is not set
 // Translated from libm/sleefsimdsp.c:480 vsel_vi2_vf_vi2
 template<class D>
 HWY_INLINE Vec<RebindToSigned<D>> SignBitOrZero(const D df, Vec<D> d, Vec<RebindToSigned<D>> x) {
   RebindToSigned<D> di;
-  
+
   return IfThenElseZero(RebindMask(di, SignBitMask(df, d)), x);
 }
 
