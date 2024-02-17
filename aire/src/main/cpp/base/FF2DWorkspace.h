@@ -83,19 +83,19 @@ namespace aire {
 
             for (int i = 0; i < h_fftw; ++i)
                 for (int j = 0; j < w_fftw; ++j, ++ptr) {
-                    int reflected_x = std::min(std::max(j, 0), w_src - 1);
+                    int reflectedX = std::clamp(j, 0, w_src - 1);
                     if (j < 0)
-                        reflected_x = -j;
+                        reflectedX = -j;
                     else if (j >= w_src)
-                        reflected_x = 2 * w_src - j - 2;
+                        reflectedX = 2 * w_src - j - 2;
 
-                    int reflected_y = std::min(std::max(i, 0), h_src - 1);
+                    int reflectedY = std::clamp(i, 0, h_src - 1);
                     if (i < 0)
-                        reflected_y = -i;
+                        reflectedY = -i;
                     else if (i >= h_src)
-                        reflected_y = 2 * h_src - i - 2;
+                        reflectedY = 2 * h_src - i - 2;
 
-                    in_src[(i) * w_fftw + j] += src[std::clamp(reflected_y, 0, h_src - 1) * w_src + std::clamp(reflected_x, 0, w_src - 1)];
+                    in_src[(i) * w_fftw + j] += src[std::clamp(reflectedY, 0, h_src - 1) * w_src + std::clamp(reflectedX, 0, w_src - 1)];
                 }
 
             for (int i = 0; i < h_kernel; ++i)
@@ -133,7 +133,7 @@ namespace aire {
 //                    *ptr /= max;
 //            }
 
-            const float normalizationFactor = float(h_fftw*w_fftw);
+            const float normalizationFactor = float(h_fftw * w_fftw);
 
             for (ptr = dst_fft, ptr_end = dst_fft + w_fftw * h_fftw; ptr < ptr_end; ++ptr)
                 *ptr /= normalizationFactor;
