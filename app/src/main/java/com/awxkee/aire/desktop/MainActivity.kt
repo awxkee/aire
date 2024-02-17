@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
 //                        }
 //
 //                        val kdTime = measureTimeMillis {
-//                            val pl = Aire.drago(bitmap, 1.0f)
+//                            val pl = Aire.scale(bitmap, 2147483647, 2147483647, BitmapScaleMode.Lanczos, true)
 //                            scope.launch {
 //                                imagesArray.add(pl)
 //                            }

@@ -31,6 +31,10 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         int lineWidth = dstWidth * sizeof(uint8_t) * 4;
+                                                        if (lineWidth < 0) {
+                                                            std::string msg("Invalid size was provided");
+                                                            throw AireError(msg);
+                                                        }
                                                         int alignment = 64;
                                                         int padding = (alignment - (lineWidth % alignment)) % alignment;
                                                         int dstStride = lineWidth + padding;
@@ -84,6 +88,10 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                         };
                                                     } else if (fmt == APF_F16) {
                                                         int lineWidth = dstWidth * sizeof(uint16_t) * 4;
+                                                        if (lineWidth < 0) {
+                                                            std::string msg("Invalid size was provided");
+                                                            throw AireError(msg);
+                                                        }
                                                         int alignment = 64;
                                                         int padding = (alignment - (lineWidth % alignment)) % alignment;
                                                         int dstStride = lineWidth + padding;
