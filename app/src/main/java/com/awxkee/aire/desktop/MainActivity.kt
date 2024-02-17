@@ -54,19 +54,19 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-                        val bitmap =
-                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-                                .scaleWith(0.3f)
-                        scope.launch {
-                            imagesArray.add(bitmap)
-                        }
-
-                        val kdTime = measureTimeMillis {
-                            val blurred = Aire.gaussianBlur(bitmap, radius = 35, sigma = 35f)
-                            scope.launch {
-                                imagesArray.add(blurred)
-                            }
-                        }
+//                        val bitmap =
+//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                                .scaleWith(0.3f)
+//                        scope.launch {
+//                            imagesArray.add(bitmap)
+//                        }
+//
+//                        val kdTime = measureTimeMillis {
+//                            val blurred = Aire.gaussianBlur(bitmap, radius = 35, sigma = 35f)
+//                            scope.launch {
+//                                imagesArray.add(blurred)
+//                            }
+//                        }
 //                        var radius = 5
 //                        repeat(25) {
 //                            val time = measureTimeMillis {
