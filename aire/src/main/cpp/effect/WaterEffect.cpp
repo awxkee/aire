@@ -12,6 +12,8 @@ namespace aire {
         std::vector<uint8_t> transient(stride * height);
         int xMove = width * fractionSize;
         int yMove = height * fractionSize;
+
+#pragma omp parallel for num_threads(3) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto dst = reinterpret_cast<uint8_t *>(
                     reinterpret_cast<uint8_t *>(transient.data()) +

@@ -207,58 +207,20 @@ namespace aire::HWY_NAMESPACE {
     void NV21ToRGBAHWY(uint8_t *dst, int dstStride, int width, int height, const uint8_t *ySrc,
                        int yStride,
                        const uint8_t *uv, int uvStride, const int permuteMap[4]) {
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    height * width / (256 * 256)), 1, 12);
-        std::vector<std::thread> workers;
-
-        int segmentHeight = height / threadCount;
-
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, ySrc, dstStride, permuteMap, yStride, uvStride, uv, dst, width, height]() {
-                        for (int y = start; y < end; ++y) {
-                            NV21ToRGBARow(dst + y * dstStride, width, ySrc + y * yStride,
-                                          uv + min(y / 2, height / 2 - 1) * uvStride, permuteMap);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
+#pragma omp parallel for num_threads(4) schedule(dynamic)
+        for (int y = 0; y < height; ++y) {
+            NV21ToRGBARow(dst + y * dstStride, width, ySrc + y * yStride,
+                          uv + min(y / 2, height / 2 - 1) * uvStride, permuteMap);
         }
     }
 
     void NV21ToRGBHWY(uint8_t *dst, int dstStride, int width, int height, const uint8_t *ySrc,
                       int yStride,
                       const uint8_t *uv, int uvStride, const int permuteMap[3]) {
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    height * width / (256 * 256)), 1, 12);
-        std::vector<std::thread> workers;
-
-        int segmentHeight = height / threadCount;
-
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, ySrc, dstStride, permuteMap, yStride, uvStride, uv, dst, width, height]() {
-                        for (int y = start; y < end; ++y) {
-                            NV21ToRGBRow(dst + y * dstStride, width, ySrc + y * yStride,
-                                         uv + min(y / 2, height / 2 - 1) * uvStride, permuteMap);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
+#pragma omp parallel for num_threads(4) schedule(dynamic)
+        for (int y = 0; y < height; ++y) {
+            NV21ToRGBRow(dst + y * dstStride, width, ySrc + y * yStride,
+                         uv + min(y / 2, height / 2 - 1) * uvStride, permuteMap);
         }
     }
 }

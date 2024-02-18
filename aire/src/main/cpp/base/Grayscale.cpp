@@ -27,6 +27,7 @@ namespace aire {
         const float lumaPrimaries[4] = {rPrimary, gPrimary, bPrimary, 0.f};
         const VF vLumaPrimaries = LoadU(dfx4, lumaPrimaries);
 
+#pragma omp parallel for num_threads(2) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto dst = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(destination) + y * stride);
             auto src = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(pixels) + y * stride);

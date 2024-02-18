@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <vector>
 #include "color/Blend.h"
+#include "jni/JNIUtils.h"
 #include <thread>
 
 namespace aire {
@@ -15,6 +16,7 @@ namespace aire {
         const float minDistance = availableDistance * radius;
         const int centerX = width * anchorX;
         const int centerY = height * anchorY;
+
         #pragma omp parallel for num_threads(4)
         for (int y = 0; y < height; ++y) {
             auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(source) + y * stride);

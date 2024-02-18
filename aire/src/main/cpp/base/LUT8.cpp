@@ -10,6 +10,7 @@ namespace aire {
     using namespace std;
 
     void LUT8::apply(uint8_t *data, int stride, int width, int height) const {
+#pragma omp parallel for num_threads(3) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto dst = reinterpret_cast<uint8_t *>(
                     reinterpret_cast<uint8_t *>(data) + y * stride);

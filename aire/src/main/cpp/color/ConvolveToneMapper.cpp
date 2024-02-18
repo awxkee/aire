@@ -40,6 +40,7 @@ namespace aire {
 
         const auto zeros = Zero(dfx4);
 
+#pragma omp parallel for num_threads(4) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto pixels = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
@@ -167,6 +168,8 @@ namespace aire {
         const float tmpr = temperature;
         const float tint = tnt / 100.f;
         const Eigen::Vector3f temp = {tmpr, tmpr, tmpr};
+
+#pragma omp parallel for num_threads(4) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto pixels = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;

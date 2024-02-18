@@ -56,62 +56,43 @@ namespace aire {
     }*/
 
     void Convolve2D::bruteForceConvolve(uint8_t *data, int stride, int width, int height) {
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    height * width / (256 * 256)), 1, 12);
-        vector<thread> workers;
-
-        int segmentHeight = height / threadCount;
-
         std::vector<uint8_t> destination(stride * height);
 
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, width, height, this, &destination, data, stride]() {
-                        const Eigen::MatrixXf mt = this->matrix;
+       const Eigen::MatrixXf mt = this->matrix;
 
-                        const FixedTag<uint8_t, 4> du8;
-                        const FixedTag<float32_t, 4> dfx4;
-                        using VF = Vec<decltype(dfx4)>;
-                        const VF zeros = Zero(dfx4);
-                        const auto max255 = Set(dfx4, 255.0f);
-                        const auto revertScale = ApproximateReciprocal(max255);
+       const FixedTag<uint8_t, 4> du8;
+       const FixedTag<float32_t, 4> dfx4;
+       using VF = Vec<decltype(dfx4)>;
+       const VF zeros = Zero(dfx4);
+       const auto max255 = Set(dfx4, 255.0f);
+       const auto revertScale = ApproximateReciprocal(max255);
 
-                        for (int y = start; y < end; ++y) {
-                            auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination.data()) + y * stride);
-                            for (int x = 0; x < width; ++x) {
+#pragma omp parallel for num_threads(4) schedule(dynamic)
+       for (int y = 0; y < height; ++y) {
+           auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination.data()) + y * stride);
+           for (int x = 0; x < width; ++x) {
 
-                                VF store = zeros;
+               VF store = zeros;
 
-                                const int ySize = this->matrix.rows() / 2;
-                                const int xSize = this->matrix.cols() / 2;
+               const int ySize = this->matrix.rows() / 2;
+               const int xSize = this->matrix.cols() / 2;
 
-                                for (int j = -ySize; j <= ySize; ++j) {
-                                    auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + clamp(y + j, 0, height - 1) * stride);
-                                    int i = -xSize;
-                                    for (; i <= xSize; ++i) {
-                                        int px = clamp(x + i, 0, width - 1) * 4;
-                                        auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
-                                        auto weight = Set(dfx4, matrix(j + ySize, i + xSize));
-                                        store = Add(store, Mul(Mul(pixels, revertScale), weight));
-                                    }
-                                }
+               for (int j = -ySize; j <= ySize; ++j) {
+                   auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + clamp(y + j, 0, height - 1) * stride);
+                   int i = -xSize;
+                   for (; i <= xSize; ++i) {
+                       int px = clamp(x + i, 0, width - 1) * 4;
+                       auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                       auto weight = Set(dfx4, matrix(j + ySize, i + xSize));
+                       store = Add(store, Mul(Mul(pixels, revertScale), weight));
+                   }
+               }
 
-                                int px = x * 4;
+               int px = x * 4;
 
-                                StoreU(DemoteToU8(du8, Clamp(Round(Mul(store, max255)), zeros, max255)), du8, &dst[px]);
-                            }
-                        }
-                    });
-        }
-        for (std::thread &thread: workers) {
-            thread.join();
-        }
-
+               StoreU(DemoteToU8(du8, Clamp(Round(Mul(store, max255)), zeros, max255)), du8, &dst[px]);
+           }
+       }
         std::copy(destination.begin(), destination.end(), data);
     }
 

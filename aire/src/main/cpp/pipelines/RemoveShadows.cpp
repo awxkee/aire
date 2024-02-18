@@ -26,7 +26,7 @@ namespace aire {
         std::vector<uint8_t> dstDiff(width * height);
         absDiff(dstDiff.data(), chan.data(), src, width, height);
         diff(chan.data(), 255, dstDiff.data(), width, height);
-        normalize(reinterpret_cast<uint8_t *>(chan.data()), width, height, uint8_t (0), uint8_t(255));
+        normalize(reinterpret_cast<uint8_t *>(chan.data()), width, height, uint8_t(0), uint8_t(255));
         std::copy(chan.begin(), chan.end(), src);
     }
 
@@ -39,21 +39,12 @@ namespace aire {
         split(src, rChan.data(), gChan.data(), bChan.data(), aChan.data(),
               stride, width, height);
 
-        vector<thread> workers;
+        removeProcessChannel(rChan.data(), width, height, kernelSize);
 
-        workers.emplace_back([&rChan, width, height, kernelSize]() {
-            removeProcessChannel(rChan.data(), width, height, kernelSize);
-        });
-        workers.emplace_back([&gChan, width, height, kernelSize]() {
-            removeProcessChannel(gChan.data(), width, height, kernelSize);
-        });
-        workers.emplace_back([&bChan, width, height, kernelSize]() {
-            removeProcessChannel(bChan.data(), width, height, kernelSize);
-        });
+        removeProcessChannel(gChan.data(), width, height, kernelSize);
 
-        for (std::thread &thread: workers) {
-            thread.join();
-        }
+        removeProcessChannel(bChan.data(), width, height, kernelSize);
+
         merge(src, rChan.data(), gChan.data(), bChan.data(), aChan.data(), stride, width, height);
     }
 }

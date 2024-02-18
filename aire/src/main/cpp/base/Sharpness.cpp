@@ -10,6 +10,7 @@ namespace aire {
     using namespace Eigen;
 
     void applySharp(uint8_t *src, uint8_t *sharpenMask, int stride, int width, int height, const float intensity) {
+#pragma omp parallel for num_threads(3) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto dst = reinterpret_cast<uint8_t *>(
                     reinterpret_cast<uint8_t *>(src) + y * stride);
@@ -32,6 +33,7 @@ namespace aire {
     }
 
     void applyUnsharp(uint8_t *src, uint8_t *sharpenMask, int stride, int width, int height, const float intensity) {
+#pragma omp parallel for num_threads(3) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto dst = reinterpret_cast<uint8_t *>(
                     reinterpret_cast<uint8_t *>(src) + y * stride);

@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <cstdint>
 #include <sstream>
+#include <omp.h>
 #include "jni/JNIUtils.h"
 
 namespace aire {
@@ -23,6 +24,8 @@ namespace aire {
         const RebindToSigned<decltype(du)> di;
         using VI = Vec<decltype(du)>;
         const int lanes = du.MaxLanes();
+
+#pragma omp parallel for num_threads(4) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto ms = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(s1) + y * width);
             auto ds = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(s2) +
@@ -91,6 +94,8 @@ namespace aire {
 
         const auto low = Set(du32x1, value);
         const auto high = Set(du32x4, value);
+
+#pragma omp parallel for num_threads(4) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto src = reinterpret_cast<uint32_t *>(reinterpret_cast<uint8_t *>(destination) + y * stride);
             int x = 0;
@@ -124,6 +129,8 @@ namespace aire {
         const auto vGlobalRange = ApproximateReciprocal(Set(dfx4, globalMax - globalMin));
         const auto vNewRange = Set(dfx4, static_cast<float>(max - min));
         const auto vNewMin = Set(dfx4, static_cast<float>(min));
+
+#pragma omp parallel for num_threads(4) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(source) + y * width);
             int x = 0;
@@ -153,6 +160,7 @@ namespace aire {
         const auto leading = Set(du16, value);
         const int lanes = du16.MaxLanes();
 
+#pragma omp parallel for num_threads(3) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto ms = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(s1) + y * width);
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination) +

@@ -9,6 +9,7 @@
 
 namespace aire {
     void vibrance(uint8_t *pixels, int stride, int width, int height, float vibrance) {
+#pragma omp parallel for num_threads(3) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto data = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(pixels) + y * stride);
             int x = 0;

@@ -8,6 +8,7 @@
 namespace aire {
     template<class T>
     void split(T *pixels, T *r, T *g, T *b, T *a, int stride, int width, int height) {
+#pragma omp parallel for num_threads(4) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto src = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(pixels) + y * stride);
             T *rDst = nullptr;
@@ -50,6 +51,7 @@ namespace aire {
 
     template<class T>
     void merge(T *destination, T *r, T *g, T *b, T *a, int stride, int width, int height) {
+#pragma omp parallel for num_threads(4) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto dst = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(destination) + y * stride);
             auto rSrc = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(r) + y * width);

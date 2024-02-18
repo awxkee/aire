@@ -11,6 +11,7 @@ namespace aire {
     using namespace std;
 
     void AffineTransform::apply(uint8_t *destination, int dstStride, int newWidth, int newHeight) {
+#pragma omp parallel for num_threads(4) schedule(dynamic)
         for (int newY = 0; newY < newHeight; ++newY) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination) + newY * dstStride);
             for (int newX = 0; newX < newWidth; ++newX) {

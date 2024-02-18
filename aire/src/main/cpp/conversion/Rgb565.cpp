@@ -505,36 +505,17 @@ namespace aire::HWY_NAMESPACE {
     void RGBAF16To565HWY(const uint16_t *sourceData, int srcStride,
                          uint16_t *dst, int dstStride, int width,
                          int height) {
-        float maxColors = powf(2, (float) 8) - 1;
+        float maxColors = std::pow(2.f, static_cast<float>(8)) - 1;
 
         auto mSrc = reinterpret_cast<const uint8_t *>(sourceData);
         auto mDst = reinterpret_cast<uint8_t *>(dst);
 
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    width * height / (256 * 256)), 1, 12);
-        vector<thread> workers;
-
-        int segmentHeight = height / threadCount;
-
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, mSrc, mDst, srcStride, dstStride, width, maxColors]() {
-                        for (int y = start; y < end; ++y) {
-                            RGBAF16To565RowHWY(
-                                    reinterpret_cast<const uint16_t *>(mSrc + srcStride * y),
-                                    reinterpret_cast<uint16_t *>(mDst + dstStride * y),
-                                    width, maxColors);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
+#pragma omp parallel for num_threads(4) schedule(dynamic)
+        for (int y = 0; y < height; ++y) {
+            RGBAF16To565RowHWY(
+                    reinterpret_cast<const uint16_t *>(mSrc + srcStride * y),
+                    reinterpret_cast<uint16_t *>(mDst + dstStride * y),
+                    width, maxColors);
         }
     }
 
@@ -546,31 +527,12 @@ namespace aire::HWY_NAMESPACE {
         auto mSrc = reinterpret_cast<const uint8_t *>(sourceData);
         auto mDst = reinterpret_cast<uint8_t *>(dst);
 
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    width * height / (256 * 256)), 1, 12);
-        std::vector<std::thread> workers;
-
-        int segmentHeight = height / threadCount;
-
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, mSrc, mDst, srcStride, dstStride, width, maxColors]() {
-                        for (int y = start; y < end; ++y) {
-                            RGBAF32To565RowHWY(
-                                    reinterpret_cast<const float *>(mSrc + srcStride * y),
-                                    reinterpret_cast<uint16_t *>(mDst + dstStride * y),
-                                    width, maxColors);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
+#pragma omp parallel for num_threads(4) schedule(dynamic)
+        for (int y = 0; y < height; ++y) {
+            RGBAF32To565RowHWY(
+                    reinterpret_cast<const float *>(mSrc + srcStride * y),
+                    reinterpret_cast<uint16_t *>(mDst + dstStride * y),
+                    width, maxColors);
         }
     }
 
@@ -581,31 +543,12 @@ namespace aire::HWY_NAMESPACE {
         auto mSrc = reinterpret_cast<const uint8_t *>(sourceData);
         auto mDst = reinterpret_cast<uint8_t *>(dst);
 
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    width * height / (312 * 312)), 1, 12);
-        vector<thread> workers;
-
-        int segmentHeight = height / threadCount;
-
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, mSrc, mDst, srcStride, dstStride, width, permuteMap]() {
-                        for (int y = start; y < end; ++y) {
-                            Rgb565ToF16HWYRow(
-                                    reinterpret_cast<const uint16_t *>(mSrc + srcStride * y),
-                                    reinterpret_cast<uint16_t *>(mDst + dstStride * y),
-                                    width, permuteMap);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
+#pragma omp parallel for num_threads(4) schedule(dynamic)
+        for (int y = 0; y < height; ++y) {
+            Rgb565ToF16HWYRow(
+                    reinterpret_cast<const uint16_t *>(mSrc + srcStride * y),
+                    reinterpret_cast<uint16_t *>(mDst + dstStride * y),
+                    width, permuteMap);
         }
     }
 
@@ -616,31 +559,12 @@ namespace aire::HWY_NAMESPACE {
         auto mSrc = reinterpret_cast<const uint8_t *>(sourceData);
         auto mDst = reinterpret_cast<uint8_t *>(dst);
 
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    width * height / (312 * 312)), 1, 12);
-        vector<thread> workers;
-
-        int segmentHeight = height / threadCount;
-
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, mSrc, mDst, srcStride, dstStride, width, permuteMap, bgColor]() {
-                        for (int y = start; y < end; ++y) {
-                            Rgb565ToU8HWYRow(
-                                    reinterpret_cast<const uint16_t *>(mSrc + srcStride * y),
-                                    reinterpret_cast<uint8_t *>(mDst + dstStride * y),
-                                    width, permuteMap, bgColor);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
+#pragma omp parallel for num_threads(4) schedule(dynamic)
+        for (int y = 0; y < height; ++y) {
+            Rgb565ToU8HWYRow(
+                    reinterpret_cast<const uint16_t *>(mSrc + srcStride * y),
+                    reinterpret_cast<uint8_t *>(mDst + dstStride * y),
+                    width, permuteMap, bgColor);
         }
     }
 }
@@ -653,6 +577,7 @@ namespace aire {
     void Rgb565ToRGBA1010102(const uint16_t *mSrc, int srcStride,
                              uint8_t *mDst, int dstStride, int width,
                              int height) {
+#pragma omp parallel for num_threads(4) schedule(dynamic)
         for (int y = 0; y < height; ++y) {
             auto src = reinterpret_cast<const uint16_t *>(mSrc + srcStride * y);
             auto dst = reinterpret_cast<uint8_t *>(mDst + dstStride * y);
