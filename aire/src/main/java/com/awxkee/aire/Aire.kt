@@ -20,4 +20,6 @@ object Aire : BlurPipelines by BlurPipelinesImpl(),
     init {
         System.loadLibrary("aire")
     }
+
+    private external fun initializeLibrary()
 }

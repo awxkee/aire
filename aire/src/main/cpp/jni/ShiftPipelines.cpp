@@ -12,7 +12,7 @@
 extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_tiltShiftImpl(JNIEnv *env, jobject thiz,
-                                                              jobject bitmap, jfloat radius,
+                                                              jobject bitmap, jint radius,
                                                               jfloat sigma, jfloat anchorX,
                                                               jfloat anchorY, jfloat tiltRadius) {
     try {
@@ -32,8 +32,10 @@ Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_tiltShiftImpl(JNIEnv *env, jobje
                                                     std::vector<uint8_t> output(input.size());
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::gaussBlurU8(blurred.data(),
-                                                                          stride, width,
-                                                                          height, radius,
+                                                                          stride,
+                                                                          width,
+                                                                          height,
+                                                                          radius,
                                                                           sigma);
                                                         aire::tiltShift(output.data(),
                                                                         input.data(),

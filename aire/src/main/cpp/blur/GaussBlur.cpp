@@ -31,12 +31,12 @@ namespace aire {
         return kernel2d;
     }
 
-    void gaussBlurU8(uint8_t *data, int stride, int width, int height, float radius, float sigma) {
+    void gaussBlurU8(uint8_t *data, int stride, int width, int height, int radius, float sigma) {
         vector<float> kernel = compute1DGaussianKernel(radius * 2 + 1, sigma);
         convolve1D(data, stride, width, height, kernel, kernel);
     }
 
-    void gaussBlurF16(uint16_t *data, int stride, int width, int height, float radius, float sigma) {
+    void gaussBlurF16(uint16_t *data, int stride, int width, int height, int radius, float sigma) {
         vector<float> kernel = compute1DGaussianKernel(radius * 2 + 1, sigma);
         Convolve1Db16 convolution(kernel, kernel);
         convolution.convolve(data, stride, width, height);

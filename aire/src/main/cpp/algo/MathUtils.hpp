@@ -21,7 +21,7 @@ static int clamp(const int value, const int minValue, const int maxValue) {
     return (value < minValue) ? minValue : ((value > maxValue) ? maxValue : value);
 }
 
-static vector<float> compute1DGaussianKernel(float width, float sigma) {
+static vector<float> compute1DGaussianKernel(int width, float sigma) {
     vector<float> kernel(ceil(width));
     int mean = ceil(width) / 2;
     float sum = 0;

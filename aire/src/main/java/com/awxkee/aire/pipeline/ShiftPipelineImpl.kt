@@ -17,7 +17,7 @@ class ShiftPipelineImpl : ShiftPipelines {
 
     override fun tiltShift(
         bitmap: Bitmap,
-        radius: Float,
+        radius: Int,
         sigma: Float,
         anchorX: Float,
         anchorY: Float,
@@ -56,7 +56,7 @@ class ShiftPipelineImpl : ShiftPipelines {
 
     private external fun tiltShiftImpl(
         bitmap: Bitmap,
-        radius: Float,
+        radius: Int,
         sigma: Float,
         anchorX: Float = 0.5f,
         anchorY: Float = 0.5f,

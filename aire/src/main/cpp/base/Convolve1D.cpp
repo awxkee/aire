@@ -7,6 +7,7 @@
 #include "jni/JNIUtils.h"
 #include <thread>
 #include "algo/support-inl.h"
+#include <omp.h>
 
 namespace aire {
 
@@ -123,53 +124,62 @@ namespace aire {
 
     void convolve1D(uint8_t *data, int stride, int width, int height, const std::vector<float> &horizontal, const std::vector<float> &vertical) {
         std::vector<uint8_t> transient(stride * height);
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    height * width / (256 * 256)), 1, 12);
-        vector<thread> workers;
 
-        int segmentHeight = height / threadCount;
-
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, width, height, stride, data, &transient, &horizontal]() {
-                        for (int y = start; y < end; ++y) {
-                            convolve1DHorizontalPass(transient, data, stride, y, width, height,
-                                                     horizontal);
-                        }
-                    });
+#pragma omp parallel for num_threads(6)
+        for (int y = 0; y < height; ++y) {
+            convolve1DHorizontalPass(transient, data, stride, y, width, height, horizontal);
         }
 
-        for (std::thread &thread: workers) {
-            thread.join();
+#pragma omp parallel for num_threads(6)
+        for (int y = 0; y < height; ++y) {
+            convolve1DVerticalPass(transient, data, stride, y, width, height, vertical);
         }
 
-        workers.clear();
+//        vector<thread> workers;
+//
+//        int segmentHeight = height / threadCount;
+//
+//        for (int i = 0; i < threadCount; i++) {
+//            int start = i * segmentHeight;
+//            int end = (i + 1) * segmentHeight;
+//            if (i == threadCount - 1) {
+//                end = height;
+//            }
+//            workers.emplace_back(
+//                    [start, end, width, height, stride, data, &transient, &horizontal]() {
+//                        for (int y = start; y < end; ++y) {
+//                            convolve1DHorizontalPass(transient, data, stride, y, width, height,
+//                                                     horizontal);
+//                        }
+//                    });
+//        }
+//
+//        for (std::thread &thread: workers) {
+//            thread.join();
+//        }
 
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, width, height, stride, data, &transient, &vertical]() {
-                        for (int y = start; y < end; ++y) {
-                            convolve1DVerticalPass(transient, data, stride, y, width, height,
-                                                   vertical);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
-        }
-
-        transient.clear();
+//        workers.clear();
+//
+//        for (int i = 0; i < threadCount; i++) {
+//            int start = i * segmentHeight;
+//            int end = (i + 1) * segmentHeight;
+//            if (i == threadCount - 1) {
+//                end = height;
+//            }
+//            workers.emplace_back(
+//                    [start, end, width, height, stride, data, &transient, &vertical]() {
+//                        for (int y = start; y < end; ++y) {
+//                            convolve1DVerticalPass(transient, data, stride, y, width, height,
+//                                                   vertical);
+//                        }
+//                    });
+//        }
+//
+//        for (std::thread &thread: workers) {
+//            thread.join();
+//        }
+//
+//        transient.clear();
     }
 
-}
+    }

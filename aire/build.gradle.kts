@@ -10,7 +10,7 @@ afterEvaluate {
             create<MavenPublication>("mavenJava") {
                 groupId = "com.awxkee"
                 artifactId = "aire"
-                version = "0.9.0"
+                version = "0.9.51"
                 from(components["release"])
             }
         }
@@ -29,7 +29,7 @@ android {
         externalNativeBuild {
             cmake {
                 ndkVersion = "26.2.11394342"
-                cppFlags.add ("-std=c++20")
+                cppFlags.add ("-std=c++20 -fopenmp -static-openmp")
 //                abiFilters += setOf("armeabi-v7a")
 
                 abiFilters += setOf("armeabi-v7a", "arm64-v8a", "x86_64", "x86")

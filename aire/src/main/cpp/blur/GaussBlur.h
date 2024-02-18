@@ -7,7 +7,7 @@
 #include <cstdint>
 
 namespace aire {
-    void gaussBlurU8(uint8_t *data, int stride, int width, int height, float radius, float sigma);
+    void gaussBlurU8(uint8_t *data, int stride, int width, int height, int radius, float sigma);
 
-    void gaussBlurF16(uint16_t *data, int stride, int width, int height, float radius, float sigma);
+    void gaussBlurF16(uint16_t *data, int stride, int width, int height, int radius, float sigma);
 }

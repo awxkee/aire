@@ -9,7 +9,7 @@ interface ShiftPipelines {
 
     fun tiltShift(
         bitmap: Bitmap,
-        radius: Float,
+        radius: Int,
         sigma: Float,
         anchorX: Float = 0.5f,
         anchorY: Float = 0.5f,

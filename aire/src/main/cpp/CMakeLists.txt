@@ -53,6 +53,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DHWY_COMPILE_ONLY_STATIC)
 endif ()
 
+add_definitions(-DOMP_NUM_THREADS=8)
+
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/algo ${CMAKE_SOURCE_DIR}/conversion
         ${CMAKE_SOURCE_DIR}/eigen ${CMAKE_SOURCE_DIR}/eigen/Core ${CMAKE_SOURCE_DIR}/vendor)
 
@@ -61,4 +63,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         log
         libzlibng
         libturbojpeg
+        -static-openmp
+        -fopenmp
         -ljnigraphics)
