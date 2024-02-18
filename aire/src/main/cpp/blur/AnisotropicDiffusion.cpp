@@ -23,8 +23,8 @@ namespace aire {
                               float conduction, int noOfTimeSteps) {
         std::vector<uint8_t> transient(stride * height);
         std::copy(data, data + stride * height, transient.begin());
-#pragma omp parallel for num_threads(6) schedule(dynamic)
         for (int iteration = 0; iteration < noOfTimeSteps; ++iteration) {
+#pragma omp parallel for num_threads(6) schedule(dynamic)
             for (int y = 0; y < height; ++y) {
                 auto src = reinterpret_cast<uint8_t *>(
                         reinterpret_cast<uint8_t *>(transient.data()) +
