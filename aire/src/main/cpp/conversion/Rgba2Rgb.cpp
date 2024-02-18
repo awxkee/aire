@@ -30,6 +30,7 @@
 #include <cstdint>
 #include <vector>
 #include <thread>
+#include "concurrency.hpp"
 
 using namespace std;
 
@@ -96,11 +97,10 @@ namespace aire::HWY_NAMESPACE {
 
         const ScalableTag<uint16_t> du16;
 
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             RgbaToRGB(du16, reinterpret_cast<const uint16_t *>(rgbaData + srcStride * y),
                       reinterpret_cast<uint16_t *>(rgbData + dstStride * y), width, permuteMap);
-        }
+        });
     }
 
     void rgb8bit2RGBH(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int width,
@@ -110,11 +110,10 @@ namespace aire::HWY_NAMESPACE {
 
         const ScalableTag<uint8_t> du8;
 
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             RgbaToRGB(du8, reinterpret_cast<const uint8_t *>(rgbaData + srcStride * y),
                       reinterpret_cast<uint8_t *>(rgbData + dstStride * y), width, permuteMap);
-        }
+        });
     }
 
 }

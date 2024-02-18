@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include <thread>
+#include "concurrency.hpp"
 
 using namespace std;
 
@@ -14,8 +15,7 @@ namespace aire {
     template<class T>
     void erodeRGBA(T *pixels, T *destination, int stride, int width, int height,
                    std::vector<std::vector<int>> &kernel) {
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(8, height, [&](int y) {
             for (int x = 0; x < width; ++x) {
                 int mSize = kernel.size() / 2;
 
@@ -48,14 +48,13 @@ namespace aire {
                         reinterpret_cast<uint8_t *>(destination) + y * stride);
                 dst[x] = min;
             }
-        }
+        });
     }
 
     template<class T>
     void erode(T *pixels, T *destination, int width, int height,
                std::vector<std::vector<int>> &kernel) {
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(8, height, [&](int y) {
             auto dst = reinterpret_cast<T *>(
                     reinterpret_cast<uint8_t *>(destination) + y * width);
             for (int x = 0; x < width; ++x) {
@@ -87,7 +86,7 @@ namespace aire {
 
                 dst[x] = min;
             }
-        }
+        });
     }
 
     template void

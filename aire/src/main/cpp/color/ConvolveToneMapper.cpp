@@ -16,6 +16,7 @@
 #include "tone/UchimuraToneMapper.hpp"
 #include "tone/AldridgeToneMapper.hpp"
 #include "tone/DragoToneMapper.hpp"
+#include "concurrency.hpp"
 #include "algo/support-inl.h"
 #include "Eigen/Eigen"
 #include "color/Blend.h"
@@ -40,8 +41,7 @@ namespace aire {
 
         const auto zeros = Zero(dfx4);
 
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(4, height, [&](int y) {
             auto pixels = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
 
@@ -87,7 +87,7 @@ namespace aire {
                 pixels[2] = std::clamp(LinearSRGBTosRGB(b) * 255.f, 0.f, 255.f);
                 pixels += 4;
             }
-        }
+        });
     }
 
     void logarithmic(uint8_t *data, int stride, int width, int height, float exposure) {
@@ -169,8 +169,7 @@ namespace aire {
         const float tint = tnt / 100.f;
         const Eigen::Vector3f temp = {tmpr, tmpr, tmpr};
 
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto pixels = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
 
@@ -196,6 +195,6 @@ namespace aire {
 
                 pixels += 4;
             }
-        }
+        });
     }
 }

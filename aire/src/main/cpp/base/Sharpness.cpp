@@ -4,14 +4,14 @@
 
 #include "Sharpness.h"
 #include "Eigen/Eigen"
+#include "concurrency.hpp"
 
 namespace aire {
     using namespace std;
     using namespace Eigen;
 
     void applySharp(uint8_t *src, uint8_t *sharpenMask, int stride, int width, int height, const float intensity) {
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(3, height, [&](int y) {
             auto dst = reinterpret_cast<uint8_t *>(
                     reinterpret_cast<uint8_t *>(src) + y * stride);
             for (int x = 0; x < width; ++x) {
@@ -29,12 +29,11 @@ namespace aire {
                 dst[px + 2] = final.z();
                 dst[px + 3] = final.w();
             }
-        }
+        });
     }
 
     void applyUnsharp(uint8_t *src, uint8_t *sharpenMask, int stride, int width, int height, const float intensity) {
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(3, height, [&](int y) {
             auto dst = reinterpret_cast<uint8_t *>(
                     reinterpret_cast<uint8_t *>(src) + y * stride);
             for (int x = 0; x < width; ++x) {
@@ -52,7 +51,7 @@ namespace aire {
                 dst[px + 2] = final.z();
                 dst[px + 3] = final.w();
             }
-        }
+        });
     }
 
     Eigen::Matrix3f generateSharpenKernel() {

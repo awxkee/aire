@@ -41,6 +41,7 @@ using namespace half_float;
 #include "hwy/foreach_target.h"
 #include "hwy/highway.h"
 #include "attenuate-inl.h"
+#include "concurrency.hpp"
 
 HWY_BEFORE_NAMESPACE();
 
@@ -188,13 +189,11 @@ namespace aire::HWY_NAMESPACE {
 
         const float scale = 1.0f / float((1 << bitDepth) - 1);
 
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
-            Rgba8ToF16HWYRow(
-                    reinterpret_cast<const uint8_t *>(mSrc + srcStride * y),
+        concurrency::parallel_for(4, height, [&](int y) {
+            Rgba8ToF16HWYRow(reinterpret_cast<const uint8_t *>(mSrc + srcStride * y),
                     reinterpret_cast<uint16_t *>(mDst + dstStride * y), width,
                     scale, permuteMap, attenuateAlpha);
-        }
+        });
     }
 }
 

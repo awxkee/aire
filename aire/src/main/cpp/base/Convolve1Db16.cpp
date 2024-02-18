@@ -7,6 +7,7 @@
 #include "jni/JNIUtils.h"
 #include <thread>
 #include "algo/support-inl.h"
+#include "concurrency.hpp"
 
 namespace aire {
 
@@ -104,7 +105,7 @@ namespace aire {
 
             for (; r <= iRadius; ++r) {
                 auto src = reinterpret_cast<hwy::float16_t * > (reinterpret_cast<uint8_t *>(transient.data()) +
-                                                           clamp((r + y), 0, height - 1) * stride);
+                                                                clamp((r + y), 0, height - 1) * stride);
                 int pos = clamp(x, 0, width - 1) * 4;
                 VF dWeight = kernelCache[r + iRadius];
                 VFb16x4 pixels = LoadU(df16x4, &src[pos]);
@@ -119,53 +120,18 @@ namespace aire {
     }
 
     void Convolve1Db16::convolve(uint16_t *data, const int stride, const int width, const int height) {
-
         std::vector<uint16_t> transient(stride * height);
+
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     height * width / (256 * 256)), 1, 12);
-        vector<thread> workers;
 
-        int segmentHeight = height / threadCount;
+        concurrency::parallel_for(threadCount, height, [&](int y) {
+            this->horizontalPass(transient, data, stride, y, width, height);
+        });;
 
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, width, height, stride, data, &transient, this]() {
-                        for (int y = start; y < end; ++y) {
-                            this->horizontalPass(transient, data, stride, y, width, height);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
-        }
-
-        workers.clear();
-
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, width, height, stride, data, &transient, this]() {
-                        for (int y = start; y < end; ++y) {
-                            this->verticalPass(transient, data, stride, y, width, height);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
-        }
-
-        transient.clear();
+        concurrency::parallel_for(threadCount, height, [&](int y) {
+            this->verticalPass(transient, data, stride, y, width, height);
+        });
     }
 
 }

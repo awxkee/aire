@@ -4,13 +4,13 @@
 
 #include "Gamut.h"
 #include "eotf-inl.h"
+#include "concurrency.hpp"
 
 namespace aire {
     using namespace aire::HWY_NAMESPACE;
     void bitmapToXYZ(uint8_t *data, int stride, float *xyzBitmap, int xyzStride, int width, int height, TransferFunction function,
                      Eigen::Matrix3f conversionMatrix) {
-#pragma omp parallel for num_threads(2) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             auto dst = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(xyzBitmap) + xyzStride * y);
             for (int x = 0; x < width; ++x) {
@@ -31,13 +31,12 @@ namespace aire {
                 dst += 3;
                 src += 4;
             }
-        }
+        });
     }
 
     void xyzToBitmap(uint8_t *data, int stride, float *xyzBitmap, int xyzStride, int width, int height, TransferFunction function,
                      Eigen::Matrix3f conversionMatrix) {
-#pragma omp parallel for num_threads(2) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(xyzBitmap) + xyzStride * y);
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + stride * y);
             for (int x = 0; x < width; ++x) {
@@ -58,6 +57,6 @@ namespace aire {
                 src += 3;
                 dst += 4;
             }
-        }
+        });
     }
 }

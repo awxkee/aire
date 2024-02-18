@@ -5,6 +5,7 @@
 #include "YuvConverter.h"
 #include <algorithm>
 #include <thread>
+#include "concurrency.hpp"
 
 using namespace std;
 
@@ -207,21 +208,19 @@ namespace aire::HWY_NAMESPACE {
     void NV21ToRGBAHWY(uint8_t *dst, int dstStride, int width, int height, const uint8_t *ySrc,
                        int yStride,
                        const uint8_t *uv, int uvStride, const int permuteMap[4]) {
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(3, height, [&](int y) {
             NV21ToRGBARow(dst + y * dstStride, width, ySrc + y * yStride,
                           uv + min(y / 2, height / 2 - 1) * uvStride, permuteMap);
-        }
+        });
     }
 
     void NV21ToRGBHWY(uint8_t *dst, int dstStride, int width, int height, const uint8_t *ySrc,
                       int yStride,
                       const uint8_t *uv, int uvStride, const int permuteMap[3]) {
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(3, height, [&](int y) {
             NV21ToRGBRow(dst + y * dstStride, width, ySrc + y * yStride,
                          uv + min(y / 2, height / 2 - 1) * uvStride, permuteMap);
-        }
+        });
     }
 }
 

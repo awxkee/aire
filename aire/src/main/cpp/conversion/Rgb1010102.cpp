@@ -31,6 +31,7 @@
 #include <algorithm>
 #include "HalfFloats.h"
 #include <thread>
+#include "concurrency.hpp"
 
 using namespace std;
 
@@ -387,13 +388,11 @@ namespace aire::HWY_NAMESPACE {
 
         auto src = reinterpret_cast<const uint8_t *>(source);
 
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
-            Rgba8ToRGBA1010102HWYRow(
-                    reinterpret_cast<const uint8_t *>(src + srcStride * y),
-                    reinterpret_cast<uint32_t *>(destination + dstStride * y),
-                    width, &permuteMap[0], attenuateAlpha);
-        }
+        concurrency::parallel_for(4, height, [&](int y) {
+            Rgba8ToRGBA1010102HWYRow(reinterpret_cast<const uint8_t *>(src + srcStride * y),
+                                     reinterpret_cast<uint32_t *>(destination + dstStride * y),
+                                     width, &permuteMap[0], attenuateAlpha);
+        });
     }
 
     void
@@ -406,13 +405,12 @@ namespace aire::HWY_NAMESPACE {
         int permuteMap[4] = {3, 2, 1, 0};
         auto src = reinterpret_cast<const uint8_t *>(source);
 
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(4, height, [&](int y) {
             F16ToRGBA1010102HWYRow(
                     reinterpret_cast<const uint16_t *>(src + srcStride * y),
                     reinterpret_cast<uint32_t *>(destination + dstStride * y),
                     width, &permuteMap[0]);
-        }
+        });
     }
 
     void
@@ -428,30 +426,13 @@ namespace aire::HWY_NAMESPACE {
 
         int threadCount = clamp(min(static_cast<int>(thread::hardware_concurrency()),
                                     width * height / (256 * 256)), 1, 12);
-        vector<thread> workers;
 
-        int segmentHeight = height / threadCount;
-
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, src, dst, srcStride, dstStride, width, permuteMap]() {
-                        for (int y = start; y < end; ++y) {
-                            F32ToRGBA1010102HWYRow(
-                                    reinterpret_cast<const float *>(src + srcStride * y),
-                                    reinterpret_cast<uint32_t *>(dst + dstStride * y),
-                                    width, &permuteMap[0]);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
-        }
+        concurrency::parallel_for(threadCount, height, [&](int y) {
+            F32ToRGBA1010102HWYRow(
+                    reinterpret_cast<const float *>(src + srcStride * y),
+                    reinterpret_cast<uint32_t *>(dst + dstStride * y),
+                    width, &permuteMap[0]);
+        });
     }
 
 // NOLINTNEXTLINE(google-readability-namespace-comments)

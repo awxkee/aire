@@ -5,6 +5,7 @@
 #include "Threshold.h"
 #include "hwy/highway.h"
 #include "algo/support-inl.h"
+#include "concurrency.hpp"
 
 namespace aire {
 
@@ -22,8 +23,7 @@ namespace aire {
         const auto vMax = Set(du, max);
         const auto vMin = Set(du, min);
 
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto data = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(pixels) + y * width);
             int x = 0;
 
@@ -42,7 +42,7 @@ namespace aire {
                 }
                 data += 1;
             }
-        }
+        });
     }
 
     template

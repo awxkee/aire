@@ -5,14 +5,14 @@
 #include "AffineTransform.h"
 #include "scale/sampler.h"
 #include <algorithm>
+#include "concurrency.hpp"
 
 namespace aire {
 
     using namespace std;
 
     void AffineTransform::apply(uint8_t *destination, int dstStride, int newWidth, int newHeight) {
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int newY = 0; newY < newHeight; ++newY) {
+        concurrency::parallel_for(4, newHeight, [&](int newY) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination) + newY * dstStride);
             for (int newX = 0; newX < newWidth; ++newX) {
 
@@ -52,6 +52,6 @@ namespace aire {
                     dst[dstX + c] = static_cast<uint8_t>(f);
                 }
             }
-        }
+        });
     }
 }

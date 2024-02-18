@@ -31,6 +31,7 @@
 #include <thread>
 #include <vector>
 #include "sampler.h"
+#include "concurrency.hpp"
 
 #if defined(__clang__)
 #pragma clang fp contract(fast) exceptions(ignore) reassociate(on)
@@ -481,12 +482,18 @@ namespace aire::HWY_NAMESPACE {
 
         auto src8 = reinterpret_cast<const uint8_t *>(input);
 
-        #pragma omp parallel for num_threads(6) schedule(dynamic)
-        for (int y = 0; y < outputHeight; ++y) {
-            scaleRowF16(src8, srcStride, dstStride, inputWidth, inputHeight,
-                        output, outputWidth,
-                        xScale, option, yScale, y, components);
-        }
+        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
+                                    outputHeight * outputWidth / (256 * 256)), 1, 12);
+
+        concurrency::parallel_for(threadCount,
+                                  outputHeight,
+                                  [src8, srcStride, dstStride, inputWidth, inputHeight,
+                                          output, outputWidth,
+                                          xScale, option, yScale, components](int iterationId) {
+                                      scaleRowF16(src8, srcStride, dstStride, inputWidth, inputHeight,
+                                                  output, outputWidth,
+                                                  xScale, option, yScale, iterationId, components);
+                                  });
     }
 
     void
@@ -881,13 +888,19 @@ namespace aire::HWY_NAMESPACE {
 
         float maxColors = pow(2.0f, (float) depth) - 1.0f;
 
-#pragma omp parallel for num_threads(6) schedule(dynamic)
-        for (int y = 0; y < outputHeight; ++y) {
-            ScaleRowU8(src8, srcStride, inputWidth, inputHeight, output,
-                       dstStride, outputWidth, components,
-                       option,
-                       xScale, yScale, maxColors, y);
-        }
+        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
+                                    outputHeight * outputWidth / (256 * 256)), 1, 12);
+
+        concurrency::parallel_for(threadCount,
+                                  outputHeight,
+                                  [src8, srcStride, inputHeight, inputWidth, dstStride,
+                                          outputWidth, components, xScale, yScale,
+                                          maxColors, option, output](int iterationId) {
+                                      ScaleRowU8(src8, srcStride, inputWidth, inputHeight, output,
+                                                 dstStride, outputWidth, components,
+                                                 option,
+                                                 xScale, yScale, maxColors, iterationId);
+                                  });
     }
 }
 

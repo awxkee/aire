@@ -3,6 +3,7 @@
 //
 
 #include "RGBAlpha.h"
+#include "concurrency.hpp"
 
 using namespace std;
 
@@ -125,10 +126,9 @@ namespace aire::HWY_NAMESPACE {
     void UnpremultiplyRGBAHWY(const uint8_t *src, int srcStride,
                                uint8_t *dst, int dstStride, int width,
                                int height) {
-//#pragma omp parallel for num_threads(4) default(shared)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&] (int y) {
             UnpremultiplyRGBAHWYRow(src, srcStride, dst, dstStride, width, y);
-        }
+        });
     }
 
     void PremultiplyRGBAHWYRow(const uint8_t *src, int srcStride,
@@ -201,10 +201,9 @@ namespace aire::HWY_NAMESPACE {
     void PremultiplyRGBAHWY(const uint8_t *src, int srcStride,
                              uint8_t *dst, int dstStride, int width,
                              int height) {
-//#pragma omp parallel for num_threads(2) schedule(dynamic) default(shared)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             PremultiplyRGBAHWYRow(src, srcStride, dst, dstStride, width, y);
-        }
+        });
     }
 }
 

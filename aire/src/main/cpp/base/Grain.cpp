@@ -4,6 +4,7 @@
 
 #include "Grain.h"
 #include <random>
+#include "concurrency.hpp"
 
 namespace aire {
 
@@ -14,8 +15,7 @@ namespace aire {
         generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
         normal_distribution<float> distribution(0, 127.f * intensity);
 
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto dst = reinterpret_cast<uint8_t *>(
                     reinterpret_cast<uint8_t *>(data) + y * stride);
             for (int x = 0; x < width; ++x) {
@@ -27,6 +27,6 @@ namespace aire {
                 dst[px + 1] = clamp(dst[px + 1] + float(grain), 0.f, 255.f);
                 dst[px + 2] = clamp(dst[px + 2] + float(grain), 0.f, 255.f);
             }
-        }
+        });
     }
 }

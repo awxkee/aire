@@ -7,6 +7,7 @@
 #include "MathUtils.hpp"
 #include <thread>
 #include <fast_math-inl.h>
+#include "concurrency.hpp"
 
 #include "hwy/highway.h"
 
@@ -95,31 +96,13 @@ namespace aire {
                        float spatialSigma) {
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     height * width / (256 * 256)), 1, 12);
-        vector<thread> workers;
-
-        int segmentHeight = height / threadCount;
-
         std::vector<V> transient(stride * height);
 
-        for (int i = 0; i < threadCount; i++) {
-            int start = i * segmentHeight;
-            int end = (i + 1) * segmentHeight;
-            if (i == threadCount - 1) {
-                end = height;
-            }
-            workers.emplace_back(
-                    [start, end, width, height, stride, data, radius, rangeSigma, spatialSigma, &transient]() {
-                        for (int y = start; y < end; ++y) {
-                            bilateralBlurPass(data, transient.data(), y,
-                                              stride, width, height, radius, rangeSigma,
-                                              spatialSigma);
-                        }
-                    });
-        }
-
-        for (std::thread &thread: workers) {
-            thread.join();
-        }
+        concurrency::parallel_for(threadCount, height, [&](int y) {
+            bilateralBlurPass(data, transient.data(), y,
+                              stride, width, height, radius, rangeSigma,
+                              spatialSigma);
+        });
 
         std::copy(transient.begin(), transient.end(), data);
     }

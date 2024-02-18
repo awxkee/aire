@@ -4,12 +4,12 @@
 
 #include "Channels.h"
 #include <iostream>
+#include "concurrency.hpp"
 
 namespace aire {
     template<class T>
     void split(T *pixels, T *r, T *g, T *b, T *a, int stride, int width, int height) {
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto src = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(pixels) + y * stride);
             T *rDst = nullptr;
             if (r != nullptr) {
@@ -46,13 +46,12 @@ namespace aire {
                 }
                 src += 4;
             }
-        }
+        });
     }
 
     template<class T>
     void merge(T *destination, T *r, T *g, T *b, T *a, int stride, int width, int height) {
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto dst = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(destination) + y * stride);
             auto rSrc = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(r) + y * width);
             auto gSrc = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(g) + y * width);
@@ -69,7 +68,7 @@ namespace aire {
                 bSrc += 1;
                 aSrc += 1;
             }
-        }
+        });
     }
 
     template void

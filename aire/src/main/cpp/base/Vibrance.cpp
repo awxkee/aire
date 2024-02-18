@@ -6,11 +6,11 @@
 #include <algorithm>
 #include "fast_math-inl.h"
 #include "MathUtils.hpp"
+#include "concurrency.hpp"
 
 namespace aire {
     void vibrance(uint8_t *pixels, int stride, int width, int height, float vibrance) {
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto data = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(pixels) + y * stride);
             int x = 0;
 
@@ -28,6 +28,6 @@ namespace aire {
                 data[2] = std::clamp(blue + vibranceBoost, 0, 255);
                 data += 4;
             }
-        }
+        });
     }
 }

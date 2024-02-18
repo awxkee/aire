@@ -11,6 +11,7 @@
 #include "algo/support-inl.h"
 #include "Eigen/Eigen"
 #include "base/Channels.h"
+#include "concurrency.hpp"
 
 using namespace std;
 
@@ -32,8 +33,7 @@ namespace aire {
         using VU8x16 = Vec<decltype(du8x16)>;
         using VU8x4 = Vec<decltype(du8x4)>;
 
-#pragma omp parallel for num_threads(6) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(6, height, [&](int y){
             for (int x = 0; x < width; ++x) {
                 int mSize = kernel.rows() / 2;
 
@@ -136,14 +136,13 @@ namespace aire {
                 dst[px + 2] = maxB;
                 dst[px + 3] = maxA;
             }
-        }
+        });
     }
 
     template<class T>
     void dilate(T *pixels, T *destination, int width, int height,
                 std::vector<std::vector<int>> &kernel) {
-#pragma omp parallel for num_threads(6) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(6, height, [&](int y) {
             const FixedTag<uint8_t, 16> du8x16;
             const FixedTag<uint8_t, 8> du8x8;
             const FixedTag<uint8_t, 4> du8x4;
@@ -214,7 +213,7 @@ namespace aire {
 
                 dst[px] = maxValue;
             }
-        }
+        });
     }
 
     template void

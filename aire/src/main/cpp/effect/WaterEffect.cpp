@@ -5,6 +5,7 @@
 #include "WaterEffect.h"
 #include <vector>
 #include <algorithm>
+#include "concurrency.hpp"
 
 namespace aire {
     void waterEffect(uint8_t *data, int stride, int width, int height, float fractionSize,
@@ -13,8 +14,7 @@ namespace aire {
         int xMove = width * fractionSize;
         int yMove = height * fractionSize;
 
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto dst = reinterpret_cast<uint8_t *>(
                     reinterpret_cast<uint8_t *>(transient.data()) +
                     y * stride);
@@ -45,7 +45,7 @@ namespace aire {
                 dst[3] = src[newX * 4 + 3];
                 dst += 4;
             }
-        }
+        });
 
         std::copy(transient.begin(), transient.end(), data);
     }

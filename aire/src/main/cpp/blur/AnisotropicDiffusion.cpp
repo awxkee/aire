@@ -6,6 +6,7 @@
 #include <vector>
 #include "hwy/highway.h"
 #include "algo/support-inl.h"
+#include "concurrency.hpp"
 
 using namespace std;
 using namespace hwy;
@@ -24,8 +25,7 @@ namespace aire {
         std::vector<uint8_t> transient(stride * height);
         std::copy(data, data + stride * height, transient.begin());
         for (int iteration = 0; iteration < noOfTimeSteps; ++iteration) {
-#pragma omp parallel for num_threads(6) schedule(dynamic)
-            for (int y = 0; y < height; ++y) {
+            concurrency::parallel_for(4, height, [&](int y) {
                 auto src = reinterpret_cast<uint8_t *>(
                         reinterpret_cast<uint8_t *>(transient.data()) +
                         y * stride);
@@ -38,32 +38,32 @@ namespace aire {
                         float local = src[x * 4 + channel];
 
                         float leftTopMagnitude = reinterpret_cast<uint8_t *>(
-                                reinterpret_cast<uint8_t *>(transient.data()) +
-                                        previousY * stride)[previousX*4 + channel] - local;
+                                                         reinterpret_cast<uint8_t *>(transient.data()) +
+                                                         previousY * stride)[previousX * 4 + channel] - local;
 
                         float rightTopMagnitude = reinterpret_cast<uint8_t *>(
-                                                         reinterpret_cast<uint8_t *>(transient.data()) +
-                                                         previousY * stride)[nextX*4 + channel] - local;
+                                                          reinterpret_cast<uint8_t *>(transient.data()) +
+                                                          previousY * stride)[nextX * 4 + channel] - local;
 
                         float leftBottomMagnitude = reinterpret_cast<uint8_t *>(
-                                                         reinterpret_cast<uint8_t *>(transient.data()) +
-                                                         nextY * stride)[previousX*4 + channel] - local;
+                                                            reinterpret_cast<uint8_t *>(transient.data()) +
+                                                            nextY * stride)[previousX * 4 + channel] - local;
 
                         float rightBottomMagnitude = reinterpret_cast<uint8_t *>(
-                                                            reinterpret_cast<uint8_t *>(transient.data()) +
-                                                            nextY * stride)[nextX*4 + channel] - local;
+                                                             reinterpret_cast<uint8_t *>(transient.data()) +
+                                                             nextY * stride)[nextX * 4 + channel] - local;
 
                         float currentPixel = src[x * 4 + channel];
                         float param = diffusion * (PerconaMalik(leftTopMagnitude, conduction) * leftTopMagnitude +
-                                PerconaMalik(rightTopMagnitude, conduction) * rightTopMagnitude +
-                                PerconaMalik(leftBottomMagnitude, conduction) * leftBottomMagnitude +
-                                PerconaMalik(rightBottomMagnitude, conduction) * rightBottomMagnitude);
+                                                   PerconaMalik(rightTopMagnitude, conduction) * rightTopMagnitude +
+                                                   PerconaMalik(leftBottomMagnitude, conduction) * leftBottomMagnitude +
+                                                   PerconaMalik(rightBottomMagnitude, conduction) * rightBottomMagnitude);
                         float newValue = currentPixel * param;
                         float updatedValue = currentPixel + newValue;
                         src[x * 4 + channel] = clamp(ceil(updatedValue), 0.f, 255.f);
                     }
                 }
-            }
+            });
         }
 
         std::copy(transient.begin(), transient.end(), data);

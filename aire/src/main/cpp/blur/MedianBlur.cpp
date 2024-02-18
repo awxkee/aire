@@ -8,7 +8,7 @@
 #include "algo/median/QuickSelect.h"
 #include "algo/median/Wirth.h"
 #include "jni/JNIUtils.h"
-#include <omp.h>
+#include "concurrency.hpp"
 
 using namespace std;
 
@@ -80,8 +80,7 @@ namespace aire {
         const int length = (2 * radius + 1);
         const int N = (2 * radius + 1) * (2 * radius + 1);
 
-#pragma omp parallel for num_threads(6) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(8, height, [&](int y) {
             uint8_t *mStore = reinterpret_cast<uint8_t *>(malloc(sizeof(uint8_t) * N));
 
             uint8_t *dst = reinterpret_cast<uint8_t *>(
@@ -122,8 +121,7 @@ namespace aire {
             }
 
             free(mStore);
-        }
-
+        });
     }
 
     void
@@ -131,11 +129,9 @@ namespace aire {
                const MedianSelector selector) {
         std::vector<uint8_t> transient(stride * height);
 
-#pragma omp parallel for num_threads(6) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
-            medianBlurU8Runner(transient, data, stride, width, y, radius, height,
-                               selector);
-        }
+        concurrency::parallel_for(6, height, [&](int y) {
+            medianBlurU8Runner(transient, data, stride, width, y, radius, height, selector);
+        });
 
         std::copy(transient.begin(), transient.end(), data);
     }

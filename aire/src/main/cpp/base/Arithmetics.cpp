@@ -11,6 +11,7 @@
 #include <sstream>
 #include <omp.h>
 #include "jni/JNIUtils.h"
+#include "concurrency.hpp"
 
 namespace aire {
 
@@ -25,8 +26,7 @@ namespace aire {
         using VI = Vec<decltype(du)>;
         const int lanes = du.MaxLanes();
 
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(3, height, [&](int y) {
             auto ms = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(s1) + y * width);
             auto ds = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(s2) +
                                                   y * width);
@@ -47,7 +47,7 @@ namespace aire {
                 ms += 1;
                 dst += 1;
             }
-        }
+        });
     }
 
     template<class V>
@@ -95,8 +95,7 @@ namespace aire {
         const auto low = Set(du32x1, value);
         const auto high = Set(du32x4, value);
 
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(3, height, [&](int y) {
             auto src = reinterpret_cast<uint32_t *>(reinterpret_cast<uint8_t *>(destination) + y * stride);
             int x = 0;
             for (; x + 4 < width; x += 4) {
@@ -108,7 +107,7 @@ namespace aire {
                 src[0] = value;
                 src += 1;
             }
-        }
+        });
     }
 
     template<class V>
@@ -130,8 +129,7 @@ namespace aire {
         const auto vNewRange = Set(dfx4, static_cast<float>(max - min));
         const auto vNewMin = Set(dfx4, static_cast<float>(min));
 
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(4, height, [&](int y) {
             auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(source) + y * width);
             int x = 0;
             for (; x + lanes < width; x += lanes) {
@@ -149,7 +147,7 @@ namespace aire {
                 src[0] = value;
                 src += 1;
             }
-        }
+        });
     }
 
     void diff(uint8_t *destination, uint8_t value, uint8_t *s1, int width, int height) {
@@ -160,11 +158,9 @@ namespace aire {
         const auto leading = Set(du16, value);
         const int lanes = du16.MaxLanes();
 
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto ms = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(s1) + y * width);
-            auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination) +
-                                                   y * width);
+            auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination) + y * width);
             int x = 0;
 
             for (; x + lanes < width; x += lanes) {
@@ -180,7 +176,7 @@ namespace aire {
                 ms += 1;
                 dst += 1;
             }
-        }
+        });
     }
 
     template

@@ -7,7 +7,7 @@
 #include "jni/JNIUtils.h"
 #include <thread>
 #include "algo/support-inl.h"
-#include <omp.h>
+#include "concurrency.hpp"
 
 namespace aire {
 
@@ -125,15 +125,16 @@ namespace aire {
     void convolve1D(uint8_t *data, int stride, int width, int height, const std::vector<float> &horizontal, const std::vector<float> &vertical) {
         std::vector<uint8_t> transient(stride * height);
 
-#pragma omp parallel for num_threads(6) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
+                                    height * width / (256 * 256)), 1, 12);
+
+        concurrency::parallel_for(threadCount, height, [&](int y) {
             convolve1DHorizontalPass(transient, data, stride, y, width, height, horizontal);
-        }
+        });
 
-#pragma omp parallel for num_threads(6) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(threadCount, height, [&](int y) {
             convolve1DVerticalPass(transient, data, stride, y, width, height, vertical);
-        }
+        });
     }
 
-    }
+}

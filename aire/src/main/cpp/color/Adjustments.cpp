@@ -7,14 +7,14 @@
 #include "color/Gamut.h"
 #include "color/Blend.h"
 #include "color/eotf-inl.h"
+#include "concurrency.hpp"
 
 namespace aire {
 
     using namespace aire::HWY_NAMESPACE;
 
     void colorMatrix(uint8_t *data, int stride, int width, int height, const Eigen::Matrix3f matrix) {
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(4, height, [&](int y) {
             auto pixels = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
 
@@ -31,14 +31,13 @@ namespace aire {
 
                 pixels += 4;
             }
-        }
+        });
     }
 
     void adjustment(uint8_t *data, int stride, int width, int height, float gain, float bias) {
         const Eigen::Vector3f fBias = {bias, bias, bias};
         const Eigen::Vector3f balance = {0.5f, 0.5f, 0.5f};
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(4, height, [&](int y) {
             auto pixels = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
 
@@ -56,13 +55,12 @@ namespace aire {
 
                 pixels += 4;
             }
-        }
+        });
     }
 
     void saturation(uint8_t *data, int stride, int width, int height, float saturation) {
         const Eigen::Vector3f lumaPrimaries = {0.2125, 0.7154, 0.0721};
-#pragma omp parallel for num_threads(3) schedule(dynamic)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(4, height, [&](int y) {
             auto pixels = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
 
@@ -83,7 +81,7 @@ namespace aire {
 
                 pixels += 4;
             }
-        }
+        });
     }
 
 }

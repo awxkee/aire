@@ -1,49 +1,105 @@
-/// \file parallel-util.hpp
-
 #pragma once
-
-// Uncommenting the following line enables the "verbose" mode, which may be
-// useful for debugging. However, notice that it affects the overall performance
-// badly as it inserts mutex-locked standard output commands.
-
-// #define PARALLELUTIL_VERBOSE
 
 #include <functional>
 #include <mutex>
 #include <queue>
 #include <thread>
 #include <vector>
-
-#ifdef PARALLELUTIL_VERBOSE
-#include <iostream>
-#endif
+#include <type_traits>
 
 namespace concurrency {
-    template <typename Function, typename... Args>
-    void parallel_for(int num_threads, int num_iterations, Function&& func, Args&&... args) {
-        std::vector<std::thread> threads;
-        std::mutex mtx;  // Mutex for synchronization
 
-        auto parallel_worker = [&](int thread_id) {
-            for (int i = 0; i < num_iterations; ++i) {
+    template<typename Function>
+    struct function_traits;
+
+    template<typename R, typename... Args>
+    struct function_traits<R(Args...)> {
+        using result_type = R;
+    };
+
+    template<typename Function, typename... Args>
+    void parallel_for(const int numThreads, const int numIterations, Function &&func, Args &&... args) {
+        static_assert(std::is_invocable_v<Function, int, Args...>, "func must take an int parameter for iteration id");
+
+        std::vector<std::thread> threads;
+
+        int segmentHeight = numIterations / numThreads;
+
+        auto parallelWorker = [&](int start, int end) {
+            for (int y = start; y < end; ++y) {
                 {
-                    std::lock_guard<std::mutex> lock(mtx);
-                    func(thread_id, std::forward<Args>(args)...);  // Execute the function
+                    std::invoke(func, y, std::forward<Args>(args)...);
                 }
             }
         };
 
-        // Launch N-1 worker threads
-        for (int i = 0; i < num_threads - 1; ++i) {
-            threads.emplace_back(parallel_worker, i);
+        if (numThreads > 1) {
+            // Launch N-1 worker threads
+            for (int i = 1; i < numThreads; ++i) {
+                int start = i * segmentHeight;
+                int end = (i + 1) * segmentHeight;
+                if (i == numThreads - 1) {
+                    end = numIterations;
+                }
+                threads.emplace_back(parallelWorker, start, end);
+            }
         }
 
-        // Main thread executes the function
-        parallel_worker(num_threads - 1);
+        int start = 0;
+        int end = segmentHeight;
+        if (numThreads == 1) {
+            end = numIterations;
+        }
+        parallelWorker(start, end);
 
         // Join all threads
-        for (auto& thread : threads) {
-            thread.join();
+        for (auto &thread: threads) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+        }
+    }
+
+    template<typename Function, typename... Args>
+    void parallel_for_with_thread_id(const int numThreads, const int numIterations, Function &&func, Args &&... args) {
+        static_assert(std::is_invocable_v<Function, int, int, Args...>, "func must take an int parameter for threadId, and iteration Id");
+
+        std::vector<std::thread> threads;
+
+        int segmentHeight = numIterations / numThreads;
+
+        auto parallel_worker = [&](int threadId, int start, int end) {
+            for (int y = start; y < end; ++y) {
+                {
+                    std::invoke(func, threadId, y, std::forward<Args>(args)...);
+                }
+            }
+        };
+
+        if (numThreads > 1) {
+            // Launch N-1 worker threads
+            for (int i = 1; i < numThreads; ++i) {
+                int start = i * segmentHeight;
+                int end = (i + 1) * segmentHeight;
+                if (i == numThreads - 1) {
+                    end = numIterations;
+                }
+                threads.emplace_back(parallel_worker, i, start, end);
+            }
+        }
+
+        int start = 0;
+        int end = segmentHeight;
+        if (numThreads == 1) {
+            end = numIterations;
+        }
+        parallel_worker(0, start, end);
+
+        // Join all threads
+        for (auto &thread: threads) {
+            if (thread.joinable()) {
+                thread.join();
+            }
         }
     }
 }

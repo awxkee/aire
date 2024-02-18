@@ -8,6 +8,7 @@
 #include "color/Blend.h"
 #include "jni/JNIUtils.h"
 #include <thread>
+#include "concurrency.hpp"
 
 namespace aire {
     void tiltShift(uint8_t *data, uint8_t *source, std::vector<uint8_t> &blurred, int stride, int width, int height,
@@ -17,8 +18,7 @@ namespace aire {
         const int centerX = width * anchorX;
         const int centerY = height * anchorY;
 
-        #pragma omp parallel for num_threads(4)
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(4, height, [&](int y) {
             auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(source) + y * stride);
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             auto blurredSource = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(blurred.data()) + y * stride);
@@ -48,7 +48,6 @@ namespace aire {
                 dst += 4;
                 blurredSource += 4;
             }
-
-        }
+        });
     }
 }

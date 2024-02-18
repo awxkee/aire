@@ -32,6 +32,7 @@
 #include <vector>
 #include <algorithm>
 #include <thread>
+#include "concurrency.hpp"
 
 #undef HWY_TARGET_INCLUDE
 #define HWY_TARGET_INCLUDE "Rgba1010102toF32.cpp"
@@ -154,13 +155,11 @@ namespace coder::HWY_NAMESPACE {
                 littleEndian = false;
             }
 
-#pragma omp parallel for num_threads(4) schedule(dynamic)
-            for (int y = 0; y < height; ++y) {
-                ConvertRGBA1010102toF32HWYRow(
-                        reinterpret_cast<const uint8_t *>(mSrcPointer + srcStride * y),
+            concurrency::parallel_for(2, height, [&](int y) {
+                ConvertRGBA1010102toF32HWYRow(reinterpret_cast<const uint8_t *>(mSrcPointer + srcStride * y),
                         reinterpret_cast<float *>(mDstPointer + dstStride * y),
                         width, littleEndian);
-            }
+            });
         }
 
     }
