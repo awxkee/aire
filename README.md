@@ -10,6 +10,17 @@ Image processing speed increased by [libhwy](https://github.com/google/highway)
 Aire.gaussianBlur(bitmap, ...)
 ```
 
+# How to add
+
+Add at first the jitpack repository
+```groovy
+  maven { url 'https://jitpack.io' }
+```
+
+```groovy
+  implementation 'com.github.awxkee:aire:Tag'
+```
+
 # Done filters
 
 ## Blur:
@@ -60,7 +71,7 @@ Aire.gaussianBlur(bitmap, ...)
 
 - [x] Mozjpeg compression
 - [x] PNG Quantize
-- [x] Palette quantize]
+- [x] Palette quantize
 
 ## Tone Mapping:
 - [x] Uchimura
