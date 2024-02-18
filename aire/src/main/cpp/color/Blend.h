@@ -15,7 +15,7 @@ static float blendColor(const float c, const float c1, const float a) {
 inline __attribute__((flatten))
 static Eigen::Vector3f blendColor(const Eigen::Vector3f c, const Eigen::Vector3f c1, const Eigen::Vector3f a) {
     const Eigen::Vector3f ones = {1.0f, 1.0f, 1.0f};
-    Eigen::Vector3f r = c1.array() * a.array() + c.array() * (ones.array() - a.array());
+    Eigen::Vector3f r = c1.array() * a.array() + c.array() * (ones - a).array();
     return r;
 }
 

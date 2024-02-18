@@ -62,9 +62,14 @@ class MainActivity : ComponentActivity() {
 //                        }
 //
 //                        val kdTime = measureTimeMillis {
-//                            val blurred = Aire.gaussianBlur(bitmap, 15, 5f)
+//                            val blurred = Aire.tiltShift(bitmap, 43.44f, 32.76f, 0.49f, 0.2f)
 //                            scope.launch {
 //                                imagesArray.add(blurred)
+//                            }
+//
+//                            val blurred1 = Aire.gaussianBlur(bitmap, 43, 32.76f)
+//                            scope.launch {
+//                                imagesArray.add(blurred1)
 //                            }
 //                        }
 //                        var radius = 5

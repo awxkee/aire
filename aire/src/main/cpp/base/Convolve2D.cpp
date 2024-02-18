@@ -16,7 +16,7 @@ namespace aire {
     using namespace std;
     using namespace hwy::HWY_NAMESPACE;
 
-    void Convolve2D::applyChannel(FF2DWorkspace *workspace,
+   /* void Convolve2D::applyChannel(FF2DWorkspace *workspace,
                                   uint8_t *data, const int stride, const int chanIndex, const int width,
                                   const int height) {
 
@@ -53,7 +53,7 @@ namespace aire {
                 dst += 4;
             }
         }
-    }
+    }*/
 
     void Convolve2D::bruteForceConvolve(uint8_t *data, int stride, int width, int height) {
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
@@ -115,7 +115,7 @@ namespace aire {
         std::copy(destination.begin(), destination.end(), data);
     }
 
-    void Convolve2D::fftConvolve(uint8_t *data, int stride, int width, int height) {
+    /*void Convolve2D::fftConvolve(uint8_t *data, int stride, int width, int height) {
         std::vector<float> rV(width * height, 0.f);
         std::vector<float> gV(width * height, 0.f);
         std::vector<float> bV(width * height, 0.f);
@@ -230,7 +230,7 @@ namespace aire {
         aV.clear();
         applyChannel(workspace.get(), data, stride, 3, width, height);
         workspace.reset();
-    }
+    }*/
 
     void Convolve2D::convolve(uint8_t *data, int stride, int width, int height) {
         this->bruteForceConvolve(data, stride, width, height);

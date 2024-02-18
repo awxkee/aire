@@ -33,10 +33,8 @@ namespace aire {
                 mSource /= 255.f;
                 Eigen::Vector3f blurSource = {blurredSource[0], blurredSource[1], blurredSource[2]};
                 blurSource /= 255.f;
-                Eigen::Vector3f aSrc = {newA, newA, newA};
-                aSrc /= 255.f;
-                auto blended = blendColor(mSource, blurSource, aSrc);
-                auto cmp = (blended.array() * 255.f).min(255.f).max(0.f);
+                auto blended = mix(mSource, blurSource, newA / 255.f);
+                auto cmp = (blended * 255.f).array().min(255.f).max(0.f);
 
                 dst[0] = cmp.x();
                 dst[1] = cmp.y();

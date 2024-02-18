@@ -30,9 +30,6 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         algo/WuQuantizer.cpp base/AffineTransform.cpp jni/Geometry.cpp base/WarpPerspective.cpp
         base/JPEGEncoder.cpp jni/Compress.cpp)
 
-add_library(libfft STATIC IMPORTED)
-set_target_properties(${CMAKE_PROJECT_NAME} libfft PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libfftw3.a)
-
 add_library(libzlibng STATIC IMPORTED)
 set_target_properties(${CMAKE_PROJECT_NAME} libzlibng PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libz.a)
 
@@ -62,7 +59,6 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${C
 target_link_libraries(${CMAKE_PROJECT_NAME}
         android
         log
-        libfft
         libzlibng
         libturbojpeg
         -ljnigraphics)
