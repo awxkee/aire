@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
-//
+////
 //                        val kdTime = measureTimeMillis {
 //                            val blurred = Aire.scale(bitmap, 4000, 4000, BitmapScaleMode.Cubic, true)
 //                            scope.launch {

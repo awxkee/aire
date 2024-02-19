@@ -63,6 +63,4 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         log
         libzlibng
         libturbojpeg
-        -static-openmp
-        -fopenmp
         -ljnigraphics)

@@ -53,145 +53,157 @@ namespace aire::HWY_NAMESPACE {
                                                                   mult255)))));
     }
 
+    void UnpremultiplyRGBAHWYRow(const uint8_t *src, int srcStride,
+                              uint8_t *dst, int dstStride, int width,
+                              int y) {
+        const FixedTag<uint8_t, 16> du8x16;
+        const FixedTag<uint16_t, 8> du16x8;
+        const FixedTag<uint8_t, 8> du8x8;
+
+        using VU8x16 = Vec<decltype(du8x16)>;
+        using VU16x8 = Vec<decltype(du16x8)>;
+
+        VU16x8 mult255 = Set(du16x8, 255);
+
+        auto mSrc = reinterpret_cast<const uint8_t *>(src + y * srcStride);
+        auto mDst = reinterpret_cast<uint8_t *>(dst + y * dstStride);
+
+        int x = 0;
+        const int pixels = 16;
+
+        for (; x + pixels < width; x += pixels) {
+            VU8x16 r8, g8, b8, a8;
+            LoadInterleaved4(du8x16, mSrc, r8, g8, b8, a8);
+
+            VU16x8 aLow = PromoteLowerTo(du16x8, a8);
+            VU16x8 rLow = PromoteLowerTo(du16x8, r8);
+            VU16x8 gLow = PromoteLowerTo(du16x8, g8);
+            VU16x8 bLow = PromoteLowerTo(du16x8, b8);
+            auto lowADivider = ShiftRight<1>(aLow);
+            VU16x8 tmp = Add(Mul(Min(rLow, aLow), mult255), lowADivider);
+            rLow = RearrangeVec(tmp);
+            tmp = Add(Mul(Min(gLow, aLow), mult255), lowADivider);
+            gLow = RearrangeVec(tmp);
+            tmp = Add(Mul(Min(bLow, aLow), mult255), lowADivider);
+            bLow = RearrangeVec(tmp);
+
+            VU16x8 aHigh = PromoteUpperTo(du16x8, a8);
+            VU16x8 rHigh = PromoteUpperTo(du16x8, r8);
+            VU16x8 gHigh = PromoteUpperTo(du16x8, g8);
+            VU16x8 bHigh = PromoteUpperTo(du16x8, b8);
+            auto highADivider = ShiftRight<1>(aHigh);
+            tmp = Add(Mul(Min(rHigh, aHigh), mult255), highADivider);
+            rHigh = RearrangeVec(tmp);
+            tmp = Add(Mul(Min(gHigh, aHigh), mult255), highADivider);
+            gHigh = RearrangeVec(tmp);
+            tmp = Add(Mul(Min(bHigh, aHigh), mult255), highADivider);
+            bHigh = RearrangeVec(tmp);
+
+            r8 = Combine(du8x16, DemoteTo(du8x8, rHigh), DemoteTo(du8x8, rLow));
+            g8 = Combine(du8x16, DemoteTo(du8x8, gHigh), DemoteTo(du8x8, gLow));
+            b8 = Combine(du8x16, DemoteTo(du8x8, bHigh), DemoteTo(du8x8, bLow));
+
+            StoreInterleaved4(r8, g8, b8, a8, du8x16, mDst);
+
+            mSrc += pixels * 4;
+            mDst += pixels * 4;
+        }
+
+        for (; x < width; ++x) {
+            uint8_t alpha = mSrc[3];
+            Eigen::Vector3i color = {mSrc[0], mSrc[1], mSrc[2]};
+            color = (color.array().min(alpha) * 255 + alpha / 2) / alpha;
+            mDst[0] = color.x();
+            mDst[1] = color.y();
+            mDst[2] = color.z();
+            mDst[3] = alpha;
+            mSrc += 4;
+            mDst += 4;
+        }
+    }
+
     void UnpremultiplyRGBAHWY(const uint8_t *src, int srcStride,
                                uint8_t *dst, int dstStride, int width,
                                int height) {
-#pragma omp parallel for num_threads(2)
+//#pragma omp parallel for num_threads(4) default(shared)
         for (int y = 0; y < height; ++y) {
-            const FixedTag<uint8_t, 16> du8x16;
-            const FixedTag<uint16_t, 8> du16x8;
-            const FixedTag<uint8_t, 8> du8x8;
+            UnpremultiplyRGBAHWYRow(src, srcStride, dst, dstStride, width, y);
+        }
+    }
 
-            using VU8x16 = Vec<decltype(du8x16)>;
-            using VU16x8 = Vec<decltype(du16x8)>;
+    void PremultiplyRGBAHWYRow(const uint8_t *src, int srcStride,
+                            uint8_t *dst, int dstStride, int width,
+                            int y) {
+        const FixedTag<uint8_t, 16> du8x16;
+        const FixedTag<uint16_t, 8> du16x8;
+        const FixedTag<uint8_t, 8> du8x8;
 
-            VU16x8 mult255 = Set(du16x8, 255);
+        using VU8x16 = Vec<decltype(du8x16)>;
+        using VU16x8 = Vec<decltype(du16x8)>;
 
-            auto mSrc = reinterpret_cast<const uint8_t *>(src + y * srcStride);
-            auto mDst = reinterpret_cast<uint8_t *>(dst + y * dstStride);
+        VU16x8 mult255d2 = Set(du16x8, 255 / 2);
 
-            int x = 0;
-            const int pixels = 16;
+        auto mSrc = reinterpret_cast<const uint8_t *>(src + y * srcStride);
+        auto mDst = reinterpret_cast<uint8_t *>(dst + y * dstStride);
 
-            for (; x + pixels < width; x += pixels) {
-                VU8x16 r8, g8, b8, a8;
-                LoadInterleaved4(du8x16, mSrc, r8, g8, b8, a8);
+        int x = 0;
+        int pixels = 16;
 
-                VU16x8 aLow = PromoteLowerTo(du16x8, a8);
-                VU16x8 rLow = PromoteLowerTo(du16x8, r8);
-                VU16x8 gLow = PromoteLowerTo(du16x8, g8);
-                VU16x8 bLow = PromoteLowerTo(du16x8, b8);
-                auto lowADivider = ShiftRight<1>(aLow);
-                VU16x8 tmp = Add(Mul(Min(rLow, aLow), mult255), lowADivider);
-                rLow = RearrangeVec(tmp);
-                tmp = Add(Mul(Min(gLow, aLow), mult255), lowADivider);
-                gLow = RearrangeVec(tmp);
-                tmp = Add(Mul(Min(bLow, aLow), mult255), lowADivider);
-                bLow = RearrangeVec(tmp);
+        for (; x + pixels < width; x += pixels) {
+            VU8x16 r8, g8, b8, a8;
+            LoadInterleaved4(du8x16, mSrc, r8, g8, b8, a8);
 
-                VU16x8 aHigh = PromoteUpperTo(du16x8, a8);
-                VU16x8 rHigh = PromoteUpperTo(du16x8, r8);
-                VU16x8 gHigh = PromoteUpperTo(du16x8, g8);
-                VU16x8 bHigh = PromoteUpperTo(du16x8, b8);
-                auto highADivider = ShiftRight<1>(aHigh);
-                tmp = Add(Mul(Min(rHigh, aHigh), mult255), highADivider);
-                rHigh = RearrangeVec(tmp);
-                tmp = Add(Mul(Min(gHigh, aHigh), mult255), highADivider);
-                gHigh = RearrangeVec(tmp);
-                tmp = Add(Mul(Min(bHigh, aHigh), mult255), highADivider);
-                bHigh = RearrangeVec(tmp);
+            VU16x8 aLow = PromoteLowerTo(du16x8, a8);
+            VU16x8 rLow = PromoteLowerTo(du16x8, r8);
+            VU16x8 gLow = PromoteLowerTo(du16x8, g8);
+            VU16x8 bLow = PromoteLowerTo(du16x8, b8);
+            VU16x8 tmp = Add(Mul(rLow, aLow), mult255d2);
+            rLow = RearrangeVec(tmp);
+            tmp = Add(Mul(gLow, aLow), mult255d2);
+            gLow = RearrangeVec(tmp);
+            tmp = Add(Mul(bLow, aLow), mult255d2);
+            bLow = RearrangeVec(tmp);
 
-                r8 = Combine(du8x16, DemoteTo(du8x8, rHigh), DemoteTo(du8x8, rLow));
-                g8 = Combine(du8x16, DemoteTo(du8x8, gHigh), DemoteTo(du8x8, gLow));
-                b8 = Combine(du8x16, DemoteTo(du8x8, bHigh), DemoteTo(du8x8, bLow));
+            VU16x8 aHigh = PromoteUpperTo(du16x8, a8);
+            VU16x8 rHigh = PromoteUpperTo(du16x8, r8);
+            VU16x8 gHigh = PromoteUpperTo(du16x8, g8);
+            VU16x8 bHigh = PromoteUpperTo(du16x8, b8);
+            tmp = Add(Mul(rHigh, aHigh), mult255d2);
+            rHigh = RearrangeVec(tmp);
+            tmp = Add(Mul(gHigh, aHigh), mult255d2);
+            gHigh = RearrangeVec(tmp);
+            tmp = Add(Mul(bHigh, aHigh), mult255d2);
+            bHigh = RearrangeVec(tmp);
 
-                StoreInterleaved4(r8, g8, b8, a8, du8x16, mDst);
+            r8 = Combine(du8x16, DemoteTo(du8x8, rHigh), DemoteTo(du8x8, rLow));
+            g8 = Combine(du8x16, DemoteTo(du8x8, gHigh), DemoteTo(du8x8, gLow));
+            b8 = Combine(du8x16, DemoteTo(du8x8, bHigh), DemoteTo(du8x8, bLow));
 
-                mSrc += pixels * 4;
-                mDst += pixels * 4;
-            }
+            StoreInterleaved4(r8, g8, b8, a8, du8x16, mDst);
 
-            for (; x < width; ++x) {
-                uint8_t alpha = mSrc[3];
-                Eigen::Vector3i color = {mSrc[0], mSrc[1], mSrc[2]};
-                color = (color.array().min(alpha) * 255 + alpha / 2) / alpha;
-                mDst[0] = color.x();
-                mDst[1] = color.y();
-                mDst[2] = color.z();
-                mDst[3] = alpha;
-                mSrc += 4;
-                mDst += 4;
-            }
+            mSrc += pixels * 4;
+            mDst += pixels * 4;
+        }
+
+        for (; x < width; ++x) {
+            uint8_t alpha = mSrc[3];
+            Eigen::Vector3i color = {mSrc[0], mSrc[1], mSrc[2]};
+            color = (color.array() * alpha + 127) / 255;
+            mDst[0] = color.x();
+            mDst[1] = color.y();
+            mDst[2] = color.z();
+            mDst[3] = alpha;
+            mSrc += 4;
+            mDst += 4;
         }
     }
 
     void PremultiplyRGBAHWY(const uint8_t *src, int srcStride,
                              uint8_t *dst, int dstStride, int width,
                              int height) {
-#pragma omp parallel for num_threads(2) schedule(dynamic)
+//#pragma omp parallel for num_threads(2) schedule(dynamic) default(shared)
         for (int y = 0; y < height; ++y) {
-            const FixedTag<uint8_t, 16> du8x16;
-            const FixedTag<uint16_t, 8> du16x8;
-            const FixedTag<uint8_t, 8> du8x8;
-
-            using VU8x16 = Vec<decltype(du8x16)>;
-            using VU16x8 = Vec<decltype(du16x8)>;
-
-            VU16x8 mult255d2 = Set(du16x8, 255 / 2);
-
-            auto mSrc = reinterpret_cast<const uint8_t *>(src + y * srcStride);
-            auto mDst = reinterpret_cast<uint8_t *>(dst + y * dstStride);
-
-            int x = 0;
-            int pixels = 16;
-
-            for (; x + pixels < width; x += pixels) {
-                VU8x16 r8, g8, b8, a8;
-                LoadInterleaved4(du8x16, mSrc, r8, g8, b8, a8);
-
-                VU16x8 aLow = PromoteLowerTo(du16x8, a8);
-                VU16x8 rLow = PromoteLowerTo(du16x8, r8);
-                VU16x8 gLow = PromoteLowerTo(du16x8, g8);
-                VU16x8 bLow = PromoteLowerTo(du16x8, b8);
-                VU16x8 tmp = Add(Mul(rLow, aLow), mult255d2);
-                rLow = RearrangeVec(tmp);
-                tmp = Add(Mul(gLow, aLow), mult255d2);
-                gLow = RearrangeVec(tmp);
-                tmp = Add(Mul(bLow, aLow), mult255d2);
-                bLow = RearrangeVec(tmp);
-
-                VU16x8 aHigh = PromoteUpperTo(du16x8, a8);
-                VU16x8 rHigh = PromoteUpperTo(du16x8, r8);
-                VU16x8 gHigh = PromoteUpperTo(du16x8, g8);
-                VU16x8 bHigh = PromoteUpperTo(du16x8, b8);
-                tmp = Add(Mul(rHigh, aHigh), mult255d2);
-                rHigh = RearrangeVec(tmp);
-                tmp = Add(Mul(gHigh, aHigh), mult255d2);
-                gHigh = RearrangeVec(tmp);
-                tmp = Add(Mul(bHigh, aHigh), mult255d2);
-                bHigh = RearrangeVec(tmp);
-
-                r8 = Combine(du8x16, DemoteTo(du8x8, rHigh), DemoteTo(du8x8, rLow));
-                g8 = Combine(du8x16, DemoteTo(du8x8, gHigh), DemoteTo(du8x8, gLow));
-                b8 = Combine(du8x16, DemoteTo(du8x8, bHigh), DemoteTo(du8x8, bLow));
-
-                StoreInterleaved4(r8, g8, b8, a8, du8x16, mDst);
-
-                mSrc += pixels * 4;
-                mDst += pixels * 4;
-            }
-
-            for (; x < width; ++x) {
-                uint8_t alpha = mSrc[3];
-                Eigen::Vector3i color = {mSrc[0], mSrc[1], mSrc[2]};
-                color = (color.array() * alpha + 127) / 255;
-                mDst[0] = color.x();
-                mDst[1] = color.y();
-                mDst[2] = color.z();
-                mDst[3] = alpha;
-                mSrc += 4;
-                mDst += 4;
-            }
+            PremultiplyRGBAHWYRow(src, srcStride, dst, dstStride, width, y);
         }
     }
 }
