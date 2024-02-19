@@ -8,6 +8,7 @@ import com.awxkee.aire.pipeline.ProcessingPipelinesImpl
 import com.awxkee.aire.pipeline.ScalePipelinesImpl
 import com.awxkee.aire.pipeline.ShiftPipelineImpl
 import com.awxkee.aire.pipeline.TonePipelinesImpl
+import com.awxkee.aire.pipeline.YuvPipelinesImpl
 
 @Keep
 object Aire : BlurPipelines by BlurPipelinesImpl(),
@@ -16,7 +17,8 @@ object Aire : BlurPipelines by BlurPipelinesImpl(),
     ProcessingPipelines by ProcessingPipelinesImpl(),
     EffectsPipelines by EffectsPipelineImpl(),
     ScalePipelines by ScalePipelinesImpl(),
-    TonePipelines by TonePipelinesImpl() {
+    TonePipelines by TonePipelinesImpl(),
+    YuvPipelines by YuvPipelinesImpl() {
     init {
         System.loadLibrary("aire")
     }
