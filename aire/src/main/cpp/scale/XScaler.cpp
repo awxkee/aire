@@ -481,7 +481,7 @@ namespace aire::HWY_NAMESPACE {
 
         auto src8 = reinterpret_cast<const uint8_t *>(input);
 
-        #pragma omp parallel for num_threads(4) schedule(dynamic)
+        #pragma omp parallel for num_threads(6) schedule(dynamic)
         for (int y = 0; y < outputHeight; ++y) {
             scaleRowF16(src8, srcStride, dstStride, inputWidth, inputHeight,
                         output, outputWidth,
@@ -881,7 +881,7 @@ namespace aire::HWY_NAMESPACE {
 
         float maxColors = pow(2.0f, (float) depth) - 1.0f;
 
-#pragma omp parallel for num_threads(4) schedule(dynamic)
+#pragma omp parallel for num_threads(6) schedule(dynamic)
         for (int y = 0; y < outputHeight; ++y) {
             ScaleRowU8(src8, srcStride, inputWidth, inputHeight, output,
                        dstStride, outputWidth, components,

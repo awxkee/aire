@@ -18,6 +18,11 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
             std::string msg("Width and height must be > but received (" + std::to_string(dstWidth) + ", " + std::to_string(dstHeight) + ")");
             throw AireError(msg);
         }
+        uint64_t maxSize = static_cast<uint64_t>(dstWidth) * static_cast<uint64_t>(dstHeight) * 4;
+        if (maxSize >= std::numeric_limits<int32_t>::max()) {
+            std::string msg("Invalid size was provided");
+            throw AireError(msg);
+        }
         std::vector<AcquirePixelFormat> formats;
         formats.insert(formats.begin(), APF_RGBA8888);
         formats.insert(formats.begin(), APF_F16);
@@ -31,10 +36,6 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         int lineWidth = dstWidth * sizeof(uint8_t) * 4;
-                                                        if (lineWidth < 0) {
-                                                            std::string msg("Invalid size was provided");
-                                                            throw AireError(msg);
-                                                        }
                                                         int alignment = 64;
                                                         int padding = (alignment - (lineWidth % alignment)) % alignment;
                                                         int dstStride = lineWidth + padding;
@@ -88,10 +89,6 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                         };
                                                     } else if (fmt == APF_F16) {
                                                         int lineWidth = dstWidth * sizeof(uint16_t) * 4;
-                                                        if (lineWidth < 0) {
-                                                            std::string msg("Invalid size was provided");
-                                                            throw AireError(msg);
-                                                        }
                                                         int alignment = 64;
                                                         int padding = (alignment - (lineWidth % alignment)) % alignment;
                                                         int dstStride = lineWidth + padding;

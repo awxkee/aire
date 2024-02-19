@@ -55,13 +55,13 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.img_6639)
+//                            BitmapFactory.decodeResource(resources, R.drawable.haze)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
 //                        val kdTime = measureTimeMillis {
-//                            val blurred = Aire.gaussianBlur(bitmap, 7, 5f)
+//                            val blurred = Aire.scale(bitmap, 4000, 4000, BitmapScaleMode.Cubic, true)
 //                            scope.launch {
 //                                imagesArray.add(blurred)
 //                            }
