@@ -91,7 +91,7 @@ extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_medianBlurPipeline(JNIEnv *env, jobject thiz,
                                                                    jobject bitmap,
-                                                                   jint radius, jint selector) {
+                                                                   jint radius) {
     try {
         std::vector<AcquirePixelFormat> formats;
         formats.insert(formats.begin(), APF_RGBA8888);
@@ -99,14 +99,13 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_medianBlurPipeline(JNIEnv *env, 
                                                 bitmap,
                                                 formats,
                                                 false,
-                                                [radius, selector](std::vector<uint8_t> &input, int stride,
+                                                [radius](std::vector<uint8_t> &input, int stride,
                                                                    int width, int height,
                                                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::medianBlur(
                                                                 reinterpret_cast<uint8_t *>(input.data()),
-                                                                stride, width, height, radius,
-                                                                static_cast<aire::MedianSelector>(selector));
+                                                                stride, width, height, radius);
                                                     }
                                                     return {
                                                             .data = input,

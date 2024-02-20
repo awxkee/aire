@@ -15,12 +15,10 @@ namespace aire {
         MEDIAN_NTH_ELEMENT = 3
     };
 
-    void medianBlurChannel(uint8_t *data, const int width, const int height, const int radius,
-                           const MedianSelector selector);
+    void medianBlurChannel(uint8_t *data, const int width, const int height, const int radius);
 
     void
-    medianBlur(uint8_t *data, const int stride, const int width, const int height, const int radius,
-               const MedianSelector selector);
+    medianBlur(uint8_t *data, const int stride, const int width, const int height, const int radius);
 }
 
 #endif //JXLCODER_MEDIANBLUR_H

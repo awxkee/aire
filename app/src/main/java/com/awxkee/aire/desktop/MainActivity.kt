@@ -56,12 +56,13 @@ class MainActivity : ComponentActivity() {
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.haze)
+//                                .scaleWith(0.7f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 ////
 //                        val kdTime = measureTimeMillis {
-//                            val blurred = Aire.scale(bitmap, 520, 520, BitmapScaleMode.Cubic, true)
+//                            val blurred = Aire.medianBlur(bitmap, 11)
 //                            scope.launch {
 //                                imagesArray.add(blurred)
 //                            }

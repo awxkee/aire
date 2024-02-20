@@ -21,7 +21,7 @@ namespace aire {
         std::vector<uint8_t> chan(width * height);
         auto kernel = getStructuringKernel(kernelSize);
         dilate(src, chan.data(), width, height, kernel);
-        medianBlurChannel(chan.data(), width, height, 5, MEDIAN_WIRTH);
+        medianBlurChannel(chan.data(), width, height, 5);
 
         std::vector<uint8_t> dstDiff(width * height);
         absDiff(dstDiff.data(), chan.data(), src, width, height);

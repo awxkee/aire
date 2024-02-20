@@ -19,8 +19,7 @@ interface BlurPipelines {
 
     fun medianBlur(
         bitmap: Bitmap,
-        radius: Int,
-        selector: MedianSelector = MedianSelector.WIRTH
+        kernelSize: Int
     ): Bitmap
 
     fun tentBlur(bitmap: Bitmap, radius: Int): Bitmap
