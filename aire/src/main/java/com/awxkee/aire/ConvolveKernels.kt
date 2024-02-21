@@ -41,7 +41,12 @@ object ConvolveKernels {
      * Box blur. Just for understanding how it works
      */
     fun box(kernelSize: Int): FloatArray {
-        return FloatArray(kernelSize * kernelSize) { _ -> 1.0f }
+        var kernel = FloatArray(kernelSize * kernelSize) { _ -> 1.0f }
+        val sum = kernel.reduce { acc, fl -> acc + fl }
+        if (sum != 0.0f) {
+            kernel = kernel.map { (it / sum).toFloat() }.toFloatArray()
+        }
+        return kernel
     }
 
     /**
