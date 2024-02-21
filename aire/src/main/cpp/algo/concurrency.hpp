@@ -61,6 +61,45 @@ namespace concurrency {
     }
 
     template<typename Function, typename... Args>
+    void parallel_for_segment(const int numThreads, const int numIterations, Function &&func, Args &&... args) {
+        static_assert(std::is_invocable_v<Function, int, int, Args...>, "func must take an int parameter for iteration id");
+
+        std::vector<std::thread> threads;
+
+        int segmentHeight = numIterations / numThreads;
+
+        auto parallelWorker = [&](int start, int end) {
+            std::invoke(func, start, end, std::forward<Args>(args)...);
+        };
+
+        if (numThreads > 1) {
+            // Launch N-1 worker threads
+            for (int i = 1; i < numThreads; ++i) {
+                int start = i * segmentHeight;
+                int end = (i + 1) * segmentHeight;
+                if (i == numThreads - 1) {
+                    end = numIterations;
+                }
+                threads.emplace_back(parallelWorker, start, end);
+            }
+        }
+
+        int start = 0;
+        int end = segmentHeight;
+        if (numThreads == 1) {
+            end = numIterations;
+        }
+        parallelWorker(start, end);
+
+        // Join all threads
+        for (auto &thread: threads) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+        }
+    }
+
+    template<typename Function, typename... Args>
     void parallel_for_with_thread_id(const int numThreads, const int numIterations, Function &&func, Args &&... args) {
         static_assert(std::is_invocable_v<Function, int, int, Args...>, "func must take an int parameter for threadId, and iteration Id");
 

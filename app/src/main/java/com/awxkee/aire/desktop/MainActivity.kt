@@ -54,20 +54,46 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-//                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.haze)
-//                                .scaleWith(0.7f)
-//                        scope.launch {
-//                            imagesArray.add(bitmap)
-//                        }
-////
-//                        val kdTime = measureTimeMillis {
-//                            val blurred = Aire.medianBlur(bitmap, 11)
-//                            scope.launch {
-//                                imagesArray.add(blurred)
-//                            }
-//                        }
-//                        Log.d("AireMedian", "remove shadows processing time ${kdTime}ms")
+                        val bitmap =
+                            BitmapFactory.decodeResource(resources, R.drawable.haze)
+                                .scaleWith(0.8f)
+                        scope.launch {
+                            imagesArray.add(bitmap)
+                        }
+//
+                        repeat(8) {
+                            val d2Time = measureTimeMillis {
+                                val blurred3 = Aire.fastGaussian2Degree(bitmap, 15)
+                                scope.launch {
+                                    imagesArray.add(blurred3)
+                                }
+                            }
+                            val d3Time = measureTimeMillis {
+                                val blurred3 = Aire.fastGaussian3Degree(bitmap, 15)
+                                scope.launch {
+                                    imagesArray.add(blurred3)
+                                }
+                            }
+                            val d4Time = measureTimeMillis {
+                                val blurred = Aire.fastGaussian4Degree(bitmap, 15)
+                                scope.launch {
+                                    imagesArray.add(blurred)
+                                }
+                            }
+                            val stack = measureTimeMillis {
+                                val blurred3 = Aire.stackBlur(bitmap, 15)
+                                scope.launch {
+                                    imagesArray.add(blurred3)
+                                }
+                            }
+                            val gauss = measureTimeMillis {
+                                val blurred3 = Aire.gaussianBlur(bitmap, 15, 15f)
+                                scope.launch {
+                                    imagesArray.add(blurred3)
+                                }
+                            }
+                            Log.d("AireMedian", "Done 2D blur in ${d2Time}ms, 3D Blur in ${d3Time}ms, 4D Blur in ${d4Time}ms stack blur in ${stack}ms, gauss ${gauss}ms")
+                        }
 //                        var radius = 5
 //                        repeat(25) {
 //                            val time = measureTimeMillis {

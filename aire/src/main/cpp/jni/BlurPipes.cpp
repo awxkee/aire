@@ -100,8 +100,8 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_medianBlurPipeline(JNIEnv *env, 
                                                 formats,
                                                 false,
                                                 [radius](std::vector<uint8_t> &input, int stride,
-                                                                   int width, int height,
-                                                                   AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                         int width, int height,
+                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::medianBlur(
                                                                 reinterpret_cast<uint8_t *>(input.data()),
@@ -391,6 +391,104 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_poissonBlurPipeline(JNIEnv *env,
                                                         aire::poissonBlurF16(reinterpret_cast<uint16_t *>(input.data()),
                                                                              stride, width,
                                                                              height, radius);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastGaussian2DImpl(JNIEnv *env, jobject thiz, jobject bitmap, jint radius) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [radius](std::vector<uint8_t> &input, int stride,
+                                                         int width, int height,
+                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::gaussianApproximation2D(input.data(), stride, width,
+                                                                                      height, radius);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastGaussian3DImpl(JNIEnv *env, jobject thiz, jobject bitmap, jint radius) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [radius](std::vector<uint8_t> &input, int stride,
+                                                         int width, int height,
+                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::gaussianApproximation3D(input.data(), stride, width,
+                                                                                      height, radius);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastGaussian4DImpl(JNIEnv *env, jobject thiz, jobject bitmap, jint radius) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [radius](std::vector<uint8_t> &input, int stride,
+                                                         int width, int height,
+                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::gaussianApproximation4D(input.data(), stride, width,
+                                                                                      height, radius);
                                                     }
                                                     return {
                                                             .data = input,

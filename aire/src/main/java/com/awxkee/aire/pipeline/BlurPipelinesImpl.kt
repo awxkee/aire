@@ -66,12 +66,30 @@ class BlurPipelinesImpl : BlurPipelines {
         return medianBlurPipeline(bitmap, kernelSize)
     }
 
+    override fun fastGaussian2Degree(bitmap: Bitmap, radius: Int): Bitmap {
+        return fastGaussian2DImpl(bitmap, radius)
+    }
+
+    override fun fastGaussian3Degree(bitmap: Bitmap, radius: Int): Bitmap {
+        return fastGaussian2DImpl(bitmap, radius)
+    }
+
     override fun tentBlur(bitmap: Bitmap, radius: Int): Bitmap {
         if (radius < 3) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
         return tentBlurPipeline(bitmap, radius)
     }
+
+    override fun fastGaussian4Degree(bitmap: Bitmap, radius: Int): Bitmap {
+        return fastGaussian4DImpl(bitmap, radius)
+    }
+
+    private external fun fastGaussian2DImpl(bitmap: Bitmap, radius: Int): Bitmap
+
+    private external fun fastGaussian3DImpl(bitmap: Bitmap, radius: Int): Bitmap
+
+    private external fun fastGaussian4DImpl(bitmap: Bitmap, radius: Int): Bitmap
 
     override fun anisotropicDiffusion(
         bitmap: Bitmap,
