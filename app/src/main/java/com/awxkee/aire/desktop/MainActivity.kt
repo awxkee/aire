@@ -34,6 +34,7 @@ import com.awxkee.aire.AirePaletteDithering
 import com.awxkee.aire.AireQuantize
 import com.awxkee.aire.BitmapScaleMode
 import com.awxkee.aire.ColorMatrices
+import com.awxkee.aire.ConvolveKernels
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,46 +55,21 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
-                        val bitmap =
-                            BitmapFactory.decodeResource(resources, R.drawable.haze)
-                                .scaleWith(0.8f)
-                        scope.launch {
-                            imagesArray.add(bitmap)
-                        }
-//
-                        repeat(8) {
-                            val d2Time = measureTimeMillis {
-                                val blurred3 = Aire.fastGaussian2Degree(bitmap, 15)
-                                scope.launch {
-                                    imagesArray.add(blurred3)
-                                }
-                            }
-                            val d3Time = measureTimeMillis {
-                                val blurred3 = Aire.fastGaussian3Degree(bitmap, 15)
-                                scope.launch {
-                                    imagesArray.add(blurred3)
-                                }
-                            }
-                            val d4Time = measureTimeMillis {
-                                val blurred = Aire.fastGaussian4Degree(bitmap, 15)
-                                scope.launch {
-                                    imagesArray.add(blurred)
-                                }
-                            }
-                            val stack = measureTimeMillis {
-                                val blurred3 = Aire.stackBlur(bitmap, 15)
-                                scope.launch {
-                                    imagesArray.add(blurred3)
-                                }
-                            }
-                            val gauss = measureTimeMillis {
-                                val blurred3 = Aire.gaussianBlur(bitmap, 15, 15f)
-                                scope.launch {
-                                    imagesArray.add(blurred3)
-                                }
-                            }
-                            Log.d("AireMedian", "Done 2D blur in ${d2Time}ms, 3D Blur in ${d3Time}ms, 4D Blur in ${d4Time}ms stack blur in ${stack}ms, gauss ${gauss}ms")
-                        }
+//                        val bitmap =
+//                            BitmapFactory.decodeResource(resources, R.drawable.haze)
+//                                .scaleWith(0.12f)
+//                        scope.launch {
+//                            imagesArray.add(bitmap)
+//                        }
+////
+//                        repeat(1) {
+//                            val d2Time = measureTimeMillis {
+//                                val blurred3 = Aire.convolve2D(bitmap, ConvolveKernels.star(19))
+//                                scope.launch {
+//                                    imagesArray.add(blurred3)
+//                                }
+//                            }
+//                        }
 //                        var radius = 5
 //                        repeat(25) {
 //                            val time = measureTimeMillis {

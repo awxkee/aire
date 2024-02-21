@@ -70,6 +70,10 @@ namespace aire {
 
         concurrency::parallel_for(8, height, [&](int y) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination.data()) + y * stride);
+
+            const int rows = this->matrix.rows();
+            const int cols = this->matrix.cols();
+
             for (int x = 0; x < width; ++x) {
 
                 VF store = zeros;
@@ -77,10 +81,10 @@ namespace aire {
                 const int ySize = this->matrix.rows() / 2;
                 const int xSize = this->matrix.cols() / 2;
 
-                for (int j = -ySize; j <= ySize; ++j) {
+                for (int j = -ySize; j < ySize; ++j) {
                     auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + clamp(y + j, 0, height - 1) * stride);
                     int i = -xSize;
-                    for (; i <= xSize; ++i) {
+                    for (; i < xSize; ++i) {
                         int px = clamp(x + i, 0, width - 1) * 4;
                         auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
                         auto weight = Set(dfx4, matrix(j + ySize, i + xSize));
