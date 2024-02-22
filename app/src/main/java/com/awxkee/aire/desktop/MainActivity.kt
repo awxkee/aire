@@ -64,11 +64,13 @@ class MainActivity : ComponentActivity() {
 ////
 //                        repeat(1) {
 //                            val d2Time = measureTimeMillis {
-//                                val blurred3 = Aire.convolve2D(bitmap, ConvolveKernels.star(19))
+//                                val blurred3 = Aire.gaussianBlur(bitmap, 7, 3f)
 //                                scope.launch {
 //                                    imagesArray.add(blurred3)
 //                                }
 //                            }
+//                            Log.d("AireMedian", "exec time $d2Time")
+//
 //                        }
 //                        var radius = 5
 //                        repeat(25) {

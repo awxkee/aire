@@ -132,7 +132,7 @@ object ConvolveKernels {
      * Kernel that produces a circle, some interesting effects appears after, it will form a circle inside and blur by a circle
      */
     fun circle(kernelSize: Int): FloatArray {
-        if (kernelSize < 3) throw InvalidParameterException("Only kernelSize >= 3 is supported")
+        if (kernelSize < 5) throw InvalidParameterException("Only kernelSize >= 3 is supported")
         var kernel = FloatArray(kernelSize * kernelSize) { _ -> 0.0f }
         var sum: Double = 0.0
 

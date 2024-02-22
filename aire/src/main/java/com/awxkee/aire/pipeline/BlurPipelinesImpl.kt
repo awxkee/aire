@@ -32,32 +32,31 @@ package com.awxkee.aire.pipeline
 
 import android.graphics.Bitmap
 import com.awxkee.aire.BlurPipelines
-import com.awxkee.aire.MedianSelector
 
 class BlurPipelinesImpl : BlurPipelines {
-    override fun gaussianBlur(bitmap: Bitmap, radius: Int, sigma: Float): Bitmap {
-        if (radius < 1) {
+    override fun gaussianBlur(bitmap: Bitmap, kernelSize: Int, sigma: Float): Bitmap {
+        if (kernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
         if (sigma < 0) {
             throw IllegalStateException("Sigma must be more than 0")
         }
-        return gaussianBlurPipeline(bitmap, radius, sigma)
+        return gaussianBlurPipeline(bitmap, kernelSize, sigma)
     }
 
     override fun bilateralBlur(
         bitmap: Bitmap,
-        radius: Int,
+        kernelSize: Int,
         rangeSigma: Float,
         spatialSigma: Float
     ): Bitmap {
-        if (radius < 1) {
+        if (kernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
         if (rangeSigma < 0 || spatialSigma < 0) {
             throw IllegalStateException("Sigma must be more than 0")
         }
-        return bilateralBlurPipeline(bitmap, radius, rangeSigma, spatialSigma)
+        return bilateralBlurPipeline(bitmap, kernelSize, rangeSigma, spatialSigma)
     }
 
     override fun fastBilateralBlur(
@@ -68,18 +67,18 @@ class BlurPipelinesImpl : BlurPipelines {
         return fastBilateralPipeline(bitmap, rangeSigma, spatialSigma)
     }
 
-    override fun boxBlur(bitmap: Bitmap, radius: Int): Bitmap {
-        if (radius < 1) {
+    override fun boxBlur(bitmap: Bitmap, kernelSize: Int): Bitmap {
+        if (kernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
-        return boxBlurPipeline(bitmap, radius)
+        return boxBlurPipeline(bitmap, kernelSize)
     }
 
-    override fun poissonBlur(bitmap: Bitmap, radius: Int): Bitmap {
-        if (radius < 1) {
+    override fun poissonBlur(bitmap: Bitmap, kernelSize: Int): Bitmap {
+        if (kernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
-        return poissonBlurPipeline(bitmap, radius)
+        return poissonBlurPipeline(bitmap, kernelSize)
     }
 
     override fun stackBlur(bitmap: Bitmap, radius: Int): Bitmap {

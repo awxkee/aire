@@ -30,22 +30,22 @@ namespace aire {
         convolution.convolve(data, stride, width, height);
     }
 
-    std::vector<float> generateBoxKernel(int radius) {
-        if (radius < 0) {
-            std::string err = "Radius must be a non-negative integer but received " + std::to_string(radius);
+    std::vector<float> generateBoxKernel(int size) {
+        if (size < 0) {
+            std::string err = "Radius must be a non-negative integer but received " + std::to_string(size);
             throw AireError(err);
         }
-        int kernelSize = 2 * radius + 1;
+        const int kernelSize = size;
         std::vector<float> boxKernel(kernelSize, 1.0 / float(kernelSize));
         return std::move(boxKernel);
     }
 
-    Eigen::MatrixXf generateBoxKernel2D(const int radius) {
-        if (radius < 0) {
-            std::string err = "Radius must be a non-negative integer but received " + std::to_string(radius);
+    Eigen::MatrixXf generateBoxKernel2D(const int size) {
+        if (size <= 0) {
+            std::string err = "Radius must be a non-negative integer but received " + std::to_string(size);
             throw AireError(err);
         }
-        const int kernelSize = 2 * radius + 1;
+        const int kernelSize = size;
         Eigen::MatrixXf kernel = Eigen::MatrixXf::Constant(kernelSize, kernelSize, 1.0f / static_cast<float>(kernelSize));
         return kernel;
     }

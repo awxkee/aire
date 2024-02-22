@@ -8,7 +8,9 @@
 #include <vector>
 
 namespace aire {
-    void poissonBlur(uint8_t* data, int stride, int width, int height, int radius);
-    void poissonBlurF16(uint16_t *data, int stride, int width, int height, int radius);
-    std::vector<float> generatePoissonBlur(int radius);
+    void poissonBlur(uint8_t *data, int stride, int width, int height, const int kernelSize);
+
+    void poissonBlurF16(uint16_t *data, int stride, int width, int height, const int kernelSize);
+
+    std::vector<float> generatePoissonBlur(const int kernelSize);
 }

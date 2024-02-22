@@ -65,13 +65,13 @@ namespace aire {
         return tentFilter;
     }
 
-    void tentBlur(uint8_t *data, int stride, int width, int height, int radius) {
-        auto gen1DKernel = generate1DTentFilterKernelNormalized(2 * radius + 1);
+    void tentBlur(uint8_t *data, int stride, int width, int height, const int size) {
+        auto gen1DKernel = generate1DTentFilterKernelNormalized(size);
         convolve1D(data, stride, width, height, gen1DKernel, gen1DKernel);
     }
 
-    void tentBlurF16(uint16_t *data, int stride, int width, int height, int radius) {
-        auto gen1DKernel = generate1DTentFilterKernelNormalized(2 * radius + 1);
+    void tentBlurF16(uint16_t *data, int stride, int width, int height, const int size) {
+        auto gen1DKernel = generate1DTentFilterKernelNormalized(size);
         Convolve1Db16 convolution(gen1DKernel, gen1DKernel);
         convolution.convolve(data, stride, width, height);
     }

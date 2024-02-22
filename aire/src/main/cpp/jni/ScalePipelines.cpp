@@ -54,11 +54,11 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                                 if (scaleMode == bilinear || scaleMode == nearest) {
                                                                     aire::gaussBlurU8(reinterpret_cast<uint8_t *>(input.data()),
                                                                                       stride,
-                                                                                      width, height, 1, 1.5f);
+                                                                                      width, height, 3, 1.5f);
                                                                 } else {
                                                                     aire::gaussBlurU8(reinterpret_cast<uint8_t *>(input.data()),
                                                                                       stride,
-                                                                                      width, height, 2, 1.55f);
+                                                                                      width, height, 5, 1.55f);
                                                                 }
                                                             }
                                                         }

@@ -10,7 +10,7 @@
 
 namespace aire {
     template<class V>
-    void bilateralBlur(V *data, int stride, int width, int height, float radius, float sigma,
+    void bilateralBlur(V *data, int stride, int width, int height, const int size, float sigma,
                        float spatialSigma);
 }
 

@@ -9,8 +9,12 @@
 
 namespace aire {
     Eigen::MatrixXf generateTentFilter(int N);
+
     Eigen::MatrixXf generateTentFilterNormalized(int N);
+
     std::vector<float> generate1DTentFilterKernelNormalized(int size);
-    void tentBlur(uint8_t *data, int stride, int width, int height, int radius);
-    void tentBlurF16(uint16_t *data, int stride, int width, int height, int radius);
+
+    void tentBlur(uint8_t *data, int stride, int width, int height, const int size);
+
+    void tentBlurF16(uint16_t *data, int stride, int width, int height, const int size);
 }

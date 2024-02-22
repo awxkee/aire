@@ -19,7 +19,7 @@ using namespace std;
 namespace aire {
 
     static Eigen::MatrixXf generate2DGaussianKernel(int size, double sigma) {
-        Eigen::MatrixXf kernel2d(2 * size + 1, 2 * size + 1);
+        Eigen::MatrixXf kernel2d(size, size);
         for (int row = 0; row < kernel2d.rows(); row++) {
             for (int col = 0; col < kernel2d.cols(); col++) {
                 double x = exp(-(row * row + col * col) / (2 * sigma * sigma));
@@ -486,13 +486,13 @@ namespace aire {
         });
     }
 
-    void gaussBlurU8(uint8_t *data, int stride, int width, int height, int radius, float sigma) {
-        vector<float> kernel = compute1DGaussianKernel(radius * 2 + 1, sigma);
+    void gaussBlurU8(uint8_t *data, int stride, int width, int height, const int size, float sigma) {
+        vector<float> kernel = compute1DGaussianKernel(size, sigma);
         convolve1D(data, stride, width, height, kernel, kernel);
     }
 
-    void gaussBlurF16(uint16_t *data, int stride, int width, int height, int radius, float sigma) {
-        vector<float> kernel = compute1DGaussianKernel(radius * 2 + 1, sigma);
+    void gaussBlurF16(uint16_t *data, int stride, int width, int height, const int size, float sigma) {
+        vector<float> kernel = compute1DGaussianKernel(size, sigma);
         Convolve1Db16 convolution(kernel, kernel);
         convolution.convolve(data, stride, width, height);
     }

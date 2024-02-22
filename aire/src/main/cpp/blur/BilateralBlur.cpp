@@ -19,7 +19,7 @@ namespace aire {
 
     template<class V>
     void
-    bilateralBlurPass(V *data, V *transient, int y, int stride, int width, int height, float radius,
+    bilateralBlurPass(V *data, V *transient, int y, int stride, int width, int height, const int size,
                       float rangeSigma,
                       float spatialSigma) {
         const float dRangeSigma = 2.f * rangeSigma * rangeSigma;
@@ -35,21 +35,22 @@ namespace aire {
         const float lumaPrimaries[4] = {0.299f, 0.587f, 0.114f, 0.f};
         const VF vLumaPrimaries = LoadU(dfx4, lumaPrimaries);
 
-        const int iRadius = ceil(radius);
         auto src = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) + y * stride);
         auto dst = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(transient) +
                                          y * stride);
 
-        std::vector<std::vector<float>> spatialWeights(2 * iRadius + 1,
-                                                       std::vector<float>(2 * iRadius + 1, 0));
+        std::vector<std::vector<float>> spatialWeights(size,
+                                                       std::vector<float>(size, 0));
 
-        for (int j = -iRadius; j <= iRadius; ++j) {
-            for (int i = -iRadius; i <= iRadius; ++i) {
+        const int rad = size / 2;
+
+        for (int j = -rad; j <= rad; ++j) {
+            for (int i = -rad; i <= rad; ++i) {
                 int py = clamp(y + j, 0, height - 1);
                 float dx = (float(i) - float(0));
                 float dy = (float(py) - float(y));
                 float distance = std::sqrt(dx * dx + dy * dy);
-                spatialWeights[j + iRadius][i + iRadius] = -distance / dSpatialSigma;
+                spatialWeights[j + rad][i + rad] = -distance / dSpatialSigma;
             }
         }
 
@@ -60,8 +61,8 @@ namespace aire {
             float kernelSum = 0.f;
             float intensity = ExtractLane(SumOfLanes(dfx4, Mul(current, vLumaPrimaries)), 0);
 
-            for (int j = -iRadius; j <= iRadius; ++j) {
-                for (int i = -iRadius; i <= iRadius; ++i) {
+            for (int j = -rad; j <= rad; ++j) {
+                for (int i = -rad; i <= rad; ++i) {
                     int py = clamp(y + j, 0, height - 1);
                     int px = clamp(x + i, 0, width - 1);
                     auto mSrc = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) +
@@ -76,7 +77,7 @@ namespace aire {
                     float drIntensity = localIntensity - intensity;
 
                     float weight = std::exp(
-                            spatialWeights[j + iRadius][i + iRadius] -
+                            spatialWeights[j + rad][i + rad] -
                             (drIntensity * drIntensity) / dRangeSigma);
 
                     kernelSum += weight;
@@ -92,7 +93,7 @@ namespace aire {
     }
 
     template<class V>
-    void bilateralBlur(V *data, int stride, int width, int height, float radius, float rangeSigma,
+    void bilateralBlur(V *data, int stride, int width, int height, const int size, float rangeSigma,
                        float spatialSigma) {
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     height * width / (256 * 256)), 1, 12);
@@ -100,7 +101,7 @@ namespace aire {
 
         concurrency::parallel_for(threadCount, height, [&](int y) {
             bilateralBlurPass(data, transient.data(), y,
-                              stride, width, height, radius, rangeSigma,
+                              stride, width, height, size, rangeSigma,
                               spatialSigma);
         });
 
@@ -108,6 +109,6 @@ namespace aire {
     }
 
     template void
-    bilateralBlur(uint8_t *data, int stride, int width, int height, float radius, float sigma,
+    bilateralBlur(uint8_t *data, int stride, int width, int height, const int size, float sigma,
                   float spatialSigma);
 }

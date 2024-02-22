@@ -35,15 +35,15 @@ import androidx.annotation.IntRange
 
 interface BlurPipelines {
 
-    fun gaussianBlur(bitmap: Bitmap, radius: Int, sigma: Float): Bitmap
+    fun gaussianBlur(bitmap: Bitmap, kernelSize: Int, sigma: Float): Bitmap
 
-    fun bilateralBlur(bitmap: Bitmap, radius: Int, rangeSigma: Float, spatialSigma: Float): Bitmap
+    fun bilateralBlur(bitmap: Bitmap, kernelSize: Int, rangeSigma: Float, spatialSigma: Float): Bitmap
 
     fun fastBilateralBlur(bitmap: Bitmap, rangeSigma: Float, spatialSigma: Float): Bitmap
 
-    fun boxBlur(bitmap: Bitmap, radius: Int): Bitmap
+    fun boxBlur(bitmap: Bitmap, kernelSize: Int): Bitmap
 
-    fun poissonBlur(bitmap: Bitmap, radius: Int): Bitmap
+    fun poissonBlur(bitmap: Bitmap, kernelSize: Int): Bitmap
 
     fun stackBlur(bitmap: Bitmap, radius: Int): Bitmap
 
@@ -67,7 +67,7 @@ interface BlurPipelines {
         kernelSize: Int
     ): Bitmap
 
-    fun tentBlur(bitmap: Bitmap, radius: Int): Bitmap
+    fun tentBlur(bitmap: Bitmap, kernelSize: Int): Bitmap
 
     fun anisotropicDiffusion(
         bitmap: Bitmap,

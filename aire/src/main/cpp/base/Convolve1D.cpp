@@ -22,6 +22,7 @@ namespace aire {
                              int height,
                              const vector<float> &kernel) {
 
+        const int kernelSize = kernel.size();
         const int iRadius = ceil((kernel.size()) / 2);
         auto src = reinterpret_cast<uint8_t *>(data + y * stride);
         auto dst = reinterpret_cast<uint8_t *>(transient.data() + y * stride);
@@ -46,28 +47,150 @@ namespace aire {
 
             int r = -iRadius;
 
-            for (; r + 4 <= iRadius && x + r + 4 < width; r += 4) {
-                int pos = clamp((x + r), 0, width - 1) * 4;
-
-                VF v1, v2, v3, v4;
-                auto pu = LoadU(du8x16, &src[pos]);
-                ConvertToFloatVec16(du8x16, pu, v1, v2, v3, v4);
-
-                VF dWeight = kernelCache[r + iRadius];
-                store = Add(store, Mul(v1, dWeight));
-                dWeight = kernelCache[r + iRadius + 1];
-                store = Add(store, Mul(v2, dWeight));
-                dWeight = kernelCache[r + iRadius + 2];
-                store = Add(store, Mul(v3, dWeight));
-                dWeight = kernelCache[r + iRadius + 3];
-                store = Add(store, Mul(v4, dWeight));
-            }
-
-            for (; r <= iRadius; ++r) {
-                int pos = clamp((x + r), 0, width - 1) * 4;
-                VF dWeight = kernelCache[r + iRadius];
+            if (kernelSize == 3) {
+                int pos = clamp(x - 1, 0, width - 1) * 4;
+                VF dWeight = kernelCache[0];
                 VU pixels = LoadU(du8, &src[pos]);
                 store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x, 0, width - 1) * 4;
+                dWeight = kernelCache[1];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x + 1, 0, width - 1) * 4;
+                dWeight = kernelCache[2];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+            } else if (kernelSize == 5) {
+                int pos = clamp(x - 2, 0, width - 1) * 4;
+                VF dWeight = kernelCache[0];
+                VU pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x - 1, 0, width - 1) * 4;
+                dWeight = kernelCache[1];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x, 0, width - 1) * 4;
+                dWeight = kernelCache[2];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x + 1, 0, width - 1) * 4;
+                dWeight = kernelCache[3];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x + 2, 0, width - 1) * 4;
+                dWeight = kernelCache[4];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+            } else if (kernelSize == 7) {
+                int pos = clamp(x - 3, 0, width - 1) * 4;
+                VF dWeight = kernelCache[0];
+                VU pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x - 2, 0, width - 1) * 4;
+                dWeight = kernelCache[1];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x - 1, 0, width - 1) * 4;
+                dWeight = kernelCache[2];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x, 0, width - 1) * 4;
+                dWeight = kernelCache[3];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x + 1, 0, width - 1) * 4;
+                dWeight = kernelCache[4];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x + 2, 0, width - 1) * 4;
+                dWeight = kernelCache[5];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x + 3, 0, width - 1) * 4;
+                dWeight = kernelCache[6];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+            } else if (kernelSize == 9) {
+                int pos = clamp(x - 4, 0, width - 1) * 4;
+                VF dWeight = kernelCache[0];
+                VU pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x - 3, 0, width - 1) * 4;
+                dWeight = kernelCache[1];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x - 2, 0, width - 1) * 4;
+                dWeight = kernelCache[2];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x - 1, 0, width - 1) * 4;
+                dWeight = kernelCache[3];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x, 0, width - 1) * 4;
+                dWeight = kernelCache[4];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x + 1, 0, width - 1) * 4;
+                dWeight = kernelCache[5];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x + 2, 0, width - 1) * 4;
+                dWeight = kernelCache[6];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x + 3, 0, width - 1) * 4;
+                dWeight = kernelCache[7];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+
+                pos = clamp(x + 4, 0, width - 1) * 4;
+                dWeight = kernelCache[8];
+                pixels = LoadU(du8, &src[pos]);
+                store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+            } else {
+                for (; r + 4 <= iRadius && x + r + 4 < width; r += 4) {
+                    int pos = clamp((x + r), 0, width - 1) * 4;
+
+                    VF v1, v2, v3, v4;
+                    auto pu = LoadU(du8x16, &src[pos]);
+                    ConvertToFloatVec16(du8x16, pu, v1, v2, v3, v4);
+
+                    VF dWeight = kernelCache[r + iRadius];
+                    store = Add(store, Mul(v1, dWeight));
+                    dWeight = kernelCache[r + iRadius + 1];
+                    store = Add(store, Mul(v2, dWeight));
+                    dWeight = kernelCache[r + iRadius + 2];
+                    store = Add(store, Mul(v3, dWeight));
+                    dWeight = kernelCache[r + iRadius + 3];
+                    store = Add(store, Mul(v4, dWeight));
+                }
+
+                for (; r <= iRadius; ++r) {
+                    int pos = clamp((x + r), 0, width - 1) * 4;
+                    VF dWeight = kernelCache[r + iRadius];
+                    VU pixels = LoadU(du8, &src[pos]);
+                    store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
+                }
             }
 
             store = Max(Min(Round(store), max255), zeros);
