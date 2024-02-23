@@ -19,13 +19,13 @@ namespace aire {
             auto dst = reinterpret_cast<uint8_t *>(
                     reinterpret_cast<uint8_t *>(data) + y * stride);
             for (int x = 0; x < width; ++x) {
-
                 int grain = distribution(generator);
+                const float mGrain = static_cast<float>(grain);
 
                 int px = x * 4;
-                dst[px] = clamp(dst[px] + float(grain), 0.f, 255.f);
-                dst[px + 1] = clamp(dst[px + 1] + float(grain), 0.f, 255.f);
-                dst[px + 2] = clamp(dst[px + 2] + float(grain), 0.f, 255.f);
+                dst[px] = clamp(dst[px] + mGrain, 0.f, 255.f);
+                dst[px + 1] = clamp(dst[px + 1] + mGrain, 0.f, 255.f);
+                dst[px + 2] = clamp(dst[px + 2] + mGrain, 0.f, 255.f);
             }
         });
     }

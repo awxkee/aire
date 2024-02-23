@@ -8,6 +8,7 @@
 #include <thread>
 #include "algo/support-inl.h"
 #include "concurrency.hpp"
+#include "Eigen/Eigen"
 
 namespace aire {
 
@@ -20,10 +21,9 @@ namespace aire {
                              uint8_t *data, int stride,
                              int y, int width,
                              int height,
-                             const vector<float> &kernel) {
+                             const Eigen::VectorXf &kernel) {
 
         const int kernelSize = kernel.size();
-        const int iRadius = ceil((kernel.size()) / 2);
         auto src = reinterpret_cast<uint8_t *>(data + y * stride);
         auto dst = reinterpret_cast<uint8_t *>(transient.data() + y * stride);
 
@@ -42,13 +42,14 @@ namespace aire {
             kernelCache[j] = Set(dfx4, kernel[j]);
         }
 
+        const int halfOfKernel = kernelSize / 2;
         const bool isEven = kernelSize % 2 == 0;
-        const int maxKernel = isEven ? kernelSize - 1 : isEven;
+        const int maxKernel = isEven ? halfOfKernel - 1 : halfOfKernel;
 
         for (int x = 0; x < width; ++x) {
             VF store = zeros;
 
-            int r = -iRadius;
+            int r = -halfOfKernel;
 
             if (kernelSize == 3) {
                 int pos = clamp(x - 1, 0, width - 1) * 4;
@@ -178,19 +179,21 @@ namespace aire {
                     auto pu = LoadU(du8x16, &src[pos]);
                     ConvertToFloatVec16(du8x16, pu, v1, v2, v3, v4);
 
-                    VF dWeight = kernelCache[r + iRadius];
+                    int pf = r + halfOfKernel;
+
+                    VF dWeight = kernelCache[pf];
                     store = Add(store, Mul(v1, dWeight));
-                    dWeight = kernelCache[r + iRadius + 1];
+                    dWeight = kernelCache[pf + 1];
                     store = Add(store, Mul(v2, dWeight));
-                    dWeight = kernelCache[r + iRadius + 2];
+                    dWeight = kernelCache[pf + 2];
                     store = Add(store, Mul(v3, dWeight));
-                    dWeight = kernelCache[r + iRadius + 3];
+                    dWeight = kernelCache[pf + 3];
                     store = Add(store, Mul(v4, dWeight));
                 }
 
                 for (; r <= maxKernel; ++r) {
                     int pos = clamp((x + r), 0, width - 1) * 4;
-                    VF dWeight = kernelCache[r + iRadius];
+                    VF dWeight = kernelCache[r + halfOfKernel];
                     VU pixels = LoadU(du8, &src[pos]);
                     store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
                 }
@@ -207,9 +210,7 @@ namespace aire {
     void
     convolve1DVerticalPass(std::vector<uint8_t> &transient, uint8_t *data, int stride,
                            int y, int width, int height,
-                           const vector<float> &kernel) {
-        const int iRadius = ceil((kernel.size()) / 2);
-
+                           const Eigen::VectorXf &kernel) {
         const FixedTag<uint8_t, 4> du8;
         const FixedTag<uint32_t, 4> du32x4;
         const FixedTag<float32_t, 4> dfx4;
@@ -224,20 +225,21 @@ namespace aire {
             kernelCache[j] = Set(dfx4, kernel[j]);
         }
 
+        const int halfOfKernel = kernel.size() / 2;
         const bool isEven = kernel.size() % 2 == 0;
-        const int maxKernel = isEven ? kernel.size() - 1 : isEven;
+        const int maxKernel = isEven ? halfOfKernel - 1 : halfOfKernel;
 
         auto dst = reinterpret_cast<uint8_t *>(data + y * stride);
         for (int x = 0; x < width; ++x) {
             VF store = zeros;
 
-            int r = -iRadius;
+            int r = -halfOfKernel;
 
             for (; r <= maxKernel; ++r) {
                 auto src = reinterpret_cast<uint8_t *>(transient.data() +
                                                        clamp((r + y), 0, height - 1) * stride);
                 int pos = clamp(x, 0, width - 1) * 4;
-                VF dWeight = kernelCache[r + iRadius];
+                VF dWeight = kernelCache[r + halfOfKernel];
                 VU pixels = LoadU(du8, &src[pos]);
                 store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
             }
@@ -257,12 +259,22 @@ namespace aire {
         int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     height * width / (256 * 256)), 1, 12);
 
+        Eigen::VectorXf horizontalKernel(horizontal.size());
+        for (int i = 0; i < horizontal.size(); ++i) {
+            horizontalKernel(i) = horizontal[i];
+        }
+
+        Eigen::VectorXf verticalKernel(vertical.size());
+        for (int i = 0; i < vertical.size(); ++i) {
+            verticalKernel(i) = vertical[i];
+        }
+
         concurrency::parallel_for(threadCount, height, [&](int y) {
-            convolve1DHorizontalPass(transient, data, stride, y, width, height, horizontal);
+            convolve1DHorizontalPass(transient, data, stride, y, width, height, horizontalKernel);
         });
 
         concurrency::parallel_for(threadCount, height, [&](int y) {
-            convolve1DVerticalPass(transient, data, stride, y, width, height, vertical);
+            convolve1DVerticalPass(transient, data, stride, y, width, height, verticalKernel);
         });
     }
 

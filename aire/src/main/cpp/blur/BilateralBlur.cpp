@@ -42,8 +42,8 @@ namespace aire {
         Eigen::MatrixXf spatialWeights(size, size);
 
         const bool isKernelEven = size % 2 == 0;
-        const int jMax = isKernelEven ? size / 2 - 1 : size / 2;
         const int halfOfKernel = size / 2;
+        const int jMax = isKernelEven ? halfOfKernel - 1 : halfOfKernel;
 
         for (int j = -halfOfKernel; j <= jMax; ++j) {
             for (int i = -halfOfKernel; i <= jMax; ++i) {

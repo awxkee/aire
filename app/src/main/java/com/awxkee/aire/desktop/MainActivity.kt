@@ -62,12 +62,14 @@ class MainActivity : ComponentActivity() {
 //                            imagesArray.add(bitmap)
 //                        }
 ////
-//                        repeat(1) {
+//                        var idx = 2
+//                        repeat(25) {
 //                            val d2Time = measureTimeMillis {
-//                                val blurred3 = Aire.bilateralBlur(bitmap, 5, 35f, 35f)
+//                                val blurred3 = Aire.gaussianBlur(bitmap, 5, 5f)
 //                                scope.launch {
 //                                    imagesArray.add(blurred3)
 //                                }
+//                                idx += 1
 //                            }
 //                            Log.d("AireMedian", "exec time $d2Time")
 //
