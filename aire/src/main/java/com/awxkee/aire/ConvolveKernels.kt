@@ -57,15 +57,16 @@ object ConvolveKernels {
         var sum: Double = 0.0
         for (row in 0..<kernelSize) {
             for (col in 0..<kernelSize) {
-                val x = exp(-((row*row).toDouble() + (col * col).toDouble()) / (2*sigma*sigma))
-                kernel[row*kernelSize + col] = x.toFloat()
+                val x =
+                    exp(-((row * row).toDouble() + (col * col).toDouble()) / (2 * sigma * sigma))
+                kernel[row * kernelSize + col] = x.toFloat()
                 sum += x
             }
         }
         // normalize the kernel
-       if (sum != 0.0) {
-           kernel = kernel.map { (it / sum).toFloat() }.toFloatArray()
-       }
+        if (sum != 0.0) {
+            kernel = kernel.map { (it / sum).toFloat() }.toFloatArray()
+        }
         return kernel
     }
 
@@ -78,8 +79,9 @@ object ConvolveKernels {
         var sum: Double = 0.0
         for (row in 0..<kernelSize) {
             for (col in 0..<kernelSize) {
-                val distance = sqrt((row - kernelSize).toDouble().pow(2.0) + (col - kernelSize).toDouble()
-                    .pow(2.0)
+                val distance = sqrt(
+                    (row - kernelSize).toDouble().pow(2.0) + (col - kernelSize).toDouble()
+                        .pow(2.0)
                 )
                 val ringWidth = 1.0f // Adjust this value to control the width of the ring
 
@@ -109,11 +111,12 @@ object ConvolveKernels {
         for (row in 0..<kernelSize) {
             for (col in 0..<kernelSize) {
 
-                val distance = sqrt((row - kernelSize / 2).toDouble().pow(2.0) + (col - kernelSize / 2).toDouble()
-                    .pow(2.0)
+                val distance = sqrt(
+                    (row - kernelSize / 2).toDouble().pow(2.0) + (col - kernelSize / 2).toDouble()
+                        .pow(2.0)
                 )
 
-                if (row == col && distance < kernelSize / 2 + 1 ) {
+                if (row == col && distance < kernelSize / 2 + 1) {
                     kernel[row * kernelSize + col] = 1.0f
                     sum += 1.0
                 } else {
@@ -143,8 +146,9 @@ object ConvolveKernels {
 
         for (row in 0..<kernelSize) {
             for (col in 0..<kernelSize) {
-                val distance = sqrt((row - centerX).toDouble().pow(2.0) + (col - centerY).toDouble()
-                    .pow(2.0)
+                val distance = sqrt(
+                    (row - centerX).toDouble().pow(2.0) + (col - centerY).toDouble()
+                        .pow(2.0)
                 )
 
                 if (distance <= radius) {

@@ -39,18 +39,19 @@ namespace aire {
         auto dst = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(transient) +
                                          y * stride);
 
-        std::vector<std::vector<float>> spatialWeights(size,
-                                                       std::vector<float>(size, 0));
+        Eigen::MatrixXf spatialWeights(size, size);
 
-        const int rad = size / 2;
+        const bool isKernelEven = size % 2 == 0;
+        const int jMax = isKernelEven ? size / 2 - 1 : size / 2;
+        const int halfOfKernel = size / 2;
 
-        for (int j = -rad; j <= rad; ++j) {
-            for (int i = -rad; i <= rad; ++i) {
+        for (int j = -halfOfKernel; j <= jMax; ++j) {
+            for (int i = -halfOfKernel; i <= jMax; ++i) {
                 int py = clamp(y + j, 0, height - 1);
                 float dx = (float(i) - float(0));
                 float dy = (float(py) - float(y));
                 float distance = std::sqrt(dx * dx + dy * dy);
-                spatialWeights[j + rad][i + rad] = -distance / dSpatialSigma;
+                spatialWeights(j + halfOfKernel, i + halfOfKernel) = -distance / dSpatialSigma;
             }
         }
 
@@ -61,12 +62,11 @@ namespace aire {
             float kernelSum = 0.f;
             float intensity = ExtractLane(SumOfLanes(dfx4, Mul(current, vLumaPrimaries)), 0);
 
-            for (int j = -rad; j <= rad; ++j) {
-                for (int i = -rad; i <= rad; ++i) {
+            for (int j = -halfOfKernel; j <= jMax; ++j) {
+                for (int i = -halfOfKernel; i <= jMax; ++i) {
                     int py = clamp(y + j, 0, height - 1);
                     int px = clamp(x + i, 0, width - 1);
-                    auto mSrc = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) +
-                                                      py * stride);
+                    auto mSrc = reinterpret_cast<V *>(reinterpret_cast<uint8_t *>(data) + py * stride);
 
                     int srcX = px * 4;
 
@@ -77,7 +77,7 @@ namespace aire {
                     float drIntensity = localIntensity - intensity;
 
                     float weight = std::exp(
-                            spatialWeights[j + rad][i + rad] -
+                            spatialWeights(j + halfOfKernel, i + halfOfKernel) -
                             (drIntensity * drIntensity) / dRangeSigma);
 
                     kernelSum += weight;

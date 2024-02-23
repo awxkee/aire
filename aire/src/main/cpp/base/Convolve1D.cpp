@@ -42,6 +42,9 @@ namespace aire {
             kernelCache[j] = Set(dfx4, kernel[j]);
         }
 
+        const bool isEven = kernelSize % 2 == 0;
+        const int maxKernel = isEven ? kernelSize - 1 : isEven;
+
         for (int x = 0; x < width; ++x) {
             VF store = zeros;
 
@@ -168,7 +171,7 @@ namespace aire {
                 pixels = LoadU(du8, &src[pos]);
                 store = Add(store, Mul(ConvertTo(dfx4, PromoteTo(du32x4, pixels)), dWeight));
             } else {
-                for (; r + 4 <= iRadius && x + r + 4 < width; r += 4) {
+                for (; r + 4 <= maxKernel && x + r + 4 < width; r += 4) {
                     int pos = clamp((x + r), 0, width - 1) * 4;
 
                     VF v1, v2, v3, v4;
@@ -185,7 +188,7 @@ namespace aire {
                     store = Add(store, Mul(v4, dWeight));
                 }
 
-                for (; r <= iRadius; ++r) {
+                for (; r <= maxKernel; ++r) {
                     int pos = clamp((x + r), 0, width - 1) * 4;
                     VF dWeight = kernelCache[r + iRadius];
                     VU pixels = LoadU(du8, &src[pos]);
@@ -221,13 +224,16 @@ namespace aire {
             kernelCache[j] = Set(dfx4, kernel[j]);
         }
 
+        const bool isEven = kernel.size() % 2 == 0;
+        const int maxKernel = isEven ? kernel.size() - 1 : isEven;
+
         auto dst = reinterpret_cast<uint8_t *>(data + y * stride);
         for (int x = 0; x < width; ++x) {
             VF store = zeros;
 
             int r = -iRadius;
 
-            for (; r <= iRadius; ++r) {
+            for (; r <= maxKernel; ++r) {
                 auto src = reinterpret_cast<uint8_t *>(transient.data() +
                                                        clamp((r + y), 0, height - 1) * stride);
                 int pos = clamp(x, 0, width - 1) * 4;

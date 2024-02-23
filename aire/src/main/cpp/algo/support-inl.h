@@ -45,14 +45,18 @@ namespace hwy::HWY_NAMESPACE {
         const FixedTag<uint16_t, 4> vu16x4;
         const FixedTag<float32_t, 4> df;
         const FixedTag<uint32_t, 4> du32x4;
-        auto lowlow = LowerHalf(LowerHalf(v));
-        auto lowhigh = PromoteTo(du32x4, PromoteUpperTo(vu16x4, LowerHalf(v)));
-        auto highlow = PromoteTo(du32x4, PromoteUpperTo(vu16x4, LowerHalf(v)));
-        auto highhigh = PromoteUpperTo(du32x4, PromoteUpperTo(vu16x8, v));
-        v1 = ConvertTo(df, highhigh);
-        v2 = ConvertTo(df, highlow);
-        v3 = ConvertTo(df, lowhigh);
-        v4 = ConvertToFloat(df, lowlow);
+
+        const auto lowerPart = PromoteLowerTo(vu16x8, v);
+        const auto higherPart = PromoteUpperTo(vu16x8, v);
+
+        auto lowlow = PromoteLowerTo(du32x4, lowerPart);
+        auto lowhigh = PromoteUpperTo(du32x4, lowerPart);
+        auto highlow = PromoteLowerTo(du32x4, higherPart);
+        auto highhigh = PromoteUpperTo(du32x4, higherPart);
+        v4 = ConvertTo(df, highhigh);
+        v3 = ConvertTo(df, highlow);
+        v2 = ConvertTo(df, lowhigh);
+        v1 = ConvertTo(df, lowlow);
     }
 
     template<class D, class VF32, HWY_IF_U8_D(D), HWY_IF_LANES_D(D, 4)>

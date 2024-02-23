@@ -6,7 +6,7 @@
 #include <vector>
 #include <thread>
 #include <algorithm>
-#include "FF2DWorkspace.h"
+#include "FF2DWorkspace.hpp"
 #include "hwy/highway.h"
 #include "algo/support-inl.h"
 #include "concurrency.hpp"
@@ -17,44 +17,44 @@ namespace aire {
     using namespace std;
     using namespace hwy::HWY_NAMESPACE;
 
-    /* void Convolve2D::applyChannel(FF2DWorkspace *workspace,
-                                   uint8_t *data, const int stride, const int chanIndex, const int width,
-                                   const int height) {
+    void Convolve2D::applyChannel(FF2DWorkspace *workspace,
+                                  uint8_t *data, const int stride, const int chanIndex, const int width,
+                                  const int height) {
 
-         const FixedTag<float32_t, 4> dfx4;
-         const FixedTag<uint8_t, 4> du8x4;
-         using VF = Vec<decltype(dfx4)>;
+        const FixedTag<float32_t, 4> dfx4;
+        const FixedTag<uint8_t, 4> du8x4;
+        using VF = Vec<decltype(dfx4)>;
 
-         const int dxR = 1;
-         const int dyR = 1;
+        const int dxR = 0;
+        const int dyR = 0;
 
-         const int dstWidth = workspace->getDstWidth();
-         const VF zeros = Zero(dfx4);
-         const VF max255 = Set(dfx4, 255);
+        const int dstWidth = workspace->getDstWidth();
+        const VF zeros = Zero(dfx4);
+        const VF max255 = Set(dfx4, 255);
 
-         const auto src = workspace->getOutput();
+        const auto src = workspace->getOutput();
 
-         for (int y = 0; y < height; ++y) {
-             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
-             int x = 0;
-             for (; x + 4 < width && x + dxR + 4 < dstWidth; x += 4) {
-                 auto vec = LoadU(dfx4, &src[(y + dyR) * dstWidth + (x + dxR)]);
-                 vec = Clamp(Mul(vec, max255), zeros, max255);
-                 auto target = DemoteToU8(du8x4, vec);
-                 dst[chanIndex] = ExtractLane(vec, 0);
-                 dst[chanIndex + 4] = ExtractLane(vec, 1);
-                 dst[chanIndex + 8] = ExtractLane(vec, 2);
-                 dst[chanIndex + 12] = ExtractLane(vec, 3);
-                 dst += 16;
-             }
+        for (int y = 0; y < height; ++y) {
+            auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
+            int x = 0;
+            for (; x + 4 < width && x + dxR + 4 < dstWidth; x += 4) {
+                auto vec = LoadU(dfx4, &src[(y + dyR) * dstWidth + (x + dxR)]);
+                vec = Clamp(Mul(vec, max255), zeros, max255);
+                auto target = DemoteToU8(du8x4, vec);
+                dst[chanIndex] = ExtractLane(vec, 0);
+                dst[chanIndex + 4] = ExtractLane(vec, 1);
+                dst[chanIndex + 8] = ExtractLane(vec, 2);
+                dst[chanIndex + 12] = ExtractLane(vec, 3);
+                dst += 16;
+            }
 
-             for (; x < width; ++x) {
-                 auto r = src[(y + dyR) * workspace->getDstWidth() + (x + dxR)];
-                 dst[chanIndex] = std::clamp(r * 255.0, 0.0, 255.0);
-                 dst += 4;
-             }
-         }
-     }*/
+            for (; x < width; ++x) {
+                auto r = src[(y + dyR) * workspace->getDstWidth() + (x + dxR)];
+                dst[chanIndex] = std::clamp(r * 255.0, 0.0, 255.0);
+                dst += 4;
+            }
+        }
+    }
 
     void Convolve2D::bruteForceConvolve(uint8_t *data, int stride, int width, int height) {
         std::vector<uint8_t> destination(stride * height);
@@ -73,14 +73,19 @@ namespace aire {
         concurrency::parallel_for(8, height, [&](int y) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(destination.data()) + y * stride);
 
+            const int ySize = this->matrix.rows() / 2;
+            const int xSize = this->matrix.cols() / 2;
+
+            const bool yEven = this->matrix.rows() % 2 == 0;
+            const bool xEven = this->matrix.cols() % 2 == 0;
+            const int jMax = yEven ? ySize - 1 : ySize;
+            const int iMax = xEven ? xSize - 1 : xSize;
+
             for (int x = 0; x < width; ++x) {
 
                 VF store = zeros;
 
-                const int ySize = this->matrix.rows() / 2;
-                const int xSize = this->matrix.cols() / 2;
-
-                for (int j = -ySize; j < ySize; ++j) {
+                for (int j = -ySize; j <= jMax; ++j) {
                     auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + clamp(y + j, 0, height - 1) * stride);
                     if (cols == 3) {
                         int px = clamp(x - 1, 0, width - 1) * 4;
@@ -205,7 +210,7 @@ namespace aire {
                     } else {
                         int i = -xSize;
 
-                        for (; i + 4 < xSize && x + 4 < width; i += 4) {
+                        for (; i + 4 < iMax && x + 4 < width; i += 4) {
                             int px = clamp(x + i, 0, width - 1) * 4;
                             auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
                             auto weight = Set(dfx4, matrix(j + ySize, i + xSize));
@@ -227,7 +232,7 @@ namespace aire {
                             store = Add(store, Mul(Mul(pixels, revertScale), weight));
                         }
 
-                        for (; i < xSize; ++i) {
+                        for (; i <= iMax; ++i) {
                             int px = clamp(x + i, 0, width - 1) * 4;
                             auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
                             auto weight = Set(dfx4, matrix(j + ySize, i + xSize));
@@ -244,7 +249,7 @@ namespace aire {
         std::copy(destination.begin(), destination.end(), data);
     }
 
-    /*void Convolve2D::fftConvolve(uint8_t *data, int stride, int width, int height) {
+    void Convolve2D::fftConvolve(uint8_t *data, int stride, int width, int height) {
         std::vector<float> rV(width * height, 0.f);
         std::vector<float> gV(width * height, 0.f);
         std::vector<float> bV(width * height, 0.f);
@@ -326,10 +331,11 @@ namespace aire {
             for (; x < width; ++x) {
                 Eigen::Vector4f color = {dst[0], dst[1], dst[2], dst[3]};
                 color /= 255.f;
-                rV[y * width + x] = color.x();
-                gV[y * width + x] = color.y();
-                bV[y * width + x] = color.z();
-                aV[y * width + x] = color.w();
+                int py = y * width;
+                rV[py + x] = color.x();
+                gV[py + x] = color.y();
+                bV[py + x] = color.z();
+                aV[py + x] = color.w();
                 dst += 4;
             }
         }
@@ -343,25 +349,30 @@ namespace aire {
 
         std::unique_ptr<FF2DWorkspace> workspace = std::make_unique<FF2DWorkspace>(height, width,
                                                                                    matrix.rows(), matrix.cols());
-        workspace->convolveWorkspace(rV.data(), kernel.data());
+        workspace->convolve(rV.data(), kernel.data());
         rV.clear();
         applyChannel(workspace.get(), data, stride, 0, width, height);
 
-        workspace->convolveWorkspace(gV.data(), kernel.data());
+        workspace->convolve(gV.data(), kernel.data());
         gV.clear();
         applyChannel(workspace.get(), data, stride, 1, width, height);
 
-        workspace->convolveWorkspace(bV.data(), kernel.data());
+        workspace->convolve(bV.data(), kernel.data());
         bV.clear();
         applyChannel(workspace.get(), data, stride, 2, width, height);
 
-        workspace->convolveWorkspace(aV.data(), kernel.data());
+        workspace->convolve(aV.data(), kernel.data());
         aV.clear();
         applyChannel(workspace.get(), data, stride, 3, width, height);
         workspace.reset();
-    }*/
+    }
 
     void Convolve2D::convolve(uint8_t *data, int stride, int width, int height) {
-        this->bruteForceConvolve(data, stride, width, height);
+        const int activationSize = 500 * 500;
+        if (width * height > activationSize && matrix.rows() > 5) {
+            fftConvolve(data, stride, width, height);
+        } else {
+            this->bruteForceConvolve(data, stride, width, height);
+        }
     }
 }

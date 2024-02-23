@@ -56,15 +56,15 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.haze)
-//                                .scaleWith(0.12f)
+//                            BitmapFactory.decodeResource(resources, R.drawable.test)
+//                                .scaleWith(0.2f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 ////
 //                        repeat(1) {
 //                            val d2Time = measureTimeMillis {
-//                                val blurred3 = Aire.gaussianBlur(bitmap, 7, 3f)
+//                                val blurred3 = Aire.bilateralBlur(bitmap, 5, 35f, 35f)
 //                                scope.launch {
 //                                    imagesArray.add(blurred3)
 //                                }

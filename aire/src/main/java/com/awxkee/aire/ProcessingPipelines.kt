@@ -39,7 +39,7 @@ interface ProcessingPipelines {
     fun dehaze(bitmap: Bitmap, radius: Int = 17, omega: Float = 0.45f): Bitmap
 
     /***
-        2D Convolution, only square kernel is supported, may be very slow for huge kernels. Some examples in [ConvolveKernels]
+        2D Convolution, only square kernel is supported, Some examples in [ConvolveKernels]
      ****/
     fun convolve2D(bitmap: Bitmap, kernel: FloatArray): Bitmap
 }

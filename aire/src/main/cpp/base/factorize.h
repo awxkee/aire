@@ -89,4 +89,21 @@ static int find_closest_factor(int n, int *implemented_factor) {
     }
 }
 
+static size_t fft_next_good_size(size_t N) {
+    if (N <= 2)
+        return 2;
+    while (true) {
+        size_t m = N;
+        while ((m % 2) == 0)
+            m /= 2;
+        while ((m % 3) == 0)
+            m /= 3;
+        while ((m % 5) == 0)
+            m /= 5;
+        if (m <= 1)
+            return N;
+        N++;
+    }
+}
+
 #endif
