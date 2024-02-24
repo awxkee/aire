@@ -21,6 +21,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            isJniDebuggable = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -50,6 +53,7 @@ android {
 }
 
 dependencies {
+//    implementation("com.github.awxkee:aire:0.9.64")
     implementation(project(":aire"))
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")

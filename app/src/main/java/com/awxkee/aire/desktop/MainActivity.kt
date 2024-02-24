@@ -56,16 +56,16 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.test)
-//                                .scaleWith(0.2f)
+//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                                .scale(853, 1280)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 ////
 //                        var idx = 2
-//                        repeat(25) {
+//                        repeat(1) {
 //                            val d2Time = measureTimeMillis {
-//                                val blurred3 = Aire.gaussianBlur(bitmap, 5, 5f)
+//                                val blurred3 = Aire.convolve2D(bitmap, ConvolveKernels.ring(25))
 //                                scope.launch {
 //                                    imagesArray.add(blurred3)
 //                                }

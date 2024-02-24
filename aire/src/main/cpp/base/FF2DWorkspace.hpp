@@ -17,8 +17,8 @@ namespace aire {
             this->hKernel = hKernel;
             this->wKernel = wKernel;
 
-            hFftw = fft_next_good_size(hSrc + hKernel * 2 - 1);
-            wFftw = fft_next_good_size(wSrc + wKernel * 2 - 1);
+            hFftw = std::max(static_cast<int>(fft_next_good_size(hSrc + hKernel * 2 - 1)), hSrc + hKernel * 2 - 1);
+            wFftw = std::max(static_cast<int>(fft_next_good_size(wSrc + wKernel * 2 - 1)), wSrc + wKernel * 2 - 1);
             hDst = hSrc + hKernel * 2 - 1;
             wDst = wSrc + wKernel * 2 - 1;
 
@@ -73,16 +73,12 @@ namespace aire {
     private:
 
         void fftwCircularConvolution(float *src, float *kernel) {
-            float *ptr, *ptr_end, *ptr2;
-
             // Reset the content of ws.inSrc
-            for (ptr = inSrc, ptr_end = inSrc + hFftw * wFftw; ptr < ptr_end; ++ptr)
-                *ptr = 0.f;
-            for (ptr = inKernel, ptr_end = inKernel + hFftw * wFftw; ptr < ptr_end; ++ptr)
-                *ptr = 0.f;
+            std::fill(inSrc, inSrc + hFftw * wFftw, 0.f);
+            std::fill(inKernel, inKernel + hFftw * wFftw, 0.f);
 
             for (int i = 0; i < hFftw; ++i)
-                for (int j = 0; j < wFftw; ++j, ++ptr) {
+                for (int j = 0; j < wFftw; ++j) {
                     int reflectedX = std::clamp(j, 0, wSrc - 1);
                     if (j >= wSrc + wKernel - 1) {
                         reflectedX = 0;
@@ -101,16 +97,19 @@ namespace aire {
                 }
 
             for (int i = 0; i < hKernel; ++i)
-                for (int j = 0; j < wKernel; ++j, ++ptr)
+                for (int j = 0; j < wKernel; ++j)
                     inKernel[(i % hFftw) * wFftw + (j % wFftw)] += kernel[i * wKernel + j];
 
             // And we compute their packed FFT
             fftwf_execute(pForwSrc);
             fftwf_execute(pForwKernel);
 
+            float *ptr, *ptr_end, *ptr2;
+
             // Compute the element-wise product on the packed terms
             // Let's put the element wise products in ws.inKernel
             float re_s, im_s, re_k, im_k;
+
             for (ptr = outSrc, ptr2 = outKernel, ptr_end = outSrc + 2 * hFftw * (wFftw / 2 + 1); ptr != ptr_end; ++ptr, ++ptr2) {
                 re_s = *ptr;
                 im_s = *(++ptr);
@@ -133,7 +132,7 @@ namespace aire {
         int wFftw, hFftw;
         float *dstFft;
         float *dst; // The array containing the result
-        int hDst, wDst; // its size ; This is automatically set by init_workspace
+        int hDst, wDst;
         fftwf_plan pForwSrc;
         fftwf_plan pForwKernel;
         fftwf_plan pBack;

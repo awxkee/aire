@@ -39,7 +39,7 @@ namespace aire {
             pBack = fftwf_plan_dft_c2r_2d(hFftw, wFftw, (fftwf_complex *) outKernel, dstFft, FFTW_ESTIMATE);
         }
 
-        void convolve(float *src, float *kernel) {
+        void convolve(float *src, const float *kernel) {
             if (hFftw <= 0 || wFftw <= 0)
                 return;
 
@@ -86,16 +86,14 @@ namespace aire {
         fftwf_plan pForwKernel;
         fftwf_plan pBack;
 
-        void fftwCircularConvolution(float *src, float *kernel) {
+        void fftwCircularConvolution(float *src, const float *kernel) {
             float *ptr, *ptr_end, *ptr2;
 
-            for (ptr = inSrc, ptr_end = inSrc + hFftw * wFftw; ptr < ptr_end; ++ptr)
-                *ptr = 0.f;
-            for (ptr = inKernel, ptr_end = inKernel + hFftw * wFftw; ptr < ptr_end; ++ptr)
-                *ptr = 0.f;
+            std::fill(inSrc, inSrc + hFftw * wFftw, 0.f);
+            std::fill(inKernel, inKernel + hFftw * wFftw, 0.f);
 
             for (int i = 0; i < hFftw; ++i)
-                for (int j = 0; j < wFftw; ++j, ++ptr) {
+                for (int j = 0; j < wFftw; ++j) {
                     int reflectedX = std::clamp(j, 0, wSrc - 1);
                     if (j >= wSrc + kernelWidth - 1) {
                         reflectedX = 0;
