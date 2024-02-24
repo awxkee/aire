@@ -325,6 +325,8 @@ namespace aire {
             std::copy(src, src + aChannel.cols(), aChannel.row(y).data());
         }
 
+        verticalWorkspace.reset();
+
         rChannel.transposeInPlace();
         gChannel.transposeInPlace();
         bChannel.transposeInPlace();
@@ -359,8 +361,6 @@ namespace aire {
             verticalKernel(i) = vertical[i];
         }
 
-//        fftConvolve(data, stride, width, height, horizontalKernel, verticalKernel);
-
         concurrency::parallel_for(threadCount, height, [&](int y) {
             convolve1DHorizontalPass(transient, data, stride, y, width, height, horizontalKernel);
         });
@@ -368,6 +368,18 @@ namespace aire {
         concurrency::parallel_for(threadCount, height, [&](int y) {
             convolve1DVerticalPass(transient, data, stride, y, width, height, verticalKernel);
         });
+
+//        if (width*height > 500*500 && (vertical.size() > 30 || horizontal.size() > 30)) {
+//            fftConvolve(data, stride, width, height, horizontalKernel, verticalKernel);
+//        } else {
+//            concurrency::parallel_for(threadCount, height, [&](int y) {
+//                convolve1DHorizontalPass(transient, data, stride, y, width, height, horizontalKernel);
+//            });
+//
+//            concurrency::parallel_for(threadCount, height, [&](int y) {
+//                convolve1DVerticalPass(transient, data, stride, y, width, height, verticalKernel);
+//            });
+//        }
     }
 
 }
