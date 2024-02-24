@@ -57,63 +57,17 @@ namespace aire::HWY_NAMESPACE {
     void UnpremultiplyRGBAHWYRow(const uint8_t *src, int srcStride,
                               uint8_t *dst, int dstStride, int width,
                               int y) {
-        const FixedTag<uint8_t, 16> du8x16;
-        const FixedTag<uint16_t, 8> du16x8;
-        const FixedTag<uint8_t, 8> du8x8;
-
-        using VU8x16 = Vec<decltype(du8x16)>;
-        using VU16x8 = Vec<decltype(du16x8)>;
-
-        VU16x8 mult255 = Set(du16x8, 255);
-
         auto mSrc = reinterpret_cast<const uint8_t *>(src + y * srcStride);
         auto mDst = reinterpret_cast<uint8_t *>(dst + y * dstStride);
 
         int x = 0;
-        const int pixels = 16;
-
-        for (; x + pixels < width; x += pixels) {
-            VU8x16 r8, g8, b8, a8;
-            LoadInterleaved4(du8x16, mSrc, r8, g8, b8, a8);
-
-            VU16x8 aLow = PromoteLowerTo(du16x8, a8);
-            VU16x8 rLow = PromoteLowerTo(du16x8, r8);
-            VU16x8 gLow = PromoteLowerTo(du16x8, g8);
-            VU16x8 bLow = PromoteLowerTo(du16x8, b8);
-            auto lowADivider = ShiftRight<1>(aLow);
-            VU16x8 tmp = Add(Mul(Min(rLow, aLow), mult255), lowADivider);
-            rLow = RearrangeVec(tmp);
-            tmp = Add(Mul(Min(gLow, aLow), mult255), lowADivider);
-            gLow = RearrangeVec(tmp);
-            tmp = Add(Mul(Min(bLow, aLow), mult255), lowADivider);
-            bLow = RearrangeVec(tmp);
-
-            VU16x8 aHigh = PromoteUpperTo(du16x8, a8);
-            VU16x8 rHigh = PromoteUpperTo(du16x8, r8);
-            VU16x8 gHigh = PromoteUpperTo(du16x8, g8);
-            VU16x8 bHigh = PromoteUpperTo(du16x8, b8);
-            auto highADivider = ShiftRight<1>(aHigh);
-            tmp = Add(Mul(Min(rHigh, aHigh), mult255), highADivider);
-            rHigh = RearrangeVec(tmp);
-            tmp = Add(Mul(Min(gHigh, aHigh), mult255), highADivider);
-            gHigh = RearrangeVec(tmp);
-            tmp = Add(Mul(Min(bHigh, aHigh), mult255), highADivider);
-            bHigh = RearrangeVec(tmp);
-
-            r8 = Combine(du8x16, DemoteTo(du8x8, rHigh), DemoteTo(du8x8, rLow));
-            g8 = Combine(du8x16, DemoteTo(du8x8, gHigh), DemoteTo(du8x8, gLow));
-            b8 = Combine(du8x16, DemoteTo(du8x8, bHigh), DemoteTo(du8x8, bLow));
-
-            StoreInterleaved4(r8, g8, b8, a8, du8x16, mDst);
-
-            mSrc += pixels * 4;
-            mDst += pixels * 4;
-        }
 
         for (; x < width; ++x) {
             uint8_t alpha = mSrc[3];
             Eigen::Vector3i color = {mSrc[0], mSrc[1], mSrc[2]};
-            color = (color.array().min(alpha) * 255 + alpha / 2) / alpha;
+            if (alpha) {
+                color = (color.array().min(alpha) * 255 + alpha / 2) / alpha;
+            }
             mDst[0] = color.x();
             mDst[1] = color.y();
             mDst[2] = color.z();

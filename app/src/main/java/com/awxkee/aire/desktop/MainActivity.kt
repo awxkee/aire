@@ -57,7 +57,6 @@ class MainActivity : ComponentActivity() {
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                                .scaleWith(0.3f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
@@ -65,13 +64,13 @@ class MainActivity : ComponentActivity() {
 //                        var idx = 1
 //                        repeat(1) {
 //                            val d2Time = measureTimeMillis {
-//                                val blurred3 = Aire.gaussianBlur(bitmap, 15, 254f)
+//                                val blurred3 = Aire.scale(bitmap, 768, 768, BitmapScaleMode.Cubic, true)
 //                                scope.launch {
 //                                    imagesArray.add(blurred3)
 //                                }
 //                                idx += 1
 //                            }
-//                            Log.d("AireMedian", "exec time $d2Time")
+//                            Log.d("AireMedian", "exec time $d2Time ms")
 //
 //                        }
 //                        var radius = 5

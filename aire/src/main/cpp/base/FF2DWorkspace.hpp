@@ -109,12 +109,6 @@ namespace aire {
             fftwf_execute(pForwSrc);
             fftwf_execute(pForwKernel);
 
-//            float *ptr, *ptr_end, *ptr2;
-
-            // Compute the element-wise product on the packed terms
-            // Let's put the element wise products in ws.inKernel
-//            float re_s, im_s, re_k, im_k;
-
             const float normalizationFactor = static_cast<float>(hFftw * wFftw);
 
             const float fact = 1.0f / normalizationFactor;
@@ -122,19 +116,7 @@ namespace aire {
             for (size_t i = 0; i < complexSize; ++i)
                 reinterpret_cast<std::complex<float> *>(outKernel)[i] *= fact * reinterpret_cast<std::complex<float> *>(outSrc)[i];
 
-//            for (ptr = outSrc, ptr2 = outKernel, ptr_end = outSrc + 2 * hFftw * (wFftw / 2 + 1); ptr != ptr_end; ++ptr, ++ptr2) {
-//                re_s = *ptr;
-//                im_s = *(++ptr);
-//                re_k = *ptr2;
-//                im_k = *(++ptr2);
-//                *(ptr2 - 1) = re_s * re_k - im_s * im_k;
-//                *ptr2 = re_s * im_k + im_s * re_k;
-//            }
-
             fftwf_execute(pBack);
-
-//            for (ptr = dstFft, ptr_end = dstFft + wFftw * hFftw; ptr < ptr_end; ++ptr)
-//                *ptr /= normalizationFactor;
         }
 
         float *inSrc, *outSrc, *inKernel, *outKernel;
