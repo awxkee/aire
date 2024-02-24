@@ -69,6 +69,10 @@ class MainActivity : ComponentActivity() {
 //                                scope.launch {
 //                                    imagesArray.add(blurred3)
 //                                }
+//                                val blur1 = Aire.convolve2D(bitmap, ConvolveKernels.ring(15))
+//                                scope.launch {
+//                                    imagesArray.add(blur1)
+//                                }
 //                                idx += 1
 //                            }
 //                            Log.d("AireMedian", "exec time $d2Time")

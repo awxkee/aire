@@ -20,8 +20,8 @@ namespace aire {
 
             hFftw = std::max(static_cast<int>(fft_next_good_size(hSrc + hKernel * 2 - 1)), hSrc + hKernel * 2 - 1);
             wFftw = std::max(static_cast<int>(fft_next_good_size(wSrc + wKernel * 2 - 1)), wSrc + wKernel * 2 - 1);
-            hDst = hSrc + hKernel * 2 - 1;
-            wDst = wSrc + wKernel * 2 - 1;
+            hDst = hFftw;
+            wDst = wFftw;
 
             inSrc = new float[hFftw * wFftw];
             outSrc = (float *) fftwf_malloc(sizeof(fftwf_complex) * hFftw * (wFftw / 2 + 1));
@@ -78,7 +78,17 @@ namespace aire {
             std::fill(inSrc, inSrc + hFftw * wFftw, 0.f);
             std::fill(inKernel, inKernel + hFftw * wFftw, 0.f);
 
-            for (int i = 0; i < hFftw; ++i)
+            for (int i = 0; i < hFftw; ++i) {
+                int reflectedY = std::clamp(i, 0, hSrc - 1);
+
+                if (i >= hSrc + hKernel - 1) {
+                    reflectedY = 0;
+                } else if (i >= hSrc) {
+                    reflectedY = hSrc - 1;
+                }
+
+                int py = std::clamp(reflectedY, 0, hSrc - 1) * wSrc;
+
                 for (int j = 0; j < wFftw; ++j) {
                     int reflectedX = std::clamp(j, 0, wSrc - 1);
                     if (j >= wSrc + wKernel - 1) {
@@ -87,15 +97,9 @@ namespace aire {
                         reflectedX = wSrc - 1;
                     }
 
-                    int reflectedY = std::clamp(i, 0, hSrc - 1);
-
-                    if (i >= hSrc + hKernel - 1) {
-                        reflectedY = 0;
-                    } else if (i >= hSrc) {
-                        reflectedY = hSrc - 1;
-                    }
-                    inSrc[(i) * wFftw + j] += src[std::clamp(reflectedY, 0, hSrc - 1) * wSrc + std::clamp(reflectedX, 0, wSrc - 1)];
+                    inSrc[i * wFftw + j] += src[py + std::clamp(reflectedX, 0, wSrc - 1)];
                 }
+            }
 
             for (int i = 0; i < hKernel; ++i)
                 for (int j = 0; j < wKernel; ++j)

@@ -260,7 +260,7 @@ namespace aire {
         Eigen::MatrixXf bChannel(height, width);
         Eigen::MatrixXf aChannel(height, width);
 
-        std::vector<float> rChan(width* height);
+        std::vector<float> rChan(width * height);
 
         for (int y = 0; y < height; ++y) {
             auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
@@ -279,10 +279,9 @@ namespace aire {
         workspace->convolve(rChan.data(), horizontal.data());
         for (int y = 0; y < height; ++y) {
             auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * workspace->getDstWidth());
-//            memcpy(rChannel.row(y).data(), src, width * sizeof(float));
-            for (int x = 0; x < width; ++ x) {
+            for (int x = 0; x < width; ++x) {
                 rChannel(y, x) = src[0];
-                rChan[y*width + x] = src[0];
+                rChan[y * width + x] = src[0];
                 src += 1;
             }
         }
@@ -351,7 +350,7 @@ namespace aire {
 //                dst[1] = rChan[y*width + x] * 255.f;
 //                dst[2] = rChan[y*width + x] * 255.f;
                 dst[0] = rChannel(y, x) * 255.f;
-                dst[1 ]= rChannel(y, x) * 255.f;
+                dst[1] = rChannel(y, x) * 255.f;
                 dst[2] = rChannel(y, x) * 255.f;
 //                dst[1] = gChannel(y, x) * 255.f;
 //                dst[2] = bChannel(y, x) * 255.f;
