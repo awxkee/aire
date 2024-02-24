@@ -255,18 +255,15 @@ namespace aire {
     }
 
     void fftConvolve(uint8_t *data, int stride, int width, int height, const Eigen::VectorXf &horizontal, const Eigen::VectorXf &vertical) {
-        Eigen::MatrixXf rChannel(height, width);
-        Eigen::MatrixXf gChannel(height, width);
-        Eigen::MatrixXf bChannel(height, width);
-        Eigen::MatrixXf aChannel(height, width);
-
-        std::vector<float> rChan(width * height);
+        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> rChannel(height, width);
+        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> gChannel(height, width);
+        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> bChannel(height, width);
+        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> aChannel(height, width);
 
         for (int y = 0; y < height; ++y) {
             auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
             for (; x < width; ++x) {
-                rChan[y * width + x] = src[0] / 255.f;
                 rChannel(y, x) = src[0] / 255.f;
                 gChannel(y, x) = src[1] / 255.f;
                 bChannel(y, x) = src[2] / 255.f;
@@ -275,90 +272,75 @@ namespace aire {
             }
         }
 
-        std::unique_ptr<FF1DWorkspace> workspace = std::make_unique<FF1DWorkspace>(width, height, horizontal.size());
-        workspace->convolve(rChan.data(), horizontal.data());
+        std::unique_ptr<FF1DWorkspace> horizontalWorkspace = std::make_unique<FF1DWorkspace>(height, width, horizontal.size());
+        horizontalWorkspace->convolve(rChannel.data(), horizontal.data());
         for (int y = 0; y < height; ++y) {
-            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * workspace->getDstWidth());
-            for (int x = 0; x < width; ++x) {
-                rChannel(y, x) = src[0];
-                rChan[y * width + x] = src[0];
-                src += 1;
-            }
+            const auto src = reinterpret_cast<float *>(horizontalWorkspace->getOutput() + y * horizontalWorkspace->getDstWidth());
+            std::copy(src, src + width, rChannel.row(y).data());
         }
-//        workspace->convolve(gChannel.data(), horizontal.data());
-//        for (int y = 0; y < height; ++y) {
-//            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * workspace->getDstWidth());
-////            memcpy(gChannel.row(y).data(), src, width * sizeof(float));
-//            for (int x = 0; x < width; ++ x) {
-//                gChannel(y, x) = src[0];
-//                src += 1;
-//            }
-//        }
-//        workspace->convolve(bChannel.data(), horizontal.data());
-//        for (int y = 0; y < height; ++y) {
-//            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * workspace->getDstWidth());
-////            memcpy(bChannel.row(y).data(), src, width * sizeof(float));
-//            for (int x = 0; x < width; ++ x) {
-//                bChannel(y, x) = src[0];
-//                src += 1;
-//            }
-//        }
-//        workspace->convolve(aChannel.data(), horizontal.data());
-//        for (int y = 0; y < height; ++y) {
-//            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * width);
-//            memcpy(aChannel.row(y).data(), src, width * sizeof(float));
-//        }
+        horizontalWorkspace->convolve(gChannel.data(), horizontal.data());
+        for (int y = 0; y < height; ++y) {
+            const auto src = reinterpret_cast<float *>(horizontalWorkspace->getOutput() + y * horizontalWorkspace->getDstWidth());
+            std::copy(src, src + width, gChannel.row(y).data());
+        }
+        horizontalWorkspace->convolve(bChannel.data(), horizontal.data());
+        for (int y = 0; y < height; ++y) {
+            const auto src = reinterpret_cast<float *>(horizontalWorkspace->getOutput() + y * horizontalWorkspace->getDstWidth());
+            std::copy(src, src + width, bChannel.row(y).data());
+        }
+        horizontalWorkspace->convolve(aChannel.data(), horizontal.data());
+        for (int y = 0; y < height; ++y) {
+            const auto src = reinterpret_cast<float *>(horizontalWorkspace->getOutput() + y * horizontalWorkspace->getDstWidth());
+            std::copy(src, src + width, aChannel.row(y).data());
+        }
 
-//        rChannel.transposeInPlace();
-//        gChannel.transposeInPlace();
-//        bChannel.transposeInPlace();
-//        aChannel.transposeInPlace();
-//
-//        workspace->convolve(rChannel.data(), vertical.data());
-//        for (int y = 0; y < width; ++y) {
-//            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * height);
-//            memcpy(rChannel.row(y).data(), src, height * sizeof(float));
-//        }
-//        workspace->convolve(gChannel.data(), vertical.data());
-//        for (int y = 0; y < width; ++y) {
-//            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * height);
-//            memcpy(gChannel.row(y).data(), src, height * sizeof(float));
-//        }
-//        workspace->convolve(bChannel.data(), vertical.data());
-//        for (int y = 0; y < width; ++y) {
-//            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * height);
-//            memcpy(bChannel.row(y).data(), src, height * sizeof(float));
-//        }
-//        workspace->convolve(aChannel.data(), vertical.data());
-//        for (int y = 0; y < width; ++y) {
-//            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * height);
-//            memcpy(aChannel.row(y).data(), src, height * sizeof(float));
-//        }
-//
-//        rChannel.transposeInPlace();
-//        gChannel.transposeInPlace();
-//        bChannel.transposeInPlace();
-//        aChannel.transposeInPlace();
+        horizontalWorkspace.reset();
 
-        workspace.reset();
+        rChannel.transposeInPlace();
+        gChannel.transposeInPlace();
+        bChannel.transposeInPlace();
+        aChannel.transposeInPlace();
+
+        std::unique_ptr<FF1DWorkspace> verticalWorkspace = std::make_unique<FF1DWorkspace>(rChannel.rows(),
+                                                                                           rChannel.cols(),
+                                                                                           vertical.size());
+        verticalWorkspace->convolve(rChannel.data(), vertical.data());
+        for (int y = 0; y < rChannel.rows(); ++y) {
+            const auto src = reinterpret_cast<float *>(verticalWorkspace->getOutput() + y * verticalWorkspace->getDstWidth());
+            std::copy(src, src + rChannel.cols(), rChannel.row(y).data());
+        }
+        verticalWorkspace->convolve(gChannel.data(), vertical.data());
+        for (int y = 0; y < gChannel.rows(); ++y) {
+            const auto src = reinterpret_cast<float *>(verticalWorkspace->getOutput() + y * verticalWorkspace->getDstWidth());
+            std::copy(src, src + gChannel.cols(), gChannel.row(y).data());
+        }
+        verticalWorkspace->convolve(bChannel.data(), vertical.data());
+        for (int y = 0; y < bChannel.rows(); ++y) {
+            const auto src = reinterpret_cast<float *>(verticalWorkspace->getOutput() + y * verticalWorkspace->getDstWidth());
+            std::copy(src, src + bChannel.cols(), bChannel.row(y).data());
+        }
+        verticalWorkspace->convolve(aChannel.data(), vertical.data());
+        for (int y = 0; y < aChannel.rows(); ++y) {
+            const auto src = reinterpret_cast<float *>(verticalWorkspace->getOutput() + y * verticalWorkspace->getDstWidth());
+            std::copy(src, src + aChannel.cols(), aChannel.row(y).data());
+        }
+
+        rChannel.transposeInPlace();
+        gChannel.transposeInPlace();
+        bChannel.transposeInPlace();
+        aChannel.transposeInPlace();
 
         for (int y = 0; y < height; ++y) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
             for (; x < width; ++x) {
-//                dst[0] = rChan[y*width + x] * 255.f;
-//                dst[1] = rChan[y*width + x] * 255.f;
-//                dst[2] = rChan[y*width + x] * 255.f;
-                dst[0] = rChannel(y, x) * 255.f;
-                dst[1] = rChannel(y, x) * 255.f;
-                dst[2] = rChannel(y, x) * 255.f;
-//                dst[1] = gChannel(y, x) * 255.f;
-//                dst[2] = bChannel(y, x) * 255.f;
-                dst[3] = aChannel(y, x) * 255.f;
+                dst[0] = std::clamp(rChannel(y, x) * 255.f, 0.f, 255.f);
+                dst[1] = std::clamp(gChannel(y, x) * 255.f, 0.f, 255.f);
+                dst[2] = std::clamp(bChannel(y, x) * 255.f, 0.f, 255.f);
+                dst[3] = std::clamp(aChannel(y, x) * 255.f, 0.f, 255.f);
                 dst += 4;
             }
         }
-
     }
 
     void convolve1D(uint8_t *data, int stride, int width, int height, const std::vector<float> &horizontal, const std::vector<float> &vertical) {
@@ -376,6 +358,7 @@ namespace aire {
         for (int i = 0; i < vertical.size(); ++i) {
             verticalKernel(i) = vertical[i];
         }
+
 //        fftConvolve(data, stride, width, height, horizontalKernel, verticalKernel);
 
         concurrency::parallel_for(threadCount, height, [&](int y) {

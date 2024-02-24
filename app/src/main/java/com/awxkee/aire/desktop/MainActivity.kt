@@ -65,13 +65,9 @@ class MainActivity : ComponentActivity() {
 //                        var idx = 1
 //                        repeat(1) {
 //                            val d2Time = measureTimeMillis {
-//                                val blurred3 = Aire.gaussianBlur(bitmap, 15, 15f)
+//                                val blurred3 = Aire.gaussianBlur(bitmap, 15, 254f)
 //                                scope.launch {
 //                                    imagesArray.add(blurred3)
-//                                }
-//                                val blur1 = Aire.convolve2D(bitmap, ConvolveKernels.ring(15))
-//                                scope.launch {
-//                                    imagesArray.add(blur1)
 //                                }
 //                                idx += 1
 //                            }

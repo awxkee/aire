@@ -21,6 +21,8 @@ namespace aire {
     using namespace std;
     using namespace hwy::HWY_NAMESPACE;
 
+    // https://stackoverflow.com/questions/25034259/scipy-ndimage-morphology-operators-saturate-my-computer-memory-ram-8gb/51159444#51159444
+
     template<class T>
     void dilateRGBA(T *pixels, T *destination, int stride, int width, int height,
                     Eigen::MatrixXi &kernel) {
