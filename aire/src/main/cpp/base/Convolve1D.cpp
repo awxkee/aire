@@ -260,10 +260,13 @@ namespace aire {
         Eigen::MatrixXf bChannel(height, width);
         Eigen::MatrixXf aChannel(height, width);
 
+        std::vector<float> rChan(width* height);
+
         for (int y = 0; y < height; ++y) {
             auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
             for (; x < width; ++x) {
+                rChan[y * width + x] = src[0] / 255.f;
                 rChannel(y, x) = src[0] / 255.f;
                 gChannel(y, x) = src[1] / 255.f;
                 bChannel(y, x) = src[2] / 255.f;
@@ -273,18 +276,19 @@ namespace aire {
         }
 
         std::unique_ptr<FF1DWorkspace> workspace = std::make_unique<FF1DWorkspace>(width, height, horizontal.size());
-        workspace->convolve(rChannel.data(), horizontal.data());
+        workspace->convolve(rChan.data(), horizontal.data());
         for (int y = 0; y < height; ++y) {
-            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * width);
+            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * workspace->getDstWidth());
 //            memcpy(rChannel.row(y).data(), src, width * sizeof(float));
             for (int x = 0; x < width; ++ x) {
                 rChannel(y, x) = src[0];
+                rChan[y*width + x] = src[0];
                 src += 1;
             }
         }
 //        workspace->convolve(gChannel.data(), horizontal.data());
 //        for (int y = 0; y < height; ++y) {
-//            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * width);
+//            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * workspace->getDstWidth());
 ////            memcpy(gChannel.row(y).data(), src, width * sizeof(float));
 //            for (int x = 0; x < width; ++ x) {
 //                gChannel(y, x) = src[0];
@@ -293,7 +297,7 @@ namespace aire {
 //        }
 //        workspace->convolve(bChannel.data(), horizontal.data());
 //        for (int y = 0; y < height; ++y) {
-//            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * width);
+//            auto src = reinterpret_cast<float *>(reinterpret_cast<uint8_t *>(workspace->getOutput()) + y * workspace->getDstWidth());
 ////            memcpy(bChannel.row(y).data(), src, width * sizeof(float));
 //            for (int x = 0; x < width; ++ x) {
 //                bChannel(y, x) = src[0];
@@ -343,9 +347,14 @@ namespace aire {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
             for (; x < width; ++x) {
+//                dst[0] = rChan[y*width + x] * 255.f;
+//                dst[1] = rChan[y*width + x] * 255.f;
+//                dst[2] = rChan[y*width + x] * 255.f;
                 dst[0] = rChannel(y, x) * 255.f;
-                dst[1] = gChannel(y, x) * 255.f;
-                dst[2] = bChannel(y, x) * 255.f;
+                dst[1 ]= rChannel(y, x) * 255.f;
+                dst[2] = rChannel(y, x) * 255.f;
+//                dst[1] = gChannel(y, x) * 255.f;
+//                dst[2] = bChannel(y, x) * 255.f;
                 dst[3] = aChannel(y, x) * 255.f;
                 dst += 4;
             }

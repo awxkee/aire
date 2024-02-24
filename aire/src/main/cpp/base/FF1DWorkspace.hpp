@@ -21,32 +21,31 @@ namespace aire {
             this->wSrc = wSrc;
             this->kernelWidth = kernelWidth;
 
-            hFftw = fft_next_good_size(hSrc + kernelWidth * 2 - 1);
-            wFftw = fft_next_good_size(wSrc + kernelWidth * 2 - 1);
+            wFftw = std::max(static_cast<int>(fft_next_good_size(wSrc + kernelWidth * 2 - 1)), wSrc + kernelWidth * 2 - 1);
             hDst = hSrc + kernelWidth * 2 - 1;
             wDst = wSrc + kernelWidth * 2 - 1;
 
-            inSrc = new float[hFftw * wFftw];
-            outSrc = (float *) fftwf_malloc(sizeof(fftwf_complex) * hFftw * (wFftw / 2 + 1));
-            uint32_t kernelSize = hFftw * wFftw;
+            inSrc = new float[wFftw];
+            outSrc = (float *) fftwf_malloc(sizeof(fftwf_complex) * (wFftw / 2 + 1));
+            uint32_t kernelSize = wFftw;
             inKernel = new float[kernelSize];
-            outKernel = (float *) fftwf_malloc(sizeof(fftwf_complex) * hFftw * (wFftw / 2 + 1));
-            dstFft = new float[hFftw * wFftw];
+            outKernel = (float *) fftwf_malloc(sizeof(fftwf_complex) * (wFftw / 2 + 1));
+            dstFft = new float[wFftw];
             dst = new float[hDst * wDst];
 
-            pForwSrc = fftwf_plan_dft_r2c_2d(hFftw, wFftw, inSrc, (fftwf_complex *) outSrc, FFTW_ESTIMATE);
+            pForwSrc = fftwf_plan_dft_r2c_1d(wFftw, inSrc, (fftwf_complex *) outSrc, FFTW_ESTIMATE);
             pForwKernel = fftwf_plan_dft_r2c_1d(kernelSize, inKernel, (fftwf_complex *) outKernel, FFTW_ESTIMATE);
-            pBack = fftwf_plan_dft_c2r_2d(hFftw, wFftw, (fftwf_complex *) outKernel, dstFft, FFTW_ESTIMATE);
+            pBack = fftwf_plan_dft_c2r_1d(wFftw, (fftwf_complex *) outKernel, dstFft, FFTW_ESTIMATE);
         }
 
         void convolve(float *src, const float *kernel) {
-            if (hFftw <= 0 || wFftw <= 0)
+            if (wFftw <= 0)
                 return;
 
             fftwCircularConvolution(src, kernel);
 
-            for (int i = 0; i < hDst; ++i)
-                memcpy(&dst[i * wDst], &dstFft[i * wFftw], wDst * sizeof(float));
+//            for (int i = 0; i < hDst; ++i)
+//                memcpy(&dst[i * wDst], &dstFft[i * wFftw], wDst * sizeof(float));
         }
 
         float *getOutput() {
@@ -78,7 +77,7 @@ namespace aire {
     private:
         float *inSrc, *outSrc, *inKernel, *outKernel;
         int hSrc, wSrc, kernelWidth;
-        int wFftw, hFftw;
+        int wFftw;
         float *dstFft;
         float *dst; // The array containing the result
         int hDst, wDst; // its size ; This is automatically set by init_workspace
@@ -87,12 +86,11 @@ namespace aire {
         fftwf_plan pBack;
 
         void fftwCircularConvolution(float *src, const float *kernel) {
-            float *ptr, *ptr_end, *ptr2;
+            std::fill(dst, dst + hDst * wDst, 0.f);
+            for (int y = 0; y < hSrc; ++y) {
+                std::fill(inSrc, inSrc + wFftw, 0.f);
+                std::fill(inKernel, inKernel + wFftw, 0.f);
 
-            std::fill(inSrc, inSrc + hFftw * wFftw, 0.f);
-            std::fill(inKernel, inKernel + hFftw * wFftw, 0.f);
-
-            for (int i = 0; i < hFftw; ++i)
                 for (int j = 0; j < wFftw; ++j) {
                     int reflectedX = std::clamp(j, 0, wSrc - 1);
                     if (j >= wSrc + kernelWidth - 1) {
@@ -101,41 +99,33 @@ namespace aire {
                         reflectedX = wSrc - 1;
                     }
 
-                    int reflectedY = std::clamp(i, 0, hSrc - 1);
+                    int reflectedY = std::clamp(y, 0, hSrc - 1);
 
-                    if (i >= hSrc + kernelWidth - 1) {
+                    if (y >= hSrc + kernelWidth - 1) {
                         reflectedY = 0;
-                    } else if (i >= hSrc) {
+                    } else if (y >= hSrc) {
                         reflectedY = hSrc - 1;
                     }
-                    inSrc[(i) * wFftw + j] += src[std::clamp(reflectedY, 0, hSrc - 1) * wSrc + std::clamp(reflectedX, 0, wSrc - 1)];
+                    inSrc[j] += src[std::clamp(reflectedY, 0, hSrc - 1) * wSrc + std::clamp(reflectedX, 0, wSrc - 1)];
                 }
 
-            for (int i = 0; i < kernelWidth; ++i)
-                inKernel[i] += kernel[i];
+                for (int i = 0; i < kernelWidth; ++i)
+                    inKernel[i] += kernel[i];
 
-            // And we compute their packed FFT
-            fftwf_execute(pForwSrc);
-            fftwf_execute(pForwKernel);
+                // And we compute their packed FFT
+                fftwf_execute(pForwSrc);
+                fftwf_execute(pForwKernel);
 
-            // Compute the element-wise product on the packed terms
-            // Let's put the element wise products in ws.inKernel
-            float re_s, im_s, re_k, im_k;
-            for (ptr = outSrc, ptr2 = outKernel, ptr_end = outSrc + 2 * hFftw * (wFftw / 2 + 1); ptr != ptr_end; ++ptr, ++ptr2) {
-                re_s = *ptr;
-                im_s = *(++ptr);
-                re_k = *ptr2;
-                im_k = *(++ptr2);
-                *(ptr2 - 1) = re_s * re_k - im_s * im_k;
-                *ptr2 = re_s * im_k + im_s * re_k;
+                const float normalizationFactor = static_cast<float>(wFftw);
+                const float fact = 1.0f / normalizationFactor;
+                const int complexSize = (wFftw / 2 + 1);
+                for (size_t i = 0; i < complexSize; ++i)
+                    reinterpret_cast<std::complex<float> *>(outKernel)[i] *= fact * reinterpret_cast<std::complex<float> *>(outSrc)[i];
+
+                fftwf_execute(pBack);
+
+                memcpy(&dst[y * wDst], &dstFft[0], wDst * sizeof(float));
             }
-
-            fftwf_execute(pBack);
-
-            const float normalizationFactor = static_cast<float>(hFftw * wFftw);
-
-            for (ptr = dstFft, ptr_end = dstFft + wFftw * hFftw; ptr < ptr_end; ++ptr)
-                *ptr /= normalizationFactor;
         }
 
     };

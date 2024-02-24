@@ -340,28 +340,21 @@ namespace aire {
             }
         }
 
-        std::vector<float> kernel(matrix.rows() * matrix.cols());
-        for (int y = 0; y < matrix.rows(); y++) {
-            for (int x = 0; x < matrix.cols(); ++x) {
-                kernel[y * matrix.rows() + x] = matrix(y, x);
-            }
-        }
-
         std::unique_ptr<FF2DWorkspace> workspace = std::make_unique<FF2DWorkspace>(height, width,
                                                                                    matrix.rows(), matrix.cols());
-        workspace->convolve(rV.data(), kernel.data());
+        workspace->convolve(rV.data(), matrix.data());
         rV.clear();
         applyChannel(workspace.get(), data, stride, 0, width, height);
 
-        workspace->convolve(gV.data(), kernel.data());
+        workspace->convolve(gV.data(), matrix.data());
         gV.clear();
         applyChannel(workspace.get(), data, stride, 1, width, height);
 
-        workspace->convolve(bV.data(), kernel.data());
+        workspace->convolve(bV.data(), matrix.data());
         bV.clear();
         applyChannel(workspace.get(), data, stride, 2, width, height);
 
-        workspace->convolve(aV.data(), kernel.data());
+        workspace->convolve(aV.data(), matrix.data());
         aV.clear();
         applyChannel(workspace.get(), data, stride, 3, width, height);
         workspace.reset();

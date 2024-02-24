@@ -57,15 +57,15 @@ class MainActivity : ComponentActivity() {
                     scope.launch(Dispatchers.IO) {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                                .scale(853, 1280)
+//                                .scaleWith(0.3f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 ////
-//                        var idx = 2
+//                        var idx = 1
 //                        repeat(1) {
 //                            val d2Time = measureTimeMillis {
-//                                val blurred3 = Aire.convolve2D(bitmap, ConvolveKernels.ring(25))
+//                                val blurred3 = Aire.gaussianBlur(bitmap, 15, 15f)
 //                                scope.launch {
 //                                    imagesArray.add(blurred3)
 //                                }
