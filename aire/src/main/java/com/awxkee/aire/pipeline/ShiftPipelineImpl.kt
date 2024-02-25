@@ -57,6 +57,28 @@ class ShiftPipelineImpl : ShiftPipelines {
         return tiltShiftImpl(bitmap, radius, sigma, anchorX, anchorY, tiltRadius)
     }
 
+    override fun horizontalLinearTiltShift(
+        bitmap: Bitmap,
+        radius: Int,
+        sigma: Float,
+        anchorY: Float,
+        tiltRadius: Float
+    ): Bitmap {
+        if (radius <= 0) throw InvalidParameterException("radius cannot be less or equal zero")
+        return horizontalLinearTiltShiftImpl(bitmap, radius, sigma, anchorY, tiltRadius)
+    }
+
+    override fun verticalLinearTiltShift(
+        bitmap: Bitmap,
+        radius: Int,
+        sigma: Float,
+        anchorX: Float,
+        tiltRadius: Float
+    ): Bitmap {
+        if (radius <= 0) throw InvalidParameterException("radius cannot be less or equal zero")
+        return verticalLinearTiltShiftImpl(bitmap, radius, sigma, anchorX, tiltRadius)
+    }
+
     override fun glitch(
         bitmap: Bitmap,
         channelsShiftX: Float,
@@ -82,6 +104,22 @@ class ShiftPipelineImpl : ShiftPipelines {
         windStrength: Float,
         streamsCount: Int,
         clearColor: Int
+    ): Bitmap
+
+    private external fun verticalLinearTiltShiftImpl(
+        bitmap: Bitmap,
+        radius: Int,
+        sigma: Float,
+        anchorY: Float = 0.5f,
+        tiltRadius: Float = 0.2f,
+    ): Bitmap
+
+    private external fun horizontalLinearTiltShiftImpl(
+        bitmap: Bitmap,
+        radius: Int,
+        sigma: Float,
+        anchorY: Float = 0.5f,
+        tiltRadius: Float = 0.2f,
     ): Bitmap
 
     private external fun tiltShiftImpl(

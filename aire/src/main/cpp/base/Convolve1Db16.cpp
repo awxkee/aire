@@ -122,7 +122,7 @@ namespace aire {
     void Convolve1Db16::convolve(uint16_t *data, const int stride, const int width, const int height) {
         std::vector<uint16_t> transient(stride * height);
 
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
+        const int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
                                     height * width / (256 * 256)), 1, 12);
 
         concurrency::parallel_for(threadCount, height, [&](int y) {

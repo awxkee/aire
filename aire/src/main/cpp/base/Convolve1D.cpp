@@ -358,7 +358,7 @@ namespace aire {
 
         const int fftPathThreshold = 650 * 650;
 
-        if (width * height > fftPathThreshold && (horizontal.size() > 27 || vertical.size() > 27)) {
+        if (width * height > fftPathThreshold && (horizontal.size() > 650 || vertical.size() > 650)) {
             fftConvolve(data, stride, width, height, horizontalKernel, verticalKernel);
         } else {
             const int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),

@@ -37,10 +37,12 @@ import com.awxkee.aire.ColorMatrices
 import com.awxkee.aire.ConvolveKernels
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.UUID
+import java.util.concurrent.Executors
 import kotlin.math.PI
 import kotlin.system.measureTimeMillis
 
@@ -54,25 +56,27 @@ class MainActivity : ComponentActivity() {
                     mutableStateListOf<Bitmap>()
                 }
                 LaunchedEffect(key1 = Unit, block = {
-                    scope.launch(Dispatchers.IO) {
+                    scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                                .scaleWith(0.3f)
+//                                .scaleWith(0.5f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 ////
-//                        var idx = 1
-//                        repeat(1) {
+//                        var idx = 744
+//                        repeat(8) {
 //                            val d2Time = measureTimeMillis {
-//                                val blurred3 = Aire.poissonBlur(bitmap, 30)
-//                                scope.launch {
-//                                    imagesArray.add(blurred3)
-//                                }
-//                                idx += 1
+//                                val blurred3 = Aire.poissonBlur(bitmap, idx)
+////                                scope.launch {
+////                                    imagesArray.add(blurred3)
+////                                }
 //                            }
-//                            Log.d("AireMedian", "exec time $d2Time ms")
-//
+//                            val cd2Time = measureTimeMillis {
+//                                Aire.convolve2D(bitmap, ConvolveKernels.ring(idx))
+//                            }
+//                            Log.d("AireMedian", "exec time for radius ${idx} $d2Time ms with 2D ${cd2Time} ms")
+//                            idx += 2
 //                        }
 //                        var radius = 5
 //                        repeat(25) {
