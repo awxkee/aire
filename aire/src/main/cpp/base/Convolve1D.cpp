@@ -260,7 +260,7 @@ namespace aire {
         Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> bChannel(height, width);
         Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> aChannel(height, width);
 
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
             for (; x < width; ++x) {
@@ -270,7 +270,7 @@ namespace aire {
                 aChannel(y, x) = src[3] / 255.f;
                 src += 4;
             }
-        }
+        });
 
         std::unique_ptr<FF1DWorkspace> horizontalWorkspace = std::make_unique<FF1DWorkspace>(height, width, horizontal.size());
         horizontalWorkspace->convolve(rChannel.data(), horizontal.data());
@@ -330,7 +330,7 @@ namespace aire {
         bChannel.transposeInPlace();
         aChannel.transposeInPlace();
 
-        for (int y = 0; y < height; ++y) {
+        concurrency::parallel_for(2, height, [&](int y) {
             auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
             int x = 0;
             for (; x < width; ++x) {
@@ -340,14 +340,11 @@ namespace aire {
                 dst[3] = std::clamp(aChannel(y, x) * 255.f, 0.f, 255.f);
                 dst += 4;
             }
-        }
+        });
     }
 
     void convolve1D(uint8_t *data, int stride, int width, int height, const std::vector<float> &horizontal, const std::vector<float> &vertical) {
         std::vector<uint8_t> transient(stride * height);
-
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    height * width / (256 * 256)), 1, 12);
 
         Eigen::VectorXf horizontalKernel(horizontal.size());
         for (int i = 0; i < horizontal.size(); ++i) {
@@ -359,15 +356,21 @@ namespace aire {
             verticalKernel(i) = vertical[i];
         }
 
-//        fftConvolve(data, stride, width, height, horizontalKernel, verticalKernel);
+        const int fftPathThreshold = 650 * 650;
 
-        concurrency::parallel_for(threadCount, height, [&](int y) {
-            convolve1DHorizontalPass(transient, data, stride, y, width, height, horizontalKernel);
-        });
+        if (width * height > fftPathThreshold && (horizontal.size() > 27 || vertical.size() > 27)) {
+            fftConvolve(data, stride, width, height, horizontalKernel, verticalKernel);
+        } else {
+            const int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
+                                              height * width / (256 * 256)), 1, 12);
+            concurrency::parallel_for(threadCount, height, [&](int y) {
+                convolve1DHorizontalPass(transient, data, stride, y, width, height, horizontalKernel);
+            });
 
-        concurrency::parallel_for(threadCount, height, [&](int y) {
-            convolve1DVerticalPass(transient, data, stride, y, width, height, verticalKernel);
-        });
+            concurrency::parallel_for(threadCount, height, [&](int y) {
+                convolve1DVerticalPass(transient, data, stride, y, width, height, verticalKernel);
+            });
+        }
     }
 
 }

@@ -362,7 +362,7 @@ namespace aire {
 
     void Convolve2D::convolve(uint8_t *data, int stride, int width, int height) {
         const int activationSize = 500 * 500;
-        if (width * height > activationSize && matrix.rows() > 5) {
+        if (width * height > activationSize && matrix.rows() > 9) {
             fftConvolve(data, stride, width, height);
         } else {
             this->bruteForceConvolve(data, stride, width, height);

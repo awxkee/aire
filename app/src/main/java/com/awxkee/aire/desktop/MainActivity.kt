@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
 //                        var idx = 1
 //                        repeat(1) {
 //                            val d2Time = measureTimeMillis {
-//                                val blurred3 = Aire.poissonBlur(bitmap, 55)
+//                                val blurred3 = Aire.poissonBlur(bitmap, 30)
 //                                scope.launch {
 //                                    imagesArray.add(blurred3)
 //                                }

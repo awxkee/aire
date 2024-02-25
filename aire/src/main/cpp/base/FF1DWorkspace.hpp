@@ -22,8 +22,9 @@ namespace aire {
             this->wSrc = wSrc;
             this->wKernel = wKernel;
 
-            hFftw = std::max(static_cast<int>(fft_next_good_size(hSrc + wKernel - 1)), hSrc + wKernel - 1);
-            wFftw = std::max(static_cast<int>(fft_next_good_size(wSrc + wKernel - 1)), wSrc + wKernel - 1);
+            // Adding padding to make a continuous signal for a convolution -> signal width = Signal Size + Kernel Width + Kernel Width / 2 - 1
+            hFftw = std::max(static_cast<int>(fft_next_good_size(hSrc + wKernel + wKernel / 2 - 1)), hSrc + wKernel + wKernel / 2 - 1);
+            wFftw = std::max(static_cast<int>(fft_next_good_size(wSrc + wKernel + wKernel / 2 - 1)), wSrc + wKernel + wKernel / 2 - 1);
             hDst = hFftw;
             wDst = wFftw;
 
@@ -102,8 +103,8 @@ namespace aire {
             std::fill(inSrc.begin(), inSrc.end(), 0.f);
             std::fill(inKernel.begin(), inKernel.end(), 0.f);
 
-            const int yReflectionBreak = hSrc + wKernel / 2;
-            const int xReflectionBreak = wSrc + wKernel / 2;
+            const int yReflectionBreak = hSrc + wKernel / 2 - 1;
+            const int xReflectionBreak = wSrc + wKernel / 2 - 1;
 
             for (int i = 0; i < hFftw; ++i) {
                 int reflectedY = std::clamp(i, 0, hSrc - 1);
@@ -131,7 +132,6 @@ namespace aire {
             for (int j = 0; j < wKernel; ++j)
                 inKernel[(j % wFftw)] += kernel[j];
 
-            // And we compute their packed FFT
             fftwf_execute(pForwSrc);
             fftwf_execute(pForwKernel);
 
