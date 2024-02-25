@@ -46,20 +46,14 @@ interface ShiftPipelines {
         tiltRadius: Float = 0.2f,
     ): Bitmap
 
-    fun horizontalLinearTiltShift(
+    fun horizontalTiltShift(
         bitmap: Bitmap,
         radius: Int,
         sigma: Float,
+        anchorX: Float,
         anchorY: Float = 0.5f,
         tiltRadius: Float = 0.2f,
-    ): Bitmap
-
-    fun verticalLinearTiltShift(
-        bitmap: Bitmap,
-        radius: Int,
-        sigma: Float,
-        anchorX: Float = 0.5f,
-        tiltRadius: Float = 0.2f,
+        angle: Float = Math.PI.toFloat() / 2,
     ): Bitmap
 
     fun glitch(

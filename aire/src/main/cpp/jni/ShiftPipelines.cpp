@@ -150,8 +150,9 @@ Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_horizontalWindStaggerImpl(JNIEnv
 
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_horizontalLinearTiltShiftImpl(JNIEnv *env, jobject thiz, jobject bitmap, jint radius, jfloat sigma,
-                                                                              jfloat anchorY, jfloat tiltRadius) {
+Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_horizontalTiltShiftImpl(JNIEnv *env, jobject thiz, jobject bitmap, jint radius, jfloat sigma,
+                                                                              jfloat anchorX, jfloat anchorY,
+                                                                              jfloat tiltRadius, jfloat angle) {
 
     try {
         std::vector<AcquirePixelFormat> formats;
@@ -175,65 +176,15 @@ Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_horizontalLinearTiltShiftImpl(JN
                                                                           height,
                                                                           radius,
                                                                           sigma);
-                                                        aire::horizontalLinearTiltShift(output.data(),
+                                                        aire::horizontalTiltShift(output.data(),
                                                                                         input.data(),
                                                                                         blurred,
                                                                                         stride, width,
                                                                                         height,
+                                                                                        anchorX,
                                                                                         anchorY,
-                                                                                        tiltRadius);
-                                                    }
-                                                    blurred.clear();
-                                                    return {
-                                                            .data = output,
-                                                            .stride = stride,
-                                                            .width = width,
-                                                            .height = height,
-                                                            .pixelFormat = fmt
-                                                    };
-                                                });
-        return newBitmap;
-    } catch (AireError &err) {
-        std::string msg = err.what();
-        throwException(env, msg);
-        return nullptr;
-    }
-}
-
-extern "C"
-JNIEXPORT jobject JNICALL
-Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_verticalLinearTiltShiftImpl(JNIEnv *env, jobject thiz, jobject bitmap,
-                                                                            jint radius, jfloat sigma,
-                                                                            jfloat anchorY, jfloat tiltRadius) {
-    try {
-        std::vector<AcquirePixelFormat> formats;
-        formats.insert(formats.begin(), APF_RGBA8888);
-        jobject newBitmap = AcquireBitmapPixels(env,
-                                                bitmap,
-                                                formats,
-                                                true,
-                                                [&](
-                                                        std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
-                                                    std::vector<uint8_t> blurred(input.size());
-                                                    std::copy(input.begin(), input.end(),
-                                                              blurred.begin());
-                                                    std::vector<uint8_t> output(input.size());
-                                                    if (fmt == APF_RGBA8888) {
-                                                        aire::gaussBlurU8(blurred.data(),
-                                                                          stride,
-                                                                          width,
-                                                                          height,
-                                                                          radius,
-                                                                          sigma);
-                                                        aire::verticalLinearTiltShift(output.data(),
-                                                                                      input.data(),
-                                                                                      blurred,
-                                                                                      stride, width,
-                                                                                      height,
-                                                                                      anchorY,
-                                                                                      tiltRadius);
+                                                                                        tiltRadius,
+                                                                                        angle);
                                                     }
                                                     blurred.clear();
                                                     return {

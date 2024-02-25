@@ -57,26 +57,17 @@ class ShiftPipelineImpl : ShiftPipelines {
         return tiltShiftImpl(bitmap, radius, sigma, anchorX, anchorY, tiltRadius)
     }
 
-    override fun horizontalLinearTiltShift(
-        bitmap: Bitmap,
-        radius: Int,
-        sigma: Float,
-        anchorY: Float,
-        tiltRadius: Float
-    ): Bitmap {
-        if (radius <= 0) throw InvalidParameterException("radius cannot be less or equal zero")
-        return horizontalLinearTiltShiftImpl(bitmap, radius, sigma, anchorY, tiltRadius)
-    }
-
-    override fun verticalLinearTiltShift(
+    override fun horizontalTiltShift(
         bitmap: Bitmap,
         radius: Int,
         sigma: Float,
         anchorX: Float,
-        tiltRadius: Float
+        anchorY: Float,
+        tiltRadius: Float,
+        angle: Float
     ): Bitmap {
         if (radius <= 0) throw InvalidParameterException("radius cannot be less or equal zero")
-        return verticalLinearTiltShiftImpl(bitmap, radius, sigma, anchorX, tiltRadius)
+        return horizontalTiltShiftImpl(bitmap, radius, sigma, anchorX, anchorY, tiltRadius, angle)
     }
 
     override fun glitch(
@@ -106,20 +97,14 @@ class ShiftPipelineImpl : ShiftPipelines {
         clearColor: Int
     ): Bitmap
 
-    private external fun verticalLinearTiltShiftImpl(
+    private external fun horizontalTiltShiftImpl(
         bitmap: Bitmap,
         radius: Int,
         sigma: Float,
-        anchorY: Float = 0.5f,
-        tiltRadius: Float = 0.2f,
-    ): Bitmap
-
-    private external fun horizontalLinearTiltShiftImpl(
-        bitmap: Bitmap,
-        radius: Int,
-        sigma: Float,
-        anchorY: Float = 0.5f,
-        tiltRadius: Float = 0.2f,
+        anchorX: Float,
+        anchorY: Float,
+        tiltRadius: Float,
+        angle: Float
     ): Bitmap
 
     private external fun tiltShiftImpl(
