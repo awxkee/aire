@@ -2,6 +2,9 @@
 #define FACTORIZE_H
 
 #include <iostream>
+#include <thread>
+
+static std::mutex fftSharedRcLock;
 
 // Code adapted from gsl/fft/factorize.c
 static void factorize(const int n,
