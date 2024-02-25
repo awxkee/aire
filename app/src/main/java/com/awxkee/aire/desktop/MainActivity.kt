@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
 //                        var idx = 1
 //                        repeat(1) {
 //                            val d2Time = measureTimeMillis {
-//                                val blurred3 = Aire.poissonBlur(bitmap, 225)
+//                                val blurred3 = Aire.scale(bitmap, 768, 768, BitmapScaleMode.Cubic, true)
 //                                scope.launch {
 //                                    imagesArray.add(blurred3)
 //                                }
