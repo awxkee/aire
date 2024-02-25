@@ -18,22 +18,25 @@ namespace aire {
                              float radius, float angle) {
         const int newWidth = std::abs(width * std::cos(angle)) + std::abs(height * std::sin(angle));
         const int newHeight = std::abs(width * std::sin(angle)) + std::abs(height * std::cos(angle));
-        const float availableDistance = std::sqrt(std::max(newHeight * newHeight, newWidth * newWidth));
-        const float minDistance = availableDistance * radius;
-
-        const int fAnchorX = width * anchorX;
-        const int fAnchorY = height * anchorY;
-
-        const int cx = width * 0.5f;
-        const int cy = height * 0.5f;
-
-        const int centerX = fAnchorX;
-        const int centerY = fAnchorY;
+        float availableDistance;
 
         const float rotationAngle = std::fmod(rotationAngle + M_PI, 2 * M_PI) - M_PI;
 
         const float horizontalRangeMin = -M_PI / 4.0;  // -45 degrees in radians
         const float horizontalRangeMax = M_PI / 4.0;   // +45 degrees in radians
+
+        if (rotationAngle >= horizontalRangeMin && rotationAngle <= horizontalRangeMax) {
+            availableDistance = std::sqrt(newWidth * newWidth);
+        } else {
+            availableDistance = std::sqrt(newHeight * newHeight);
+        }
+        const float minDistance = availableDistance * radius;
+
+        const int fAnchorX = width * anchorX;
+        const int fAnchorY = height * anchorY;
+
+        const int centerX = fAnchorX;
+        const int centerY = fAnchorY;
 
         concurrency::parallel_for(4, height, [&](int y) {
             auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(source) + y * stride);
@@ -41,8 +44,8 @@ namespace aire {
             auto blurredSource = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(blurred.data()) + y * stride);
             for (int x = 0; x < width; ++x) {
 
-                const int newX = (x - fAnchorX) * std::cos(angle) - (y - fAnchorY) * std::sin(angle) + cx;
-                const int newY = (x - fAnchorX) * std::sin(angle) + (y - fAnchorY) * std::cos(angle) + cy;
+                const int newX = (x - fAnchorX) * std::cos(angle) - (y - fAnchorY) * std::sin(angle) + fAnchorX;
+                const int newY = (x - fAnchorX) * std::sin(angle) + (y - fAnchorY) * std::cos(angle) + fAnchorY;
 
                 const float dx = newX - centerX;
                 const float dy = newY - centerY;
