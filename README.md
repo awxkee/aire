@@ -15,7 +15,7 @@ Aire
 
 <div align="center">
             
-Fast & Simple image processing library for Android with 50+ available operartions
+Fast & Simple image processing library for Android with 50+ available operations
 
 Image processing speed increased by [libhwy](https://github.com/google/highway)
 
