@@ -57,23 +57,23 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-//                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                        scope.launch {
-//                            imagesArray.add(bitmap)
-//                        }
-////
-//                        repeat(1) {
-//                            val d2Time = measureTimeMillis {
-//                                val blurred3 =
-//                                    Aire.horizontalTiltShift(bitmap, 120, 120f, 0.73f, 0.17f, 0.08f,
-//                                        Math.PI.toFloat() / 2)
-//                                scope.launch {
-//                                    imagesArray.add(blurred3)
-//                                }
-//                            }
-//                            Log.d("AireMedian", "exec time for $d2Time ms")
-//                        }
+                        val bitmap =
+                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+                                .scaleWith(0.2f)
+                        scope.launch {
+                            imagesArray.add(bitmap)
+                        }
+//
+                        repeat(1) {
+                            val d2Time = measureTimeMillis {
+                                val blurred3 =
+                                    Aire.stackBlur(bitmap, 10)
+                                scope.launch {
+                                    imagesArray.add(blurred3)
+                                }
+                            }
+                            Log.d("AireMedian", "exec time for $d2Time ms")
+                        }
 //                        var radius = 5
 //                        repeat(25) {
 //                            val time = measureTimeMillis {

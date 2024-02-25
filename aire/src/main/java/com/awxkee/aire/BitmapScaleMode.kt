@@ -3,7 +3,7 @@
  *  * MIT License
  *  *
  *  * Copyright (c) 2024 Radzivon Bartoshyk
- *  * jxl-coder [https://github.com/awxkee/jxl-coder]
+ *  * aire [https://github.com/awxkee/aire]
  *  *
  *  * Created by Radzivon Bartoshyk on 2/21/24, 6:13 PM
  *  *

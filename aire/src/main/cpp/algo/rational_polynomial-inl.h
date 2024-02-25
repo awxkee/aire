@@ -1,16 +1,39 @@
-// Copyright (c) the JPEG XL Project Authors. All rights reserved.
-//
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+/*
+ *
+ *  * MIT License
+ *  *
+ *  * Copyright (c) 2024 Radzivon Bartoshyk
+ *  * aire [https://github.com/awxkee/aire]
+ *  *
+ *  * Created by Radzivon Bartoshyk on 01/02/24, 6:13 PM
+ *  *
+ *  * Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  * of this software and associated documentation files (the "Software"), to deal
+ *  * in the Software without restriction, including without limitation the rights
+ *  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  * copies of the Software, and to permit persons to whom the Software is
+ *  * furnished to do so, subject to the following conditions:
+ *  *
+ *  * The above copyright notice and this permission notice shall be included in all
+ *  * copies or substantial portions of the Software.
+ *  *
+ *  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ *  * SOFTWARE.
+ *  *
+ *
+ */
 
-// Fast SIMD evaluation of rational polynomials for approximating functions.
-
-#if defined(LIB_JXL_BASE_RATIONAL_POLYNOMIAL_INL_H_) == \
+#if defined(AIRE_RATIONAL_POLYNOMIAL_INL_H_) == \
     defined(HWY_TARGET_TOGGLE)
-#ifdef LIB_JXL_BASE_RATIONAL_POLYNOMIAL_INL_H_
-#undef LIB_JXL_BASE_RATIONAL_POLYNOMIAL_INL_H_
+#ifdef AIRE_RATIONAL_POLYNOMIAL_INL_H_
+#undef AIRE_RATIONAL_POLYNOMIAL_INL_H_
 #else
-#define LIB_JXL_BASE_RATIONAL_POLYNOMIAL_INL_H_
+#define AIRE_RATIONAL_POLYNOMIAL_INL_H_
 #endif
 
 #include <stddef.h>
@@ -111,4 +134,4 @@ namespace aire {
 }  // namespace jxl
 HWY_AFTER_NAMESPACE();
 
-#endif  // LIB_JXL_BASE_RATIONAL_POLYNOMIAL_INL_H_
+#endif  // AIRE_RATIONAL_POLYNOMIAL_INL_H_
