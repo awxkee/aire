@@ -40,5 +40,6 @@ enum class BitmapScaleMode(internal val value: Int) {
     Hermite(7),
     BSpline(8),
     Hann(9),
-    BiCubic(10)
+    BiCubic(10),
+    Lanczos3Jinc(11) // Jinc function instead of sinc of original lanczos
 }

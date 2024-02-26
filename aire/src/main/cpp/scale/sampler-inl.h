@@ -240,5 +240,59 @@ HWY_MATH_INLINE T HannWindow(const D df, const T n, const float length) {
     return res;
 }
 
+template<class D, typename T = Vec<D>>
+HWY_MATH_INLINE T J1(const D df, T x) {
+    T p = Set(df, 0.270112271089232341485679099e+4);
+    T q = Set(df, 0.1e+1);
+
+    p = MulAdd(Mul(p, x), x, Set(df, -0.4695753530642995859767162166e+7));
+    q = MulAdd(Mul(q, x), x, Set(df, 0.1606931573481487801970916749e+4));
+
+    p = MulAdd(Mul(p, x), x, Set(df, 0.3413234182301700539091292655e+10));
+    q = MulAdd(Mul(q, x), x, Set(df, 0.1501793594998585505921097578e+7));
+
+    p = MulAdd(Mul(p, x), x, Set(df, -0.1322983480332126453125473247e+13));
+    q = MulAdd(Mul(q, x), x, Set(df, 0.1013863514358673989967045588e+10));
+
+    p = MulAdd(Mul(p, x), x, Set(df, 0.2908795263834775409737601689e+15));
+    q = MulAdd(Mul(q, x), x, Set(df, 0.5243710262167649715406728642e+12));
+
+    p = MulAdd(Mul(p, x), x, Set(df, -0.3588817569910106050743641413e+17));
+    q = MulAdd(Mul(q, x), x, Set(df, 0.2081661221307607351240184229e+15));
+
+    p = MulAdd(Mul(p, x), x, Set(df, 0.2316433580634002297931815435e+19));
+    q = MulAdd(Mul(q, x), x, Set(df, 0.6092061398917521746105196863e+17));
+
+    p = MulAdd(Mul(p, x), x, Set(df, -0.6672106568924916298020941484e+20));
+    q = MulAdd(Mul(q, x), x, Set(df, 0.1185770712190320999837113348e+20));
+
+    p = MulAdd(Mul(p, x), x, Set(df, 0.581199354001606143928050809e+21));
+    q = MulAdd(Mul(q, x), x, Set(df, 0.11623987080032122878585294e+22));
+
+    const auto zeros = Zero(df);
+    const auto ones = Set(df, 1.0f);
+    q = IfThenElse(q == zeros, ones, q);
+
+    return Div(p, q);
+}
+
+template<class D, typename T = Vec<D>>
+HWY_MATH_INLINE T jinc(const D d, T x) {
+    const T ones = Set(d, 1);
+    const T zeros = Zero(d);
+    auto maskEqualToZero = x == zeros;
+    x = IfThenElse(maskEqualToZero, ones, x);
+    T result = Div(J1(d, x), x);
+    result = IfThenElse(maskEqualToZero, ones, result);
+    return result;
+}
+
+template<class D, typename T = Vec<D>>
+HWY_MATH_INLINE T LanczosJinc(const D df, T x, const T a) {
+    auto mask = Abs(x) >= a;
+    T v = Mul(Set(df, M_PI), x);
+    T r = Mul(jinc(df, v), jinc(df, Div(v, a)));
+    return IfThenZeroElse(mask, r);
+}
 
 #endif

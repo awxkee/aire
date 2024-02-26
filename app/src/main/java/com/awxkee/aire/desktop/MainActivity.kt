@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
 //                                        bitmap,
 //                                        bitmap.width / 2,
 //                                        bitmap.height / 2,
-//                                        BitmapScaleMode.BSpline,
+//                                        BitmapScaleMode.Lanczos3Jinc,
 //                                        true
 //                                    )
 //                                scope.launch {

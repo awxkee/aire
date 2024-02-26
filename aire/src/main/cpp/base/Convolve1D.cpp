@@ -50,7 +50,6 @@ namespace aire {
                              int height,
                              const Eigen::VectorXf &kernel) {
 
-        const int kernelSize = kernel.size();
         auto src = reinterpret_cast<uint8_t *>(data + y * stride);
         auto dst = reinterpret_cast<uint8_t *>(transient.data() + y * stride);
 
@@ -69,6 +68,7 @@ namespace aire {
             kernelCache[j] = Set(dfx4, kernel[j]);
         }
 
+        const int kernelSize = kernel.size();
         const int halfOfKernel = kernelSize / 2;
         const bool isEven = kernelSize % 2 == 0;
         const int maxKernel = isEven ? halfOfKernel - 1 : halfOfKernel;

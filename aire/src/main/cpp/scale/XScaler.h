@@ -41,7 +41,8 @@ enum XSampler {
     hermite = 7,
     bSpline = 8,
     hann = 9,
-    bicubic = 10
+    bicubic = 10,
+    lanczos3Jinc = 11
 };
 
 namespace aire {

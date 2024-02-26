@@ -103,6 +103,8 @@ namespace aire::HWY_NAMESPACE {
                 return HannWindow(value, float(3));
             case bicubic:
                 return BiCubicSpline(value);
+            case lanczos3Jinc:
+                return LanczosJinc(value, float (3));
         }
         return 0;
     }
@@ -133,6 +135,10 @@ namespace aire::HWY_NAMESPACE {
             }
             case bicubic:
                 return BiCubicSplineV(df, x);
+            case lanczos3Jinc: {
+                const auto threes = Set(df, 3.0f);
+                return LanczosJinc(df, x, threes);
+            }
         }
         return Zero(df);
     }
@@ -323,7 +329,7 @@ namespace aire::HWY_NAMESPACE {
                         dst16[x * components + c] = half(rgb[c]).data_;
                     }
                 }
-            } else if (option == lanczos || option == hann) {
+            } else if (option == lanczos || option == hann || option == lanczos3Jinc) {
                 if (x + 8 < outputWidth && components == 4) {
                     auto lanczosFA = float(3.0f);
                     int a = 3;
@@ -702,7 +708,7 @@ namespace aire::HWY_NAMESPACE {
                                 0.0f, maxColors));
                     }
                 }
-            } else if (option == lanczos || option == hann) {
+            } else if (option == lanczos || option == hann || option == lanczos3Jinc) {
                 if (x + 8 < outputWidth && components == 4) {
                     // only kernel with size 3 is supported
                     constexpr int kernelSize = 3;
