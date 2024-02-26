@@ -241,9 +241,11 @@ static float J1(float x)
     float p = Pone[8];
     float q = Qone[8];
 
+    const float dX = x*x;
+
     for (int i = 7; i >= 0; i--){
-        p = p*x*x + Pone[i];
-        q = q*x*x + Qone[i];
+        p = p*dX + Pone[i];
+        q = q*dX + Qone[i];
     }
 
     return p/q;
@@ -272,9 +274,11 @@ static float P1(float x)
     float p = Pone[5];
     float q = Qone[5];
 
+    const float dX = (8.0/x)*(8.0/x);
+
     for (int i = 4; i >= 0; i--) {
-        p = p*(8.0/x)*(8.0/x) + Pone[i];
-        q = q*(8.0/x)*(8.0/x) + Qone[i];
+        p = p*dX + Pone[i];
+        q = q*dX + Qone[i];
     }
 
     return p/q;
@@ -303,9 +307,11 @@ static float Q1(float x)
     float p = Pone[5];
     float q = Qone[5];
 
+    const float dX = (8.0/x)*(8.0/x);
+
     for (int i = 4; i >= 0; i--) {
-        p = p*(8.0/x)*(8.0/x) + Pone[i];
-        q = q*(8.0/x)*(8.0/x) + Qone[i];
+        p = p*dX + Pone[i];
+        q = q*dX + Qone[i];
     }
 
     return p/q;

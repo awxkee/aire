@@ -77,6 +77,19 @@ class MainActivity : ComponentActivity() {
 //                                    imagesArray.add(blurred3)
 //                                }
 //                            }
+//                            val d3Time = measureTimeMillis {
+//                                val blurred3 =
+//                                    Aire.scale(
+//                                        bitmap,
+//                                        bitmap.width / 2,
+//                                        bitmap.height / 2,
+//                                        BitmapScaleMode.Lanczos,
+//                                        true
+//                                    )
+//                                scope.launch {
+//                                    imagesArray.add(blurred3)
+//                                }
+//                            }
 //                            Log.d("AireMedian", "exec time for $d2Time ms")
 //                        }
 //                        var radius = 5

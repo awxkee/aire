@@ -245,29 +245,31 @@ HWY_MATH_INLINE T J1(const D df, T x) {
     T p = Set(df, 0.270112271089232341485679099e+4);
     T q = Set(df, 0.1e+1);
 
-    p = MulAdd(Mul(p, x), x, Set(df, -0.4695753530642995859767162166e+7));
-    q = MulAdd(Mul(q, x), x, Set(df, 0.1606931573481487801970916749e+4));
+    const auto dX = Mul(x, x);
 
-    p = MulAdd(Mul(p, x), x, Set(df, 0.3413234182301700539091292655e+10));
-    q = MulAdd(Mul(q, x), x, Set(df, 0.1501793594998585505921097578e+7));
+    p = MulAdd(p, dX, Set(df, -0.4695753530642995859767162166e+7));
+    q = MulAdd(q, dX, Set(df, 0.1606931573481487801970916749e+4));
 
-    p = MulAdd(Mul(p, x), x, Set(df, -0.1322983480332126453125473247e+13));
-    q = MulAdd(Mul(q, x), x, Set(df, 0.1013863514358673989967045588e+10));
+    p = MulAdd(p, dX, Set(df, 0.3413234182301700539091292655e+10));
+    q = MulAdd(q, dX, Set(df, 0.1501793594998585505921097578e+7));
 
-    p = MulAdd(Mul(p, x), x, Set(df, 0.2908795263834775409737601689e+15));
-    q = MulAdd(Mul(q, x), x, Set(df, 0.5243710262167649715406728642e+12));
+    p = MulAdd(p, dX, Set(df, -0.1322983480332126453125473247e+13));
+    q = MulAdd(q, dX, Set(df, 0.1013863514358673989967045588e+10));
 
-    p = MulAdd(Mul(p, x), x, Set(df, -0.3588817569910106050743641413e+17));
-    q = MulAdd(Mul(q, x), x, Set(df, 0.2081661221307607351240184229e+15));
+    p = MulAdd(p, dX, Set(df, 0.2908795263834775409737601689e+15));
+    q = MulAdd(q, dX, Set(df, 0.5243710262167649715406728642e+12));
 
-    p = MulAdd(Mul(p, x), x, Set(df, 0.2316433580634002297931815435e+19));
-    q = MulAdd(Mul(q, x), x, Set(df, 0.6092061398917521746105196863e+17));
+    p = MulAdd(p, dX, Set(df, -0.3588817569910106050743641413e+17));
+    q = MulAdd(q, dX, Set(df, 0.2081661221307607351240184229e+15));
 
-    p = MulAdd(Mul(p, x), x, Set(df, -0.6672106568924916298020941484e+20));
-    q = MulAdd(Mul(q, x), x, Set(df, 0.1185770712190320999837113348e+20));
+    p = MulAdd(p, dX, Set(df, 0.2316433580634002297931815435e+19));
+    q = MulAdd(q, dX, Set(df, 0.6092061398917521746105196863e+17));
 
-    p = MulAdd(Mul(p, x), x, Set(df, 0.581199354001606143928050809e+21));
-    q = MulAdd(Mul(q, x), x, Set(df, 0.11623987080032122878585294e+22));
+    p = MulAdd(p, dX, Set(df, -0.6672106568924916298020941484e+20));
+    q = MulAdd(q, dX, Set(df, 0.1185770712190320999837113348e+20));
+
+    p = MulAdd(p, dX, Set(df, 0.581199354001606143928050809e+21));
+    q = MulAdd(q, dX, Set(df, 0.11623987080032122878585294e+22));
 
     const auto zeros = Zero(df);
     const auto ones = Set(df, 1.0f);
@@ -306,11 +308,13 @@ HWY_MATH_INLINE T Q1(const D df, T x) {
 
     x = IfThenElse(x == zeros, ones, x);
 
-    auto recX = Div(eights, x);
+    const auto recX = Div(eights, x);
+
+    const auto dX = Mul(recX, recX);
 
     for (int i = 4; i >= 0; i--) {
-        p = MulAdd(Mul(p, recX), recX, Set(df, Pone[i]));
-        q = MulAdd(Mul(q, recX), recX, Set(df, Pone[i]));
+        p = MulAdd(p, dX, Set(df, Pone[i]));
+        q = MulAdd(q, dX, Set(df, Pone[i]));
     }
 
     q = IfThenElse(q == zeros, ones, q);
@@ -350,11 +354,13 @@ HWY_MATH_INLINE T P1(const D df, T x) {
 
     x = IfThenElse(x == zeros, ones, x);
 
-    auto recX = Div(eights, x);
+    const auto recX = Div(eights, x);
+
+    const auto dX = Mul(recX, recX);
 
     for (int i = 4; i >= 0; i--) {
-        p = MulAdd(Mul(p, recX), recX, Set(df, Pone[i]));
-        q = MulAdd(Mul(q, recX), recX, Set(df, Pone[i]));
+        p = MulAdd(p, dX, Set(df, Pone[i]));
+        q = MulAdd(q, dX, Set(df, Pone[i]));
     }
 
     q = IfThenElse(q == zeros, ones, q);
@@ -386,8 +392,8 @@ HWY_MATH_INLINE T jinc(const D d, T x) {
     x = IfThenElse(maskEqualToZero, ones, x);
     const T pi = Set(d, M_PI);
     T result = Div(BesselOrderOne(d, Mul(pi, x)), x);
-    result = IfThenElse(maskEqualToZero, ones, result);
-    result = IfThenElse(zerosMask, zeros, Set(d, 0.5*M_PI));
+    result = IfThenElse(maskEqualToZero, zeros, result);
+    result = IfThenElse(zerosMask, Set(d, 0.5*M_PI), result);
     return result;
 }
 
