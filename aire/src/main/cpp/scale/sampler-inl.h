@@ -277,13 +277,117 @@ HWY_MATH_INLINE T J1(const D df, T x) {
 }
 
 template<class D, typename T = Vec<D>>
+HWY_MATH_INLINE T Q1(const D df, T x) {
+    static const float
+            Pone[] = {
+            0.3511751914303552822533318e+3,
+            0.7210391804904475039280863e+3,
+            0.4259873011654442389886993e+3,
+            0.831898957673850827325226e+2,
+            0.45681716295512267064405e+1,
+            0.3532840052740123642735e-1
+    },
+            Qone[] = {
+            0.74917374171809127714519505e+4,
+            0.154141773392650970499848051e+5,
+            0.91522317015169922705904727e+4,
+            0.18111867005523513506724158e+4,
+            0.1038187585462133728776636e+3,
+            0.1e+1
+    };
+
+    T p = Set(df, Pone[5]);
+    T q = Set(df, Qone[5]);
+
+    const auto zeros = Zero(df);
+    const auto ones = Set(df, 1.0f);
+
+    const auto eights = Set(df, 8.0);
+
+    x = IfThenElse(x == zeros, ones, x);
+
+    auto recX = Div(eights, x);
+
+    for (int i = 4; i >= 0; i--) {
+        p = MulAdd(Mul(p, recX), recX, Set(df, Pone[i]));
+        q = MulAdd(Mul(q, recX), recX, Set(df, Pone[i]));
+    }
+
+    q = IfThenElse(q == zeros, ones, q);
+
+    auto res = Div(p, q);
+    res = IfThenElse(x == zeros, zeros, res);
+    return res;
+}
+
+template<class D, typename T = Vec<D>>
+HWY_MATH_INLINE T P1(const D df, T x) {
+    static const float
+            Pone[] = {
+            0.352246649133679798341724373e+5,
+            0.62758845247161281269005675e+5,
+            0.313539631109159574238669888e+5,
+            0.49854832060594338434500455e+4,
+            0.2111529182853962382105718e+3,
+            0.12571716929145341558495e+1
+    },
+            Qone[] = {
+            0.352246649133679798068390431e+5,
+            0.626943469593560511888833731e+5,
+            0.312404063819041039923015703e+5,
+            0.4930396490181088979386097e+4,
+            0.2030775189134759322293574e+3,
+            0.1e+1
+    };
+
+    T p = Set(df, Pone[5]);
+    T q = Set(df, Qone[5]);
+
+    const auto zeros = Zero(df);
+    const auto ones = Set(df, 1.0f);
+
+    const auto eights = Set(df, 8.0);
+
+    x = IfThenElse(x == zeros, ones, x);
+
+    auto recX = Div(eights, x);
+
+    for (int i = 4; i >= 0; i--) {
+        p = MulAdd(Mul(p, recX), recX, Set(df, Pone[i]));
+        q = MulAdd(Mul(q, recX), recX, Set(df, Pone[i]));
+    }
+
+    q = IfThenElse(q == zeros, ones, q);
+
+    auto res = Div(p, q);
+    res = IfThenElse(x == zeros, zeros, res);
+    return res;
+}
+
+template<class D, typename T = Vec<D>>
+HWY_MATH_INLINE T BesselOrderOne(const D df, T x) {
+    auto p = x;
+    x = Abs(x);
+    const auto minZValue = Set(df, 1e-8);
+    auto zerosMask = x < minZValue;
+    auto res = Mul(J1(df, x), p);
+    const auto zeros = Zero(df);
+    res = IfThenElse(zerosMask, zeros, res);
+    return res;
+}
+
+template<class D, typename T = Vec<D>>
 HWY_MATH_INLINE T jinc(const D d, T x) {
     const T ones = Set(d, 1);
     const T zeros = Zero(d);
     auto maskEqualToZero = x == zeros;
+    const auto minZValue = Set(d, 1e-8);
+    auto zerosMask = x < minZValue;
     x = IfThenElse(maskEqualToZero, ones, x);
-    T result = Div(J1(d, x), x);
+    const T pi = Set(d, M_PI);
+    T result = Div(BesselOrderOne(d, Mul(pi, x)), x);
     result = IfThenElse(maskEqualToZero, ones, result);
+    result = IfThenElse(zerosMask, zeros, Set(d, 0.5*M_PI));
     return result;
 }
 

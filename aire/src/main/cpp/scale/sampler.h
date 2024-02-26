@@ -124,12 +124,12 @@ static inline T BiCubicSpline(T x, const T a = -0.5) {
     if (modulo >= 2) {
         return 0;
     }
-    const T doubled = modulo * modulo;
-    const T triplet = doubled * modulo;
+    const T floatd = modulo * modulo;
+    const T triplet = floatd * modulo;
     if (modulo <= 1) {
-        return (a + T(2.0))*triplet - (a + T(3.0)) * doubled + T(1.0);
+        return (a + T(2.0))*triplet - (a + T(3.0)) * floatd + T(1.0);
     }
-    return a * triplet - T(5.0) * a * doubled + T(8.0) * a * modulo - T(4.0) * a;
+    return a * triplet - T(5.0) * a * floatd + T(8.0) * a * modulo - T(4.0) * a;
 }
 
 template<typename T>
@@ -212,7 +212,7 @@ static inline T blerp(T c00, T c10, T c01, T c11, T tx, T ty) {
     return lerp(lerp(c00, c10, tx), lerp(c01, c11, tx), ty);
 }
 
-static inline float J1(float x)
+static float J1(float x)
 {
     static const float
             Pone[] = {
@@ -246,15 +246,100 @@ static inline float J1(float x)
         q = q*x*x + Qone[i];
     }
 
-    if (q == 0) {
-        return 1;
-    } else {
-        return p/q;
-    }
+    return p/q;
 }
 
+static float P1(float x)
+{
+    static const float
+            Pone[] = {
+            0.352246649133679798341724373e+5,
+            0.62758845247161281269005675e+5,
+            0.313539631109159574238669888e+5,
+            0.49854832060594338434500455e+4,
+            0.2111529182853962382105718e+3,
+            0.12571716929145341558495e+1
+    },
+            Qone[] = {
+            0.352246649133679798068390431e+5,
+            0.626943469593560511888833731e+5,
+            0.312404063819041039923015703e+5,
+            0.4930396490181088979386097e+4,
+            0.2030775189134759322293574e+3,
+            0.1e+1
+    };
+
+    float p = Pone[5];
+    float q = Qone[5];
+
+    for (int i = 4; i >= 0; i--) {
+        p = p*(8.0/x)*(8.0/x) + Pone[i];
+        q = q*(8.0/x)*(8.0/x) + Qone[i];
+    }
+
+    return p/q;
+}
+
+static float Q1(float x)
+{
+    static const float
+            Pone[] = {
+            0.3511751914303552822533318e+3,
+            0.7210391804904475039280863e+3,
+            0.4259873011654442389886993e+3,
+            0.831898957673850827325226e+2,
+            0.45681716295512267064405e+1,
+            0.3532840052740123642735e-1
+    },
+            Qone[] = {
+            0.74917374171809127714519505e+4,
+            0.154141773392650970499848051e+5,
+            0.91522317015169922705904727e+4,
+            0.18111867005523513506724158e+4,
+            0.1038187585462133728776636e+3,
+            0.1e+1
+    };
+
+    float p = Pone[5];
+    float q = Qone[5];
+
+    for (int i = 4; i >= 0; i--) {
+        p = p*(8.0/x)*(8.0/x) + Pone[i];
+        q = q*(8.0/x)*(8.0/x) + Qone[i];
+    }
+
+    return p/q;
+}
+
+static float BesselOrderOne(float x)
+{
+    if (x < 1e-8)
+        return 0.0;
+
+    float p = x;
+
+    if (x < 0.0)
+        x = -x;
+
+    if (x < 8.0)
+        return p * J1(x);
+
+    float q = (
+            sqrt((float)(2.0/(M_PI*x)))
+            * (P1(x)*(1.0/sqrt(2.0)*(sin((float)x)-cos((float)x)))-8.0/x*Q1(x)*(-1.0/sqrt(2.0)*(sin((float) x)+cos((float) x))))
+    );
+
+    if (p < 0.0)
+        q = -q;
+
+    return q;
+}
+
+
 static inline float jinc(float x) {
-    return jinc(x) / x;
+    if (x < 1e-8)
+        return 0.5*M_PI;
+    return BesselOrderOne(M_PI*x)/x;
 }
 
 template<typename T>
