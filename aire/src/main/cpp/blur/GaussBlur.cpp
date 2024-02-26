@@ -62,7 +62,7 @@ namespace aire {
     // https://zingl.github.io/blurring.pdf
 
     void vertical3Degree(uint8_t *data, const int stride, const int width, const int height, const int radius, const int channels, const int z) {
-        int radius3D = radius * radius * radius;
+        const int radius3D = radius * radius * radius;
 
         ska::flat_hash_map<int, int> buffer;
 

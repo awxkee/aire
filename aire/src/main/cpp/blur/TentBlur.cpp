@@ -65,8 +65,10 @@ namespace aire {
         for (int i = 0; i < size; i++) {
             sum += kernel[i];
         }
-        for (int i = 0; i < size; i++) {
-            kernel[i] /= sum;
+        if (sum != 0.f) {
+            for (int i = 0; i < size; i++) {
+                kernel[i] /= sum;
+            }
         }
         return kernel;
     }
