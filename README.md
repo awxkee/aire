@@ -87,12 +87,13 @@ Aire.gaussianBlur(
     * Nearest Neighbour
     * Bicubic
     * Mitchell
-    * Lanczos
+    * Lanczos3 ( Sinc )
     * Catmull
     * Hermite
     * Spline
     * BSpline
     * Hann
+    * Lanczos3 ( Jinc )
 
 ### Effects:
 
