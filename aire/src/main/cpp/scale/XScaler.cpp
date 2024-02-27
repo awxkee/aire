@@ -330,93 +330,93 @@ namespace aire::HWY_NAMESPACE {
                     }
                 }
             } else if (option == lanczos || option == hann || option == lanczos3Jinc) {
-//                if (x + 8 < outputWidth && components == 4) {
-//                    auto lanczosFA = float(3.0f);
-//                    int a = 3;
-//                    float rgb[components];
-//                    fill(rgb, rgb + components, 0.0f);
-//
-//                    float kx1 = floor(srcX);
-//                    float ky1 = floor(srcY);
-//
-//                    float kWeightSum = 0;
-//                    VF4 color = Set(dfx4, 0);
-//
-//                    const int appendixLow[4] = {-2, -1, 0, 1};
-//                    const int appendixHigh[4] = {2, 3, 0, 0};
-//
-//                    const VF4 aVector = Set(dfx4, a);
-//                    VF4 srcXV = Set(dfx4, srcX);
-//                    VI4 kx1V = Set(dix4, kx1);
-//                    const VI4 appendixLowV = LoadU(dix4, appendixLow);
-//                    const VI4 appendixHighV = LoadU(dix4, appendixHigh);
-//
-//                    for (int j = -a + 1; j <= a; j++) {
-//                        int yj = (int) ky1 + j;
-//                        float dy = float(srcY) - (float(ky1) + (float) j);
-//                        float yWeight;
-//                        if (option == lanczos) {
-//                            yWeight = LanczosWindow(dy, lanczosFA);
-//                        } else if (option == lanczos) {
-//                            yWeight = LanczosJinc(dy, lanczosFA);
-//                        } else {
-//                            yWeight = HannWindow(float(j), lanczosFA);
-//                        }
-//                        auto row = reinterpret_cast<const uint16_t *>(src8 +
-//                                                                      clamp(yj, 0,
-//                                                                            inputHeight - 1) *
-//                                                                      srcStride);
-//                        VF4 yWeightV = Set(dfx4, yWeight);
-//                        VI4 xi = Add(kx1V, appendixLowV);
-//                        VF4 dx = Sub(srcXV, ConvertTo(dfx4, xi));
-//                        VF4 sampleParameter = dx;
-//                        if (option == hann) {
-//                            sampleParameter = ConvertTo(dfx4, appendixLowV);
-//                        }
-//                        VF4 weights = Mul(SampleOptionResult(dfx4, sampleParameter, option),
-//                                          yWeightV);
-//                        kWeightSum += ExtractLane(SumOfLanes(dfx4, weights), 0);
-//                        for (int i = 0; i < 4; ++i) {
-//                            int sizeXPos = clamp(ExtractLane(xi, i), 0, mMaxWidth) * components;
-//                            VF16x4 r1 = LoadU(df16x4,
-//                                              reinterpret_cast<const float16_t *>(&row[sizeXPos]));
-//                            VF4 fr1 = PromoteTo(dfx4, r1);
-//                            fr1 = Mul(fr1, Set(dfx4, ExtractLane(weights, i)));
-//                            color = Add(color, fr1);
-//                        }
-//
-//                        xi = Add(kx1V, appendixHighV);
-//                        dx = Sub(srcXV, ConvertTo(dfx4, xi));
-//                        sampleParameter = dx;
-//                        if (option == hann) {
-//                            sampleParameter = ConvertTo(dfx4, appendixLowV);
-//                        }
-//                        weights = Mul(SampleOptionResult(dfx4, sampleParameter, option), yWeightV);
-//                        if (option == hann) {
-//                            sampleParameter = ConvertTo(dfx4, appendixHighV);
-//                        }
-//                        for (int i = 0; i < 2; ++i) {
-//                            int sizeXPos = clamp(ExtractLane(xi, i), 0, mMaxWidth) * components;
-//                            VF16x4 r1 = LoadU(df16x4,
-//                                              reinterpret_cast<const float16_t *>(&row[sizeXPos]));
-//                            VF4 fr1 = PromoteTo(dfx4, r1);
-//                            float weight = ExtractLane(weights, i);
-//                            kWeightSum += weight;
-//                            fr1 = Mul(fr1, Set(dfx4, weight));
-//                            color = Add(color, fr1);
-//                        }
-//                    }
-//
-//                    if (kWeightSum == 0) {
-//                        VF16x4 f16Color = DemoteTo(df16x4, color);
-//                        StoreU(f16Color, df16x4,
-//                               reinterpret_cast<float16_t *>(&dst16[x * components]));
-//                    } else {
-//                        VF16x4 f16Color = DemoteTo(df16x4, Div(color, Set(dfx4, kWeightSum)));
-//                        StoreU(f16Color, df16x4,
-//                               reinterpret_cast<float16_t *>(&dst16[x * components]));
-//                    }
-//                } else {
+                if (x + 8 < outputWidth && components == 4) {
+                    auto lanczosFA = float(3.0f);
+                    int a = 3;
+                    float rgb[components];
+                    fill(rgb, rgb + components, 0.0f);
+
+                    float kx1 = floor(srcX);
+                    float ky1 = floor(srcY);
+
+                    float kWeightSum = 0;
+                    VF4 color = Set(dfx4, 0);
+
+                    const int appendixLow[4] = {-2, -1, 0, 1};
+                    const int appendixHigh[4] = {2, 3, 0, 0};
+
+                    const VF4 aVector = Set(dfx4, a);
+                    VF4 srcXV = Set(dfx4, srcX);
+                    VI4 kx1V = Set(dix4, kx1);
+                    const VI4 appendixLowV = LoadU(dix4, appendixLow);
+                    const VI4 appendixHighV = LoadU(dix4, appendixHigh);
+
+                    for (int j = -a + 1; j <= a; j++) {
+                        int yj = (int) ky1 + j;
+                        float dy = float(srcY) - (float(ky1) + (float) j);
+                        float yWeight;
+                        if (option == lanczos) {
+                            yWeight = LanczosWindow(dy, lanczosFA);
+                        } else if (option == lanczos) {
+                            yWeight = LanczosJinc(dy, lanczosFA);
+                        } else {
+                            yWeight = HannWindow(float(j), lanczosFA);
+                        }
+                        auto row = reinterpret_cast<const uint16_t *>(src8 +
+                                                                      clamp(yj, 0,
+                                                                            inputHeight - 1) *
+                                                                      srcStride);
+                        VF4 yWeightV = Set(dfx4, yWeight);
+                        VI4 xi = Add(kx1V, appendixLowV);
+                        VF4 dx = Sub(srcXV, ConvertTo(dfx4, xi));
+                        VF4 sampleParameter = dx;
+                        if (option == hann) {
+                            sampleParameter = ConvertTo(dfx4, appendixLowV);
+                        }
+                        VF4 weights = Mul(SampleOptionResult(dfx4, sampleParameter, option),
+                                          yWeightV);
+                        kWeightSum += ExtractLane(SumOfLanes(dfx4, weights), 0);
+                        for (int i = 0; i < 4; ++i) {
+                            int sizeXPos = clamp(ExtractLane(xi, i), 0, mMaxWidth) * components;
+                            VF16x4 r1 = LoadU(df16x4,
+                                              reinterpret_cast<const float16_t *>(&row[sizeXPos]));
+                            VF4 fr1 = PromoteTo(dfx4, r1);
+                            fr1 = Mul(fr1, Set(dfx4, ExtractLane(weights, i)));
+                            color = Add(color, fr1);
+                        }
+
+                        xi = Add(kx1V, appendixHighV);
+                        dx = Sub(srcXV, ConvertTo(dfx4, xi));
+                        sampleParameter = dx;
+                        if (option == hann) {
+                            sampleParameter = ConvertTo(dfx4, appendixLowV);
+                        }
+                        weights = Mul(SampleOptionResult(dfx4, sampleParameter, option), yWeightV);
+                        if (option == hann) {
+                            sampleParameter = ConvertTo(dfx4, appendixHighV);
+                        }
+                        for (int i = 0; i < 2; ++i) {
+                            int sizeXPos = clamp(ExtractLane(xi, i), 0, mMaxWidth) * components;
+                            VF16x4 r1 = LoadU(df16x4,
+                                              reinterpret_cast<const float16_t *>(&row[sizeXPos]));
+                            VF4 fr1 = PromoteTo(dfx4, r1);
+                            float weight = ExtractLane(weights, i);
+                            kWeightSum += weight;
+                            fr1 = Mul(fr1, Set(dfx4, weight));
+                            color = Add(color, fr1);
+                        }
+                    }
+
+                    if (kWeightSum == 0) {
+                        VF16x4 f16Color = DemoteTo(df16x4, color);
+                        StoreU(f16Color, df16x4,
+                               reinterpret_cast<float16_t *>(&dst16[x * components]));
+                    } else {
+                        VF16x4 f16Color = DemoteTo(df16x4, Div(color, Set(dfx4, kWeightSum)));
+                        StoreU(f16Color, df16x4,
+                               reinterpret_cast<float16_t *>(&dst16[x * components]));
+                    }
+                } else {
                     auto lanczosFA = float(3.0f);
                     int a = 3;
                     float rgb[components];
@@ -472,7 +472,7 @@ namespace aire::HWY_NAMESPACE {
                             dst16[x * components + c] = half(rgb[c] / weightSum).data_;
                         }
                     }
-//                }
+                }
             } else {
                 auto row = reinterpret_cast<const uint16_t *>(src8 + y1 * srcStride);
                 memcpy(&dst16[x * components], &row[x1 * components],
