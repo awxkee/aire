@@ -142,7 +142,8 @@ HWY_MATH_INLINE T CubicBSplineV(const D df, T d) {
 }
 
 template<class D, typename T = Vec<D>>
-HWY_MATH_INLINE T BiCubicSplineV(const D df, T x, hwy::HWY_NAMESPACE::TFromD<D> a = -0.5) {
+HWY_MATH_INLINE T BiCubicSplineV(const D df, T x) {
+    const hwy::HWY_NAMESPACE::TFromD<D> a = -0.5;
     const T aVec = Set(df, a);
     const T ones = Set(df, 1.0);
     const T two = Set(df, 2.0);
@@ -403,6 +404,16 @@ HWY_MATH_INLINE T LanczosJinc(const D df, T x, const T a) {
     T v = Mul(Set(df, M_PI), x);
     T r = Mul(jinc(df, v), jinc(df, Div(v, a)));
     return IfThenZeroElse(mask, r);
+}
+
+template<class D, typename T = Vec<D>>
+HWY_MATH_INLINE T Lanczos3Jinc(const D df, T x) {
+    return LanczosJinc(df, x, Set(df, 3.0f));
+}
+
+template<class D, typename T = Vec<D>>
+HWY_MATH_INLINE T Lanczos3Sinc(const D df, T x) {
+    return LanczosWindowHWY(df, x, Set(df, 3.0f));
 }
 
 #endif

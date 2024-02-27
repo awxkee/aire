@@ -52,6 +52,7 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
         std::vector<AcquirePixelFormat> formats;
         formats.insert(formats.begin(), APF_RGBA8888);
         formats.insert(formats.begin(), APF_F16);
+        formats.insert(formats.begin(), APF_RGBA1010102);
         jobject newBitmap = AcquireBitmapPixels(env,
                                                 bitmap,
                                                 formats,
@@ -61,10 +62,10 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-                                                        int lineWidth = dstWidth * sizeof(uint8_t) * 4;
-                                                        int alignment = 64;
-                                                        int padding = (alignment - (lineWidth % alignment)) % alignment;
-                                                        int dstStride = lineWidth + padding;
+                                                        const int lineWidth = dstWidth * sizeof(uint8_t) * 4;
+                                                        const int alignment = 64;
+                                                        const int padding = (alignment - (lineWidth % alignment)) % alignment;
+                                                        const int dstStride = lineWidth + padding;
 
                                                         std::vector<uint8_t> output(dstStride * dstHeight);
 
@@ -114,10 +115,10 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                                 .pixelFormat = fmt
                                                         };
                                                     } else if (fmt == APF_F16) {
-                                                        int lineWidth = dstWidth * sizeof(uint16_t) * 4;
-                                                        int alignment = 64;
-                                                        int padding = (alignment - (lineWidth % alignment)) % alignment;
-                                                        int dstStride = lineWidth + padding;
+                                                        const int lineWidth = dstWidth * sizeof(uint16_t) * 4;
+                                                        const int alignment = 64;
+                                                        const int padding = (alignment - (lineWidth % alignment)) % alignment;
+                                                        const int dstStride = lineWidth + padding;
 
                                                         std::vector<uint8_t> output(dstStride * dstHeight);
 
@@ -143,6 +144,32 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                                 reinterpret_cast<uint16_t *>(output.data()),
                                                                 dstStride, dstWidth,
                                                                 dstHeight, 4,
+                                                                static_cast<XSampler>(scaleMode)
+                                                        );
+
+                                                        return {
+                                                                .data = output,
+                                                                .stride = dstStride,
+                                                                .width = dstWidth,
+                                                                .height = dstHeight,
+                                                                .pixelFormat = fmt
+                                                        };
+                                                    } else if (fmt == APF_RGBA1010102) {
+                                                        const int lineWidth = dstWidth * sizeof(uint32_t);
+                                                        const int alignment = 64;
+                                                        const int padding = (alignment - (lineWidth % alignment)) % alignment;
+                                                        const int dstStride = lineWidth + padding;
+
+                                                        std::vector<uint8_t> output(dstStride * dstHeight);
+
+                                                        aire::scaleImageRGBA1010102(
+                                                                reinterpret_cast<const uint32_t *>(input.data()),
+                                                                stride,
+                                                                width, height,
+                                                                reinterpret_cast<uint32_t *>(output.data()),
+                                                                dstStride,
+                                                                dstWidth,
+                                                                dstHeight,
                                                                 static_cast<XSampler>(scaleMode)
                                                         );
 

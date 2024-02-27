@@ -37,42 +37,7 @@
 using namespace std;
 using namespace half_float;
 
-// P Found using maxima
-//
-// y(x) := 4 * x * (%pi-x) / (%pi^2) ;
-// z(x) := (1-p)*y(x) + p * y(x)^2;
-// e(x) := z(x) - sin(x);
-// solve( diff( integrate( e(x)^2, x, 0, %pi/2 ), p ) = 0, p ),numer;
-//
-// [p = .2248391013559941]
-template<typename T>
-static inline T fastSin1(T x) {
-    constexpr T A = T(4.0) / (T(M_PI) * T(M_PI));
-    constexpr T P = 0.2248391013559941;
-    T y = A * x * (T(M_PI) - x);
-    return y * ((1 - P) + y * P);
-}
-
-// P and Q found using maxima
-//
-// y(x) := 4 * x * (%pi-x) / (%pi^2) ;
-// zz(x) := (1-p-q)*y(x) + p * y(x)^2 + q * y(x)^3
-// ee(x) := zz(x) - sin(x)
-// solve( [ integrate( diff(ee(x)^2, p ), x, 0, %pi/2 ) = 0, integrate( diff(ee(x)^2,q), x, 0, %pi/2 ) = 0 ] , [p,q] ),numer;
-//
-// [[p = .1952403377008734, q = .01915214119105392]]
-template<typename T>
-static inline T fastSin2(T x) {
-    constexpr T A = T(4.0) / (T(M_PI) * T(M_PI));
-    constexpr T P = 0.1952403377008734;
-    constexpr T Q = 0.01915214119105392;
-
-    T y = A * x * (T(M_PI) - x);
-
-    return y * ((1 - P - Q) + y * (P + y * Q));
-}
-
-static inline half_float::half castU16(uint16_t t) {
+static inline half_float::half castU16(const uint16_t t) {
     half_float::half result;
     result.data_ = t;
     return result;
@@ -119,7 +84,8 @@ static inline T SimpleCubic(T x) {
 }
 
 template<typename T>
-static inline T BiCubicSpline(T x, const T a = -0.5) {
+static inline T BiCubicSpline(T x) {
+    const T a = -0.5;
     const T modulo = abs(x);
     if (modulo >= 2) {
         return 0;
@@ -354,6 +320,16 @@ static inline T LanczosJinc(T x, const T a) {
         return jinc(T(M_PI) * x) * jinc(T(M_PI) * x / a);
     }
     return T(0.0);
+}
+
+template<typename T>
+static inline T Lanczos3Jinc(T x) {
+    return LanczosJinc(x, 3.0f);
+}
+
+template<typename T>
+static inline T Lanczos3Sinc(T x) {
+    return LanczosWindow(x, 3.0f);
 }
 
 #endif //JXLCODER_SAMPLER_H

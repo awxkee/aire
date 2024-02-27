@@ -59,38 +59,30 @@ class MainActivity : ComponentActivity() {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.abstract_alpha)
+//                                .copy(Bitmap.Config.RGBA_1010102, true)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
+//
+//                        val samples = BitmapScaleMode.entries.toTypedArray()
 ////
-//                        repeat(1) {
-//                            val d2Time = measureTimeMillis {
-//                                val blurred3 =
-//                                    Aire.scale(
-//                                        bitmap,
-//                                        bitmap.width / 2,
-//                                        bitmap.height / 2,
-//                                        BitmapScaleMode.Lanczos3Jinc,
-//                                        true
-//                                    )
-//                                scope.launch {
-//                                    imagesArray.add(blurred3)
+//                        samples.forEach { sampler ->
+//                            repeat(1) {
+//                                val d2Time = measureTimeMillis {
+//                                    val blurred3 =
+//                                        Aire.scale(
+//                                            bitmap,
+//                                            bitmap.width / 2,
+//                                            bitmap.height / 2,
+//                                            sampler,
+//                                            true
+//                                        )
+//                                    scope.launch {
+//                                        imagesArray.add(blurred3)
+//                                    }
 //                                }
+//                                Log.d("AireMedian", "exec time for $d2Time ms")
 //                            }
-//                            val d3Time = measureTimeMillis {
-//                                val blurred3 =
-//                                    Aire.scale(
-//                                        bitmap,
-//                                        bitmap.width / 2,
-//                                        bitmap.height / 2,
-//                                        BitmapScaleMode.Lanczos,
-//                                        true
-//                                    )
-//                                scope.launch {
-//                                    imagesArray.add(blurred3)
-//                                }
-//                            }
-//                            Log.d("AireMedian", "exec time for $d2Time ms")
 //                        }
 //                        var radius = 5
 //                        repeat(25) {

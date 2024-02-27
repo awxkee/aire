@@ -46,7 +46,6 @@ namespace aire {
                                        int y, int width,
                                        int height) {
 
-        const int iRadius = ceil((this->horizontal.size()) / 2);
         auto src = reinterpret_cast<hwy::float16_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
         auto dst = reinterpret_cast<hwy::float16_t *>(reinterpret_cast<uint8_t *>(transient.data()) + y * stride);
 
@@ -65,34 +64,38 @@ namespace aire {
             kernelCache[j] = Set(dfx4, this->horizontal[j]);
         }
 
+        const int halfOfKernel = this->horizontal.size() / 2;
+        const bool isEven = this->horizontal.size() % 2 == 0;
+        const int maxKernel = isEven ? halfOfKernel - 1 : halfOfKernel;
+
         for (int x = 0; x < width; ++x) {
             VF store = zeros;
 
-            int r = -iRadius;
+            int r = -halfOfKernel;
 
-            for (; r + 4 <= iRadius && x + r + 4 < width; r += 4) {
+            for (; r + 4 <= maxKernel && x + r + 4 < width; r += 4) {
                 int pos = clamp((x + r), 0, width - 1) * 4;
 
                 VFb16 lane = LoadU(df16x8, &src[pos]);
 
-                VF dWeight = kernelCache[r + iRadius];
+                VF dWeight = kernelCache[r + halfOfKernel];
                 store = Add(store, Mul(PromoteUpperTo(dfx4, lane), dWeight));
-                dWeight = kernelCache[r + iRadius + 1];
+                dWeight = kernelCache[r + halfOfKernel + 1];
                 store = Add(store, Mul(PromoteLowerTo(dfx4, lane), dWeight));
 
                 pos = clamp((x + r + 2), 0, width - 1) * 4;
 
                 lane = LoadU(df16x8, &src[pos]);
 
-                dWeight = kernelCache[r + iRadius + 2];
+                dWeight = kernelCache[r + halfOfKernel + 2];
                 store = Add(store, Mul(PromoteUpperTo(dfx4, lane), dWeight));
-                dWeight = kernelCache[r + iRadius + 3];
+                dWeight = kernelCache[r + halfOfKernel + 3];
                 store = Add(store, Mul(PromoteLowerTo(dfx4, lane), dWeight));
             }
 
-            for (; r <= iRadius; ++r) {
+            for (; r <= maxKernel; ++r) {
                 int pos = clamp((x + r), 0, width - 1) * 4;
-                VF dWeight = kernelCache[r + iRadius];
+                VF dWeight = kernelCache[r + halfOfKernel];
                 VFb16x4 pixels = LoadU(df16x4, &src[pos]);
                 store = Add(store, Mul(PromoteTo(dfx4, pixels), dWeight));
             }
@@ -109,7 +112,6 @@ namespace aire {
                                 uint16_t *data, int stride,
                                 int y, int width,
                                 int height) {
-        const int iRadius = ceil((vertical.size()) / 2);
 
         const FixedTag<float32_t, 4> dfx4;
         using VF = Vec<decltype(dfx4)>;
@@ -123,17 +125,21 @@ namespace aire {
             kernelCache[j] = Set(dfx4, vertical[j]);
         }
 
+        const int halfOfKernel = this->vertical.size() / 2;
+        const bool isEven = this->vertical.size() % 2 == 0;
+        const int maxKernel = isEven ? halfOfKernel - 1 : halfOfKernel;
+
         auto dst = reinterpret_cast<hwy::float16_t *>(reinterpret_cast<uint8_t *>(data) + y * stride);
         for (int x = 0; x < width; ++x) {
             VF store = zeros;
 
-            int r = -iRadius;
+            int r = -halfOfKernel;
 
-            for (; r <= iRadius; ++r) {
+            for (; r <= maxKernel; ++r) {
                 auto src = reinterpret_cast<hwy::float16_t * > (reinterpret_cast<uint8_t *>(transient.data()) +
                                                                 clamp((r + y), 0, height - 1) * stride);
                 int pos = clamp(x, 0, width - 1) * 4;
-                VF dWeight = kernelCache[r + iRadius];
+                VF dWeight = kernelCache[r + halfOfKernel];
                 VFb16x4 pixels = LoadU(df16x4, &src[pos]);
                 store = Add(store, Mul(PromoteTo(dfx4, pixels), dWeight));
             }

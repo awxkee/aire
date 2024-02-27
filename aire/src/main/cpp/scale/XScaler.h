@@ -46,6 +46,15 @@ enum XSampler {
 };
 
 namespace aire {
+    void scaleImageRGBA1010102(const uint32_t *input,
+                               int srcStride,
+                               int inputWidth, int inputHeight,
+                               uint32_t *output,
+                               int dstStride,
+                               int outputWidth,
+                               int outputHeight,
+                               XSampler option);
+
     void scaleImageFloat16(const uint16_t *input,
                            int srcStride,
                            int inputWidth, int inputHeight,

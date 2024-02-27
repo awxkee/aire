@@ -46,4 +46,8 @@ float half_to_float(const uint16_t x);
 
 uint16_t float_to_half(const float x);
 
+uint as_uint(const float x);
+
+float as_float(const uint x);
+
 #endif //JXLCODER_HALFFLOATS_H
