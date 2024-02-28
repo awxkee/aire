@@ -538,7 +538,7 @@ JNIEXPORT jobject JNICALL
 Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_zoomBlurImpl(JNIEnv *env, jobject thiz, jobject bitmap,
                                                              jint kernelSize, jfloat sigma,
                                                              jfloat centerX, jfloat centerY,
-                                                             jfloat strength) {
+                                                             jfloat strength, jfloat angle) {
     try {
         if (kernelSize < 1) {
             std::string msg("Kernel size must be > 1, but received " + std::to_string(kernelSize));
@@ -554,7 +554,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_zoomBlurImpl(JNIEnv *env, jobjec
                                                     int width, int height,
                                                     AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-                                                        aire::ZoomBlur zoom(kernelSize, sigma, centerX, centerY, strength);
+                                                        aire::ZoomBlur zoom(kernelSize, sigma, centerX, centerY, strength, angle);
                                                         zoom.apply(input.data(), stride, width, height);
                                                     }
                                                     return {

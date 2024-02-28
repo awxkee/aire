@@ -129,9 +129,10 @@ class BlurPipelinesImpl : BlurPipelines {
         sigma: Float,
         centerX: Float,
         centerY: Float,
-        strength: Float
+        strength: Float,
+        angle: Float
     ): Bitmap {
-        return zoomBlurImpl(bitmap, kernelSize, sigma, centerX, centerY, strength)
+        return zoomBlurImpl(bitmap, kernelSize, sigma, centerX, centerY, strength, angle)
     }
 
     private external fun zoomBlurImpl(
@@ -140,7 +141,8 @@ class BlurPipelinesImpl : BlurPipelines {
         sigma: Float,
         centerX: Float,
         centerY: Float,
-        strength: Float
+        strength: Float,
+        angle: Float
     ): Bitmap
 
     private external fun fastGaussian2DImpl(bitmap: Bitmap, radius: Int): Bitmap

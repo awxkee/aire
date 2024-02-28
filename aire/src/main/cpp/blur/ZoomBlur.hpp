@@ -42,12 +42,14 @@ namespace aire {
                  float sigma,
                  float centerX,
                  float centerY,
-                 float strength) :
+                 float strength,
+                 float angle) :
                 centerX(centerX),
                 centerY(centerY),
                 strength(strength),
                 sigma(sigma),
-                kernelSize(kernelSize) {
+                kernelSize(kernelSize),
+                angle(angle) {
         }
 
         void apply(uint8_t *data, int stride, int width, int height) {
@@ -60,15 +62,18 @@ namespace aire {
 
             const auto gaussian = compute1DGaussianKernel(kernelSize, sigma);
 
-            const bool isKernelEven = gaussian.size() % 2 == 0;
             const int halfOfKernel = gaussian.size() / 2;
-            const int jMax = isKernelEven ? halfOfKernel - 1 : halfOfKernel;
 
-            concurrency::parallel_for(5, height, [&](int y) {
+            const Eigen::Vector2f move = {std::cos(angle), std::sin(angle)};
+
+            const int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
+                                              height * width / (256 * 256)), 1, 12);
+
+            concurrency::parallel_for(threadCount, height, [&](int y) {
                 auto dst = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(transient.data()) + y * stride);
                 for (int x = 0; x < width; ++x) {
                     Eigen::Vector2f point = {x, y};
-                    Eigen::Vector2f offset = (1.0f / 100.0f * (centerPoint - point) * strength);
+                    Eigen::Vector2f offset = (1.0f / 100.0f * (centerPoint - point) * strength).array() * move.array();
 
                     Eigen::Vector4f accumulator = {0, 0, 0, 0};
 
@@ -96,6 +101,7 @@ namespace aire {
         const float strength;
         const float sigma;
         const int kernelSize;
+        const float angle;
 
         inline Eigen::Vector4f loadPoint(uint8_t *data, Eigen::Vector2i px, const int stride, const int width, const int height) {
             px.x() = std::clamp(px.x(), 0, width - 1);

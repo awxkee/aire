@@ -48,13 +48,17 @@ interface BlurPipelines {
 
     fun boxBlur(bitmap: Bitmap, kernelSize: Int): Bitmap
 
+    /**
+     * @param angle - default is PI / 2
+     */
     fun zoomBlur(
         bitmap: Bitmap,
         kernelSize: Int,
         sigma: Float,
         centerX: Float = 0.5f,
         centerY: Float = 0.5f,
-        strength: Float
+        strength: Float,
+        angle: Float
     ): Bitmap
 
     fun poissonBlur(bitmap: Bitmap, kernelSize: Int): Bitmap

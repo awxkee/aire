@@ -52,7 +52,7 @@ static vector<float> compute1DGaussianKernel(int width, float sigma) {
     int mean = ceil(width) / 2;
     float sum = 0;
     for (int x = 0; x < width; x++) {
-        kernel[x] = (float) exp(-0.5 * pow((x - mean) / sigma, 2.0));
+        kernel[x] = (float) std::exp(-0.5 * pow((x - mean) / sigma, 2.0));
         sum += kernel[x];
     }
     for (int x = 0; x < width; x++)

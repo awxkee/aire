@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Matrix
+import android.hardware.HardwareBuffer
 import android.os.Bundle
 import android.os.FileUtils
 import android.util.Log
@@ -59,16 +60,18 @@ class MainActivity : ComponentActivity() {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                                .scaleWith(0.7f)
+//                                .scaleWith(0.4f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
 //                        val d2Time = measureTimeMillis {
 //                            val blurred3 =
-//                                Aire.removeShadows(
+//                                Aire.zoomBlur(
 //                                    bitmap,
-//                                    7
+//                                    17, 17f,
+//                                    0.5f, 0.5f, 1.4f,
+//                                    Math.PI.toFloat() / 3
 //                                )
 //                            scope.launch {
 //                                imagesArray.add(blurred3)
