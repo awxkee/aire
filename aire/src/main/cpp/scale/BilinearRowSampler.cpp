@@ -56,8 +56,8 @@ namespace aire::HWY_NAMESPACE {
             int x2 = min(x1 + 1, inputWidth - 1);
             int y2 = min(y1 + 1, inputHeight - 1);
 
-            float dx((float) srcX - (float) x1);
-            float dy((float) srcY - (float) y1);
+            float dx = static_cast<float>(srcX) - static_cast<float>(x1);
+            float dy = static_cast<float>(srcY) - static_cast<float>(y1);
 
             auto row1 = reinterpret_cast<const uint32_t *>(src8 + y1 * srcStride);
             auto row2 = reinterpret_cast<const uint32_t *>(src8 + y2 * srcStride);
@@ -133,10 +133,8 @@ namespace aire::HWY_NAMESPACE {
                 VF4 dy = Max(Sub(currentYVF, ConvertTo(dfx4, yi1)), vfZeros);
 
                 for (int i = 0; i < 4; i++) {
-                    auto row1 = reinterpret_cast<const hwy::float16_t *>(src8 +
-                                                                         ExtractLane(row1Add, i));
-                    auto row2 = reinterpret_cast<const hwy::float16_t *>(src8 +
-                                                                         ExtractLane(row2Add, i));
+                    auto row1 = reinterpret_cast<const hwy::float16_t *>(src8 + ExtractLane(row1Add, i));
+                    auto row2 = reinterpret_cast<const hwy::float16_t *>(src8 + ExtractLane(row2Add, i));
                     VF16x4 lane = LoadU(df16x4, &row1[ExtractLane(xi1, i) * components]);
                     VF4 c1 = PromoteTo(dfx4, lane);
                     lane = LoadU(df16x4, &row1[ExtractLane(xi2, i) * components]);
@@ -163,8 +161,8 @@ namespace aire::HWY_NAMESPACE {
                 int x2 = min(x1 + 1, inputWidth - 1);
                 int y2 = min(y1 + 1, inputHeight - 1);
 
-                float dx((float) srcX - (float) x1);
-                float dy((float) srcY - (float) y1);
+                float dx = static_cast<float>(srcX) - static_cast<float>(x1);
+                float dy = static_cast<float>(srcY) - static_cast<float>(y1);
 
                 auto row1 = reinterpret_cast<const uint16_t *>(src8 + y1 * srcStride);
                 auto row2 = reinterpret_cast<const uint16_t *>(src8 + y2 * srcStride);
@@ -199,8 +197,8 @@ namespace aire::HWY_NAMESPACE {
             int x2 = min(x1 + 1, inputWidth - 1);
             int y2 = min(y1 + 1, inputHeight - 1);
 
-            float dx = max((float) srcX - (float) x1, 0.0f);
-            float dy = max((float) srcY - (float) y1, 0.0f);
+            float dx = std::max((float) srcX - (float) x1, 0.0f);
+            float dy = std::max((float) srcY - (float) y1, 0.0f);
 
             auto row1 = reinterpret_cast<const uint8_t *>(src8 + y1 * srcStride);
             auto row2 = reinterpret_cast<const uint8_t *>(src8 + y2 * srcStride);

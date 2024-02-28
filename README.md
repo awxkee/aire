@@ -66,6 +66,8 @@ Aire.gaussianBlur(
 - [x] Bilateral Blur
 - [x] Fast Bilateral Approximation
 - [x] Anisotropic Diffusion
+- [x] Fast Gaussian Approximation
+- [x] Zoom Blur
 
 ### Base operations:
 
@@ -82,6 +84,7 @@ Aire.gaussianBlur(
 - [x] Dilate
 - [x] Erode
 - [x] Exposure
+- [x] Convolve 2D
 - [x] Scaling
     * Bilinear
     * Nearest Neighbour
@@ -103,13 +106,16 @@ Aire.gaussianBlur(
 - [x] Oil
 - [x] Water effect
 - [x] Glitch
-- [x] Tilt Shift
+- [x] Radial Tilt Shift
+- [x] Horizontal Tilt Shift
 - [x] Wind Stagger
 - [x] Monochrome
+- [x] Grain
 
 ### Postprocessing:
 
 - [x] Dehaze dark channel
+- [x] Remove shadows
 
 ### Compression:
 

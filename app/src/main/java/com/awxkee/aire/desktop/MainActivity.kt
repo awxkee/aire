@@ -52,36 +52,26 @@ class MainActivity : ComponentActivity() {
         setContent {
             AireDesktopTheme {
                 val scope = rememberCoroutineScope()
-                var imagesArray = remember {
+                val imagesArray = remember {
                     mutableStateListOf<Bitmap>()
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.abstract_alpha)
-//                                .copy(Bitmap.Config.RGBA_1010102, true)
+//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                                .scaleWith(0.7f)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
-//                        val samples = BitmapScaleMode.entries.toTypedArray()
-////
-//                        samples.forEach { sampler ->
-//                            repeat(1) {
-//                                val d2Time = measureTimeMillis {
-//                                    val blurred3 =
-//                                        Aire.scale(
-//                                            bitmap,
-//                                            bitmap.width / 2,
-//                                            bitmap.height / 2,
-//                                            sampler,
-//                                            true
-//                                        )
-//                                    scope.launch {
-//                                        imagesArray.add(blurred3)
-//                                    }
-//                                }
-//                                Log.d("AireMedian", "exec time for $d2Time ms")
+//                        val d2Time = measureTimeMillis {
+//                            val blurred3 =
+//                                Aire.removeShadows(
+//                                    bitmap,
+//                                    7
+//                                )
+//                            scope.launch {
+//                                imagesArray.add(blurred3)
 //                            }
 //                        }
 //                        var radius = 5

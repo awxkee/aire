@@ -201,7 +201,7 @@ namespace aire::HWY_NAMESPACE {
                         }
                     }
 
-                    int px = x * components;
+                    const int px = x * components;
 
                     for (int c = 0; c < components; ++c) {
                         dst[px + c] = static_cast<uint8_t>(std::clamp(std::round(rgb[c]), 0.f, maxColors));

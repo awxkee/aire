@@ -40,6 +40,7 @@
 #include "blur/PoissonBlur.h"
 #include <string>
 #include "blur/TentBlur.h"
+#include "blur/ZoomBlur.hpp"
 #include "blur/AnisotropicDiffusion.h"
 #include "color/Gamut.h"
 
@@ -372,9 +373,9 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastBilateralPipeline(JNIEnv *en
                                                                 r = src[0];
                                                                 g = src[1];
                                                                 b = src[2];
-                                                                dst[0] = clamp(r * 255.f, 0.f, 255.f);
-                                                                dst[1] = clamp(g * 255.f, 0.f, 255.f);
-                                                                dst[2] = clamp(b * 255.f, 0.f, 255.f);
+                                                                dst[0] = std::clamp(r * 255.f, 0.f, 255.f);
+                                                                dst[1] = std::clamp(g * 255.f, 0.f, 255.f);
+                                                                dst[2] = std::clamp(b * 255.f, 0.f, 255.f);
                                                                 dst += 4;
                                                                 src += 3;
                                                             }
@@ -477,9 +478,9 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastGaussian3DImpl(JNIEnv *env, 
                                                 bitmap,
                                                 formats,
                                                 true,
-                                                [radius](std::vector<uint8_t> &input, int stride,
-                                                         int width, int height,
-                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                [&](std::vector<uint8_t> &input, int stride,
+                                                    int width, int height,
+                                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::gaussianApproximation3D(input.data(), stride, width,
                                                                                       height, radius);
@@ -509,12 +510,52 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastGaussian4DImpl(JNIEnv *env, 
                                                 bitmap,
                                                 formats,
                                                 true,
-                                                [radius](std::vector<uint8_t> &input, int stride,
-                                                         int width, int height,
-                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                [&](std::vector<uint8_t> &input, int stride,
+                                                    int width, int height,
+                                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::gaussianApproximation4D(input.data(), stride, width,
                                                                                       height, radius);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_zoomBlurImpl(JNIEnv *env, jobject thiz, jobject bitmap,
+                                                             jint kernelSize, jfloat sigma,
+                                                             jfloat centerX, jfloat centerY,
+                                                             jfloat strength) {
+    try {
+        if (kernelSize < 1) {
+            std::string msg("Kernel size must be > 1, but received " + std::to_string(kernelSize));
+            throw AireError(msg);
+        }
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [&](std::vector<uint8_t> &input, int stride,
+                                                    int width, int height,
+                                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::ZoomBlur zoom(kernelSize, sigma, centerX, centerY, strength);
+                                                        zoom.apply(input.data(), stride, width, height);
                                                     }
                                                     return {
                                                             .data = input,

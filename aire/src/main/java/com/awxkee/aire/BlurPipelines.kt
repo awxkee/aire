@@ -37,11 +37,25 @@ interface BlurPipelines {
 
     fun gaussianBlur(bitmap: Bitmap, kernelSize: Int, sigma: Float): Bitmap
 
-    fun bilateralBlur(bitmap: Bitmap, kernelSize: Int, rangeSigma: Float, spatialSigma: Float): Bitmap
+    fun bilateralBlur(
+        bitmap: Bitmap,
+        kernelSize: Int,
+        rangeSigma: Float,
+        spatialSigma: Float
+    ): Bitmap
 
     fun fastBilateralBlur(bitmap: Bitmap, rangeSigma: Float, spatialSigma: Float): Bitmap
 
     fun boxBlur(bitmap: Bitmap, kernelSize: Int): Bitmap
+
+    fun zoomBlur(
+        bitmap: Bitmap,
+        kernelSize: Int,
+        sigma: Float,
+        centerX: Float = 0.5f,
+        centerY: Float = 0.5f,
+        strength: Float
+    ): Bitmap
 
     fun poissonBlur(bitmap: Bitmap, kernelSize: Int): Bitmap
 

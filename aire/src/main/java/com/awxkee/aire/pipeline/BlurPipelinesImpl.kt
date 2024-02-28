@@ -103,22 +103,16 @@ class BlurPipelinesImpl : BlurPipelines {
         return fastGaussian2DImpl(bitmap, radius)
     }
 
-    override fun tentBlur(bitmap: Bitmap, radius: Int): Bitmap {
-        if (radius < 3) {
+    override fun tentBlur(bitmap: Bitmap, kernelSize: Int): Bitmap {
+        if (kernelSize < 3) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
-        return tentBlurPipeline(bitmap, radius)
+        return tentBlurPipeline(bitmap, kernelSize)
     }
 
     override fun fastGaussian4Degree(bitmap: Bitmap, radius: Int): Bitmap {
         return fastGaussian4DImpl(bitmap, radius)
     }
-
-    private external fun fastGaussian2DImpl(bitmap: Bitmap, radius: Int): Bitmap
-
-    private external fun fastGaussian3DImpl(bitmap: Bitmap, radius: Int): Bitmap
-
-    private external fun fastGaussian4DImpl(bitmap: Bitmap, radius: Int): Bitmap
 
     override fun anisotropicDiffusion(
         bitmap: Bitmap,
@@ -129,6 +123,32 @@ class BlurPipelinesImpl : BlurPipelines {
         return anisotropicDiffusionPipeline(bitmap, numOfSteps, conduction, diffusion)
     }
 
+    override fun zoomBlur(
+        bitmap: Bitmap,
+        kernelSize: Int,
+        sigma: Float,
+        centerX: Float,
+        centerY: Float,
+        strength: Float
+    ): Bitmap {
+        return zoomBlurImpl(bitmap, kernelSize, sigma, centerX, centerY, strength)
+    }
+
+    private external fun zoomBlurImpl(
+        bitmap: Bitmap,
+        kernelSize: Int,
+        sigma: Float,
+        centerX: Float,
+        centerY: Float,
+        strength: Float
+    ): Bitmap
+
+    private external fun fastGaussian2DImpl(bitmap: Bitmap, radius: Int): Bitmap
+
+    private external fun fastGaussian3DImpl(bitmap: Bitmap, radius: Int): Bitmap
+
+    private external fun fastGaussian4DImpl(bitmap: Bitmap, radius: Int): Bitmap
+
     private external fun anisotropicDiffusionPipeline(
         bitmap: Bitmap,
         numOfSteps: Int,
@@ -138,7 +158,11 @@ class BlurPipelinesImpl : BlurPipelines {
 
     private external fun poissonBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
 
-    private external fun fastBilateralPipeline(bitmap: Bitmap, radiusSigma: Float, spatialSigma: Float): Bitmap
+    private external fun fastBilateralPipeline(
+        bitmap: Bitmap,
+        radiusSigma: Float,
+        spatialSigma: Float
+    ): Bitmap
 
     private external fun gaussianBlurPipeline(bitmap: Bitmap, radius: Int, sigma: Float): Bitmap
 
