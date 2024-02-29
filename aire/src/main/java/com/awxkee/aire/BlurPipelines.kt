@@ -35,6 +35,12 @@ import androidx.annotation.IntRange
 
 interface BlurPipelines {
 
+    fun bokehBlur(
+        bitmap: Bitmap,
+        @IntRange(from = 3) kernelSize: Int,
+        @IntRange(from = 3) sides: Int = 6,
+    ): Bitmap
+
     fun gaussianBlur(bitmap: Bitmap, kernelSize: Int, sigma: Float): Bitmap
 
     fun bilateralBlur(

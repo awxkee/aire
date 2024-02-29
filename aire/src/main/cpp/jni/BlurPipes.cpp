@@ -42,7 +42,9 @@
 #include "blur/TentBlur.h"
 #include "blur/ZoomBlur.hpp"
 #include "blur/AnisotropicDiffusion.h"
+#include "base/Convolve2D.h"
 #include "color/Gamut.h"
+#include "EigenUtils.h"
 
 extern "C"
 JNIEXPORT jobject JNICALL
@@ -556,6 +558,67 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_zoomBlurImpl(JNIEnv *env, jobjec
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::ZoomBlur zoom(kernelSize, sigma, centerX, centerY, strength, angle);
                                                         zoom.apply(input.data(), stride, width, height);
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_bokehBlurImpl(JNIEnv *env,
+                                                              jobject thiz, jobject bitmap,
+                                                              jint kernelSize, jint sides) {
+    try {
+        if (kernelSize < 3) {
+            std::string msg("Kernel size must be >= 3, but received " + std::to_string(kernelSize));
+            throw AireError(msg);
+        }
+        if (sides < 3) {
+            std::string msg("Sides must be >= 3, but received " + std::to_string(sides));
+            throw AireError(msg);
+        }
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                true,
+                                                [&](std::vector<uint8_t> &input, int stride,
+                                                    int width, int height,
+                                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        auto krn = getBokehEffect(kernelSize, sides);
+                                                        auto bokehKernel = krn.cast<float>().eval();
+                                                        auto sigma = std::max(static_cast<float>(bokehKernel.cols()), static_cast<float>(bokehKernel.rows()));
+                                                        const auto center = std::max(static_cast<float>(bokehKernel.cols()), static_cast<float>(bokehKernel.rows())) / 2;
+                                                        for (int i = 0; i < bokehKernel.rows(); ++i) {
+                                                            for (int j = 0; j < bokehKernel.cols(); ++j) {
+                                                                if (bokehKernel(i, j) == 1.f) {
+                                                                    const float scale = 1.f / (std::sqrt(2 * M_PI) * sigma);
+                                                                    float distance = std::sqrt((i - center) * (i - center) + (j - center) * (j - center));
+                                                                    float value = std::exp(-(distance * distance) / (2.f * sigma * sigma)) * scale;
+                                                                    bokehKernel(i, j) = value;
+                                                                }
+                                                            }
+                                                        }
+                                                        float sum = bokehKernel.sum();
+                                                        if (sum != 0.f) {
+                                                            bokehKernel /= sum;
+                                                        }
+                                                        aire::Convolve2D convolve2D(bokehKernel);
+                                                        convolve2D.convolve(input.data(), stride, width, height);
                                                     }
                                                     return {
                                                             .data = input,

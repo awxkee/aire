@@ -29,10 +29,11 @@
  */
 
 #include "Channels.h"
-#include <iostream>
 #include "concurrency.hpp"
+#include <iostream>
 
 namespace aire {
+
     template<class T>
     void split(T *pixels, T *r, T *g, T *b, T *a, int stride, int width, int height) {
         concurrency::parallel_for(2, height, [&](int y) {

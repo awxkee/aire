@@ -32,14 +32,15 @@ package com.awxkee.aire
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import androidx.annotation.IntRange
 
 interface EffectsPipelines {
 
     fun bokeh(
         bitmap: Bitmap,
-        radius: Int,
-        angle: Float = Math.PI.toFloat() / 4f,
-        sides: Int = 6
+        @IntRange(from = 3) kernelSize: Int,
+        @IntRange(from = 3) sides: Int = 6,
+        enhance: Boolean,
     ): Bitmap
 
     fun marble(

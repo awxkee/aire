@@ -1,6 +1,32 @@
-//
-// Created by Radzivon Bartoshyk on 09/02/2024.
-//
+/*
+ *
+ *  * MIT License
+ *  *
+ *  * Copyright (c) 2024 Radzivon Bartoshyk
+ *  * aire [https://github.com/awxkee/aire]
+ *  *
+ *  * Created by Radzivon Bartoshyk on 09/02/24, 6:13 PM
+ *  *
+ *  * Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  * of this software and associated documentation files (the "Software"), to deal
+ *  * in the Software without restriction, including without limitation the rights
+ *  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  * copies of the Software, and to permit persons to whom the Software is
+ *  * furnished to do so, subject to the following conditions:
+ *  *
+ *  * The above copyright notice and this permission notice shall be included in all
+ *  * copies or substantial portions of the Software.
+ *  *
+ *  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ *  * SOFTWARE.
+ *  *
+ *
+ */
 
 #pragma once
 
@@ -97,7 +123,7 @@ static Eigen::Matrix<float, 4, 2> computeBoundingBox(const Eigen::Matrix3f& tran
 }
 
 static void floodFill(Eigen::MatrixXi &grid, int startX, int startY, int target, int replacement) {
-    int rows = grid.size();
+    int rows = grid.rows();
     if (rows == 0) return;
     int cols = grid.cols();
     if (cols == 0) return;
@@ -106,61 +132,121 @@ static void floodFill(Eigen::MatrixXi &grid, int startX, int startY, int target,
         return;
 
     std::queue<std::pair<int, int>> pointsQueue;
-    pointsQueue.push({startX, startY});
+    pointsQueue.emplace(startX, startY);
 
     while (!pointsQueue.empty()) {
         auto [x, y] = pointsQueue.front();
         pointsQueue.pop();
 
-        if (x < 0 || x >= rows || y < 0 || y >= cols || grid(x, y) != target)
+        if (x < 0 || x >= rows || y < 0 || y >= cols)
             continue;
 
-        grid(x, y) = replacement;
+        if (grid(y, x) == target) {
+            grid(y, x) = replacement;
 
-        pointsQueue.push({x + 1, y});
-        pointsQueue.push({x - 1, y});
-        pointsQueue.push({x, y + 1});
-        pointsQueue.push({x, y - 1});
+            if (x + 1 >= 0 && x + 1 < rows) {
+                pointsQueue.emplace(x + 1, y);
+            }
+            if (x - 1 >= 0 && x - 1 < rows) {
+                pointsQueue.emplace(x - 1, y);
+            }
+            if (y + 1 >= 0 && y + 1 < cols) {
+                pointsQueue.emplace(x, y + 1);
+            }
+            if (y - 1 >= 0 && y - 1 < cols) {
+                pointsQueue.emplace(x, y - 1);
+            }
+        }
     }
 }
 
+static void revertPixels(Eigen::MatrixXi& matrix) {
+    int rows = matrix.rows();
+    int cols = matrix.cols();
 
-static Eigen::MatrixXi getBokehEffect(int radius, float startAngle, int sides) {
-    Eigen::MatrixXi kernel(2 * radius + 1, 2 * radius + 1);
-    kernel = Eigen::MatrixXi::Ones(2 * radius + 1, 2 * radius + 1);
-    int diameter = (radius * 2) + 1;
-    float startRadians = startAngle;
-    float endRadians = M_PI * 2 + startAngle;
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            matrix(i, j) = (matrix(i, j) == 0) ? 1 : 0;
+        }
+    }
+}
 
-    float previousX = -1;
-    float previousY = -1;
+static Eigen::MatrixXi getBokehEffect(int kernelSize, int sides) {
+    Eigen::MatrixXi kernel(kernelSize, kernelSize);
+    kernel = Eigen::MatrixXi::Zero(kernelSize, kernelSize);
+    int rows = kernel.rows();
+    int cols = kernel.cols();
 
-    float angle = ((M_PI * 2.0f) / float(sides));
+    float cx = cols / 2.0;
+    float cy = rows / 2.0;
+    float radius = std::min(cx, cy) * 0.85f;
 
-    for (float radian = startRadians; radian < endRadians + 2; radian += angle) {
-        float x = float(radius) + sin(radian) * (radius - 0.01f);
-        float y = float(radius) + cos(radian) * (radius - 0.01f);
+    for (int i = 0; i < sides; ++i) {
+        float angle1 = 2.0f * static_cast<float>(M_PI) * static_cast<float>(i) / static_cast<float>(sides);
+        float angle2 = 2.0f * static_cast<float>(M_PI) * static_cast<float>(i + 1) / static_cast<float>(sides);
 
-        if (previousX != -1) {
-            float deltaX = 1.0 / std::max(std::abs(previousX - x), std::abs(previousY - y));
+        int x1 = static_cast<int>(cx + radius * cos(angle1));
+        int y1 = static_cast<int>(cy + radius * sin(angle1));
 
-            for (float t = 0; t < 1; t += deltaX) {
-                float newX = lerp(previousX, x, t);
-                float newY = lerp(previousY, y, t);
+        int x2 = static_cast<int>(cx + radius * cos(angle2));
+        int y2 = static_cast<int>(cy + radius * sin(angle2));
 
-                int coordX = round(newX);
-                int coordY = round(newY);
+        // Bresenham's line algorithm to draw a line between (x1, y1) and (x2, y2)
+        int dx = std::abs(x2 - x1);
+        int dy = -std::abs(y2 - y1);
+        int sx = (x1 < x2) ? 1 : -1;
+        int sy = (y1 < y2) ? 1 : -1;
+        int err = dx + dy;
 
-                if (coordX >= 0 && coordX < diameter && coordY >= 0 && coordY < diameter) {
-                    kernel(coordY, coordX) = 0;
-                }
+        while (true) {
+            if (x1 >= 0 && x1 < cols && y1 >= 0 && y1 < rows) {
+                kernel(y1, x1) = 1;
+            }
+
+            if (x1 == x2 && y1 == y2) break;
+
+            int e2 = 2 * err;
+
+            if (e2 >= dy) {
+                err += dy;
+                x1 += sx;
+            }
+
+            if (e2 <= dx) {
+                err += dx;
+                y1 += sy;
+            }
+        }
+    }
+
+    floodFill(kernel, kernel.cols() / 2,kernel.rows() / 2, 0, 1);
+//    revertPixels(kernel);
+    return kernel;
+}
+
+template<typename T>
+static std::string matrixToString(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matrix) {
+    std::ostringstream oss;
+
+    for (int i = 0; i < matrix.rows(); ++i) {
+        for (int j = 0; j < matrix.cols(); ++j) {
+            oss << matrix(i, j);
+
+            // Add a separator (e.g., space) between elements
+            if (j < matrix.cols() - 1) {
+                oss << " ";
             }
         }
 
-        previousX = x;
-        previousY = y;
+        // Add a newline after each row
+        oss << "\n";
     }
 
-    floodFill(kernel, 0, 0, 1, 0);
+    return oss.str();
+}
+
+static Eigen::MatrixXi getStructuringKernel(int size) {
+    Eigen::MatrixXi kernel(size, size);
+    kernel << Eigen::MatrixXi::Ones(size, size);
     return kernel;
 }

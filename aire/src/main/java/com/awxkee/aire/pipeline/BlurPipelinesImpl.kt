@@ -31,6 +31,7 @@
 package com.awxkee.aire.pipeline
 
 import android.graphics.Bitmap
+import androidx.annotation.IntRange
 import com.awxkee.aire.BlurPipelines
 
 class BlurPipelinesImpl : BlurPipelines {
@@ -134,6 +135,16 @@ class BlurPipelinesImpl : BlurPipelines {
     ): Bitmap {
         return zoomBlurImpl(bitmap, kernelSize, sigma, centerX, centerY, strength, angle)
     }
+
+    override fun bokehBlur(
+        bitmap: Bitmap,
+        @IntRange(from = 3.toLong()) kernelSize: Int,
+        @IntRange(from = 3.toLong()) sides: Int
+    ): Bitmap {
+        return bokehBlurImpl(bitmap, kernelSize, sides)
+    }
+
+    private external fun bokehBlurImpl(bitmap: Bitmap, kernelSize: Int, sides: Int): Bitmap
 
     private external fun zoomBlurImpl(
         bitmap: Bitmap,

@@ -38,6 +38,7 @@
 #include "effect/WaterEffect.h"
 #include "effect/PerlinDistortion.h"
 #include "base/Dilation.h"
+#include "blur/GaussBlur.h"
 #include "color/ConvolveToneMapper.h"
 #include "MathUtils.hpp"
 #include "EigenUtils.h"
@@ -249,11 +250,11 @@ Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_perlinDistortionImpl(JNIEnv *e
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::perlinDistortion(input.data(),
-                                                                          stride, width,
-                                                                          height,
-                                                                          intensity,
-                                                                          turbulence,
-                                                                          amplitude);
+                                                                               stride, width,
+                                                                               height,
+                                                                               intensity,
+                                                                               turbulence,
+                                                                               amplitude);
                                                     }
                                                     return {
                                                             .data = input,
@@ -270,17 +271,18 @@ Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_perlinDistortionImpl(JNIEnv *e
         return nullptr;
     }
 }
-
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_bokehImpl(JNIEnv *env, jobject thiz, jobject bitmap,
-                                                            jint radius, jfloat angle, jint sides) {
-    if (radius < 1) {
-        std::string msg("Radius must be > 0 but received: " + std::to_string(radius));
+Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_bokehImpl(JNIEnv *env, jobject thiz,
+                                                            jobject bitmap,
+                                                            jint kernelSize, jint sides,
+                                                            jboolean enhance) {
+    if (kernelSize < 1) {
+        std::string msg("Kernel size must be > 0 but received: " + std::to_string(kernelSize));
         throw AireError(msg);
     }
-    if (sides < 1) {
-        std::string msg("Sides must be > 0 but received: " + std::to_string(sides));
+    if (sides < 3) {
+        std::string msg("Sides must be >= 3 but received: " + std::to_string(sides));
         throw AireError(msg);
     }
     try {
@@ -290,12 +292,17 @@ Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_bokehImpl(JNIEnv *env, jobject
                                                 bitmap,
                                                 formats,
                                                 true,
-                                                [radius, angle, sides](
+                                                [&](
                                                         std::vector<uint8_t> &input, int stride,
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-                                                        auto kernel = getBokehEffect(radius, angle, sides);
+                                                        if (enhance) {
+                                                            aire::gaussBlurU8(input.data(),
+                                                                              stride, width, height,
+                                                                              kernelSize, kernelSize);
+                                                        }
+                                                        auto kernel = getBokehEffect(kernelSize, sides);
                                                         std::vector<uint8_t> output(stride * height);
                                                         aire::dilateRGBA(input.data(),
                                                                          output.data(),

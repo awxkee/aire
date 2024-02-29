@@ -40,10 +40,10 @@ namespace aire {
 
     template<class T>
     void erodeRGBA(T *pixels, T *destination, int stride, int width, int height,
-                   std::vector<std::vector<int>> &kernel) {
+                   Eigen::MatrixXi &kernel) {
         concurrency::parallel_for(8, height, [&](int y) {
             for (int x = 0; x < width; ++x) {
-                int mSize = kernel.size() / 2;
+                int mSize = kernel.rows() / 2;
 
                 auto srcLocal = reinterpret_cast<uint32_t *>(
                         reinterpret_cast<uint8_t *>(pixels) +
@@ -52,8 +52,7 @@ namespace aire {
                 long min = srcLocal[x];
 
                 for (int m = -mSize; m < mSize; ++m) {
-                    std::vector<int> sub = kernel[m + mSize];
-                    int nSize = sub.size() / 2;
+                    int nSize = kernel.cols() / 2;
                     for (int n = -nSize; n < nSize; ++n) {
                         int newX = x + m;
                         int newY = y + n;
@@ -62,7 +61,7 @@ namespace aire {
                             auto src = reinterpret_cast<uint32_t *>(
                                     reinterpret_cast<uint8_t *>(pixels) +
                                     newY * stride);
-                            const uint32_t item = src[newX] * sub[n + nSize];
+                            const uint32_t item = src[newX] * kernel(m + mSize, n + nSize);
                             if (item < min) {
                                 min = item;
                             }
@@ -79,22 +78,20 @@ namespace aire {
 
     template<class T>
     void erode(T *pixels, T *destination, int width, int height,
-               std::vector<std::vector<int>> &kernel) {
+               Eigen::MatrixXi &kernel) {
         concurrency::parallel_for(8, height, [&](int y) {
             auto dst = reinterpret_cast<T *>(
                     reinterpret_cast<uint8_t *>(destination) + y * width);
             for (int x = 0; x < width; ++x) {
-                int mSize = kernel.size() / 2;
+                int mSize = kernel.rows() / 2;
 
                 auto srcLocal = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(pixels) + y * height);
 
                 T min = srcLocal[x];
 
                 for (int m = -mSize; m < mSize; ++m) {
-                    std::vector<int> sub = kernel[m + mSize];
-                    int nSize = sub.size() / 2;
+                    int nSize = kernel.cols() / 2;
                     for (int n = -nSize; n < nSize; ++n) {
-                        float kernelItem = sub[n + nSize];
                         int newX = x + m;
                         int newY = y + n;
                         if (newX >= 0 && newX < width && newY >= 0 &&
@@ -102,7 +99,7 @@ namespace aire {
                             auto src = reinterpret_cast<T *>(
                                     reinterpret_cast<uint8_t *>(pixels) +
                                     newY * width);
-                            T vl = src[newX] * kernelItem;
+                            T vl = src[newX] * kernel(m + mSize, n + nSize);
                             if (vl > min) {
                                 min = vl;
                             }
@@ -117,9 +114,9 @@ namespace aire {
 
     template void
     erode(uint8_t *pixels, uint8_t *destination, int width, int height,
-          std::vector<std::vector<int>> &kernel);
+          Eigen::MatrixXi &kernel);
 
     template
     void erodeRGBA(uint8_t *pixels, uint8_t *destination, int stride, int width, int height,
-                   std::vector<std::vector<int>> &kernel);
+                   Eigen::MatrixXi &kernel);
 }

@@ -31,11 +31,17 @@
 package com.awxkee.aire.pipeline
 
 import android.graphics.Bitmap
+import androidx.annotation.IntRange
 import com.awxkee.aire.EffectsPipelines
 
 class EffectsPipelineImpl : EffectsPipelines {
-    override fun bokeh(bitmap: Bitmap, radius: Int, angle: Float, sides: Int): Bitmap {
-        return bokehImpl(bitmap, radius, angle, sides)
+    override fun bokeh(
+        bitmap: Bitmap,
+        @IntRange(from = 3.toLong()) kernelSize: Int,
+        @IntRange(from = 3.toLong()) sides: Int,
+        enhance: Boolean
+    ): Bitmap {
+        return bokehImpl(bitmap, kernelSize, sides, enhance)
     }
 
     override fun marble(
@@ -79,7 +85,7 @@ class EffectsPipelineImpl : EffectsPipelines {
         return crystallizeImpl(bitmap, numClusters, strokeColor)
     }
 
-    private external fun bokehImpl(bitmap: Bitmap, radius: Int, angle: Float, sides: Int): Bitmap
+    private external fun bokehImpl(bitmap: Bitmap, kernelSize: Int, sides: Int, enhance: Boolean): Bitmap
 
     private external fun perlinDistortionImpl(
         bitmap: Bitmap,

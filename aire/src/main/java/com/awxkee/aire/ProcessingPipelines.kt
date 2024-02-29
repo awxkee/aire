@@ -34,7 +34,7 @@ import android.graphics.Bitmap
 import androidx.annotation.IntRange
 
 interface ProcessingPipelines {
-    fun removeShadows(bitmap: Bitmap, @IntRange(from = 3, to = 9) kernelSize: Int = 5): Bitmap
+    fun removeShadows(bitmap: Bitmap, @IntRange(from = 3) kernelSize: Int = 5): Bitmap
 
     fun dehaze(bitmap: Bitmap, radius: Int = 17, omega: Float = 0.45f): Bitmap
 

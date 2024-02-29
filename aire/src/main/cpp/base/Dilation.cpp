@@ -38,6 +38,7 @@
 #include "Eigen/Eigen"
 #include "base/Channels.h"
 #include "concurrency.hpp"
+#include "ArbitraryUtil.h"
 
 using namespace std;
 
@@ -47,206 +48,249 @@ namespace aire {
     using namespace std;
     using namespace hwy::HWY_NAMESPACE;
 
-    // https://stackoverflow.com/questions/25034259/scipy-ndimage-morphology-operators-saturate-my-computer-memory-ram-8gb/51159444#51159444
+    // https://stackoverflow.com/questions/25034259/scipy-ndimage-morphology-operators-saturate-my-computer-x-ram-8gb/51159444#51159444
+
+    /*************************************************************/
+/* Dilation procedure		                             */
+/* ATTENTION: sizeof(in) != sizeof(out) 		     */
+/*************************************************************/
+    int dilationImage(uint8_t *bloc, int blocWidth, int blocHeight,
+                      uint8_t *out, int imageWidth, int imageHeight,
+                      uint8_t *se, int bh, int bv,
+                      struct front *l, struct front *r, struct front *u, struct front *d,
+                      int ox, int oy) {
+        uint8_t max, *corner, val;
+        int i, col, *pos, lx, n;
+
+        std::vector<uint8_t> histo(256, 0);
+
+/* Build the first histogram */
+        for (i = 0; i < bh * bv; i++)
+            if (se[i] != 0)
+                histo[0]++;
+
+        max = std::numeric_limits<uint8_t>::min();
+
+/* Each line is scanned through */
+        for (int line = 0; line < imageHeight + bv; ++line)
+            if (line % 2 == 0) {
+                lx = line * blocWidth;
+                /* From left to right */
+                for (col = 0; col < imageWidth + bh; col++) {
+                    corner = &bloc[col + lx];
+                    /* Updates the histogram */
+                    /* 1. Adding "flat" pixels */
+                    pos = r->pos;
+                    for (n = 0; n < r->size; n++) {
+                        int pf = *pos;
+                        val = *(corner + (pf + 1));
+                        histo[val]++;
+                        if (val > max) max = val;
+                        pos++;
+                    }
+                    /* 3. Removing "flat" pixels */
+                    pos = l->pos;
+                    for (n = 0; n < l->size; n++) {
+                        histo[*(corner + *pos)]--;
+                        pos++;
+                    }
+                    /* Recomputes the maximum if necessary */
+                    while (histo[max] == 0) max--;
+                    /* Puts the value in the picture */
+                    if ((col + 1 + ox >= bh) && (col + 1 - bh + ox < imageWidth) &&
+                        (line - bv + oy >= 0) && (line - bv + oy < imageHeight))
+                        out[col + 1 - bh + ox + (line - bv + oy) * imageWidth] = max;
+                }
+            } else {
+                lx = line * blocWidth;
+                /* From right to left */
+                for (col = imageWidth + bh; col > 0; col--) {
+                    corner = &bloc[col + lx];
+                    /* Updates the histogram */
+                    /* 1. Adding "flat" pixels */
+                    pos = l->pos;
+                    for (n = 0; n < l->size; n++) {
+                        val = *(corner + ((*pos) - 1));
+                        histo[val]++;
+                        if (val > max) max = val;
+                        pos++;
+                    }
+                    /* 3. Removing "flat" pixels */
+                    pos = r->pos;
+                    for (n = 0; n < r->size; n++) {
+                        histo[*(corner + *pos)]--;
+                        pos++;
+                    }
+                    /* Recomputes the maximum if necessary */
+                    while (histo[max] == 0) max--;
+                    /* Put the value in the picture */
+                    if ((col - 1 + ox >= bh) && (col - 1 - bh + ox < imageWidth) &&
+                        (line - bv + oy >= 0) && (line - bv + oy < imageHeight))
+                        out[col - 1 - bh + ox + (line - bv + oy) * imageWidth] = max;
+                }
+            }
+
+        return MORPHO_SUCCESS;
+    }
+
+    int
+    dilationArbitrarySE(uint8_t *imageIn, uint8_t *imageOut, int imageWidth, int imageHeight,
+                        uint8_t *se, int seWidth, int seHeight, int seHorizontalOrigin,
+                        int seVerticalOrigin) {
+        char st[200];
+
+        struct front l = {0}, r = {0}, u = {0}, d = {0};
+        int i, j, ret;
+        int blocWidth, blocHeight;
+        int se2HorizontalOrigin, se2VerticalOrigin;
+
+        if (imageWidth <= seWidth) {
+            snprintf(st, 200, "ERROR(%s): size(=%d) of the structuring elements should be larger than the image one(=%d).", "dilation_arbitrary_SE", seWidth,
+                     imageWidth);
+            perror(st);
+            return MORPHO_ERROR;
+        }
+
+        if (imageHeight <= seHeight) {
+            snprintf(st, 200, "ERROR(%s): size(=%d) of the structuring elements should be larger than the image one(=%d).", "dilation_arbitrary_SE", seHeight,
+                     imageHeight);
+            perror(st);
+            return MORPHO_ERROR;
+        }
+
+/* First of all we invert the structuring function */
+        std::vector<uint8_t> se2(seWidth * seHeight);
+        invert_SE(se, se2.data(), seWidth, seHeight);
+        se2HorizontalOrigin = seWidth - 1 - seHorizontalOrigin;
+        se2VerticalOrigin = seHeight - 1 - seVerticalOrigin;
+
+/* We proceed to the analysis of the structuring element
+   and search for an origin */
+        if (MORPHO_SUCCESS != analyse_b(se2.data(), seWidth, seHeight, &l, &r, &u, &d, se2HorizontalOrigin, se2VerticalOrigin)
+                ) {
+            perror("ERROR(dilation_arbitrary_SE): analyse_b did not return a valid code");
+            return MORPHO_ERROR;
+        }
+
+/* Allocate a new picture with a border */
+        blocWidth = imageWidth + seWidth * 2;
+        blocHeight = imageHeight + seHeight * 2;
+        std::vector<uint8_t> tmpImage(blocWidth * blocHeight);
+        for (i = 0; i < blocWidth * blocHeight; i++) tmpImage[i] = std::numeric_limits<uint8_t>::min();
+        for (j = 0; j < imageHeight; j++)
+            for (i = 0; i < imageWidth; i++)
+                tmpImage[i + seWidth + (j + seHeight) * blocWidth] = imageIn[i + j * imageWidth];
+
+/* Transforms the information contained in the front structures */
+        if (MORPHO_SUCCESS != transform_b(blocWidth, &l, &r, &u, &d)) {
+            perror("ERROR(dilation_arbitrary_SE): transform_b did not return a valid code");
+            return MORPHO_ERROR;
+        }
+
+/* Proceed to the dilation;
+   ATTENTION: sizeof(im_inter->f...) != sizeof(im_out->f...) */
+        ret = dilationImage(tmpImage.data(), blocWidth, blocHeight, imageOut,
+                            imageWidth, imageHeight, se, seWidth, seHeight, &l, &r, &u, &d,
+                            se2HorizontalOrigin, se2VerticalOrigin);
+
+        if (MORPHO_SUCCESS != ret) {
+            perror("ERROR(dilation_arbitrary_SE): dilationImage did not return a valid code");
+            return MORPHO_ERROR;
+        }
+
+/* Free the data */
+        free_front(&l);
+        free_front(&r);
+        free_front(&u);
+        free_front(&d);
+        return MORPHO_SUCCESS;
+    }
 
     template<class T>
     void dilateRGBA(T *pixels, T *destination, int stride, int width, int height,
                     Eigen::MatrixXi &kernel) {
-        const FixedTag<uint8_t, 16> du8x16;
-        const FixedTag<uint8_t, 8> du8x8;
-        const FixedTag<uint8_t, 4> du8x4;
-        const FixedTag<int16_t, 8> di16x8;
-        const FixedTag<int16_t, 4> di16x4;
-        const FixedTag<int32_t, 4> di32x4;
-        using VU8x16 = Vec<decltype(du8x16)>;
-        using VU8x4 = Vec<decltype(du8x4)>;
+        std::vector<uint8_t> rVec(width * height);
+        std::vector<uint8_t> gVec(width * height);
+        std::vector<uint8_t> bVec(width * height);
+        std::vector<uint8_t> aVec(width * height);
 
-        concurrency::parallel_for(6, height, [&](int y){
-            for (int x = 0; x < width; ++x) {
-                int mSize = kernel.rows() / 2;
+        split(pixels, rVec.data(), gVec.data(), bVec.data(), aVec.data(), stride, width, height);
 
-                auto srcLocal = reinterpret_cast<uint8_t *>(
-                        reinterpret_cast<uint8_t *>(pixels) +
-                        y * stride);
+        std::vector<uint8_t> rDstVec(width * height);
+        std::vector<uint8_t> gDstVec(width * height);
+        std::vector<uint8_t> bDstVec(width * height);
+        std::vector<uint8_t> aDstVec(width * height);
 
-                int px = x * 4;
-                int maxR = srcLocal[px];
-                int maxG = srcLocal[px + 1];
-                int maxB = srcLocal[px + 2];
-                int maxA = srcLocal[px + 3];
+        Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajorBit> rowMajor(kernel.rows(), kernel.cols());
+        for (int i = 0; i < kernel.rows(); ++i) {
+            for (int j = 0; j < kernel.cols(); ++j) {
+                rowMajor(i, j) = kernel(i, j);
+            }
+        }
 
-                for (int j = -mSize; j < mSize; ++j) {
-                    int nSize = kernel.cols() / 2;
-                    int i = -nSize;
-                    int newY = y + j;
-                    auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(pixels) + newY * stride);
-                    if (newY >= 0 && newY < height) {
-                        for (; i + nSize + 16 < nSize && x + i + 16 < width; i += 16) {
-                            VU8x16 r, g, b, a;
-                            int newX = (clamp(x + i, 0, width - 1)) * 4;
-                            LoadInterleaved4(du8x16, &src[newX], r, g, b, a);
-                            auto lowR = PromoteLowerTo(di16x8, r);
+        int cx = kernel.cols() / 2;
+        int cy = kernel.rows() / 2;
 
-                            auto vKernelHigh = LoadU(di32x4, kernel.row(j + mSize).data() + (i + nSize));
-                            auto vKernelLow = LoadU(di32x4, kernel.row(j + mSize).data() + (i + nSize + 4));
-
-                            auto vKernel = Combine(di16x8, DemoteTo(di16x4, vKernelHigh), DemoteTo(di16x4, vKernelLow));
-
-                            maxR = std::max(int(maxR), (int) ExtractLane(
-                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, UpperHalf(du8x8, r)), vKernel)), 0));
-                            maxG = std::max(int(maxG), (int) ExtractLane(
-                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, UpperHalf(du8x8, g)), vKernel)), 0));
-                            maxB = std::max(int(maxB), (int) ExtractLane(
-                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, UpperHalf(du8x8, b)), vKernel)), 0));
-                            maxA = std::max(int(maxA), (int) ExtractLane(
-                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, UpperHalf(du8x8, a)), vKernel)), 0));
-
-                            vKernelHigh = LoadU(di32x4, kernel.row(j + mSize).data() + (i + nSize + 8));
-                            vKernelLow = LoadU(di32x4, kernel.row(j + mSize).data() + (i + nSize + 12));
-
-                            vKernel = Combine(di16x8, DemoteTo(di16x4, vKernelHigh), DemoteTo(di16x4, vKernelLow));
-
-                            maxR = std::max(int(maxR), (int) ExtractLane(
-                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, LowerHalf(r)), vKernel)), 0));
-                            maxG = std::max(int(maxG), (int) ExtractLane(
-                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, LowerHalf(g)), vKernel)), 0));
-                            maxB = std::max(int(maxB), (int) ExtractLane(
-                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, LowerHalf(b)), vKernel)), 0));
-                            maxA = std::max(int(maxA), (int) ExtractLane(
-                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, LowerHalf(a)), vKernel)), 0));
-                        }
-
-                        for (; i + nSize + 4 < nSize && x + i + 4 < width; i += 4) {
-                            VU8x4 r, g, b, a;
-                            int newX = (clamp(x + i, 0, width - 1)) * 4;
-                            auto vKernel = LoadU(di32x4, kernel.row(j + mSize).data() + (i + nSize));
-                            LoadInterleaved4(du8x4, reinterpret_cast<uint8_t *>(src) + newX, r, g, b, a);
-                            maxR = std::max(int(maxR), ExtractLane(
-                                    MaxOfLanes(di32x4, Mul(PromoteTo(di32x4, r), vKernel)), 0));
-                            maxG = std::max(int(maxG), ExtractLane(
-                                    MaxOfLanes(di32x4, Mul(PromoteTo(di32x4, g), vKernel)), 0));
-                            maxB = std::max(int(maxB), ExtractLane(
-                                    MaxOfLanes(di32x4, Mul(PromoteTo(di32x4, b), vKernel)), 0));
-                            maxA = std::max(int(maxA), ExtractLane(
-                                    MaxOfLanes(di32x4, Mul(PromoteTo(di32x4, a), vKernel)), 0));
-                        }
-
-                        for (; i < nSize; ++i) {
-                            int newX = clamp(x + i, 0, width - 1);
-                            if (newX >= 0 && newX < width) {
-                                const auto kernValue = kernel(j + mSize, i + nSize);
-                                newX *= 4;
-                                const uint8_t itemR = src[newX] * kernValue;
-                                if (itemR > maxR) {
-                                    maxR = itemR;
-                                }
-                                const uint8_t itemG = src[newX + 1] * kernValue;
-                                if (itemG > maxG) {
-                                    maxG = itemG;
-                                }
-                                const uint8_t itemB = src[newX + 2] * kernValue;
-                                if (itemB > maxB) {
-                                    maxB = itemB;
-                                }
-                                const uint8_t itemA = src[newX + 3] * kernValue;
-                                if (itemA > maxA) {
-                                    maxA = itemA;
-                                }
-                            }
-                        }
+        if (rowMajor(cy, cx) == 0) {
+            for (int i = 0; i < kernel.rows(); ++i) {
+                for (int j = 0; j < kernel.cols(); ++j) {
+                    if (rowMajor(i, j) != 0) {
+                        cx = j;
+                        cy = i;
+                        break;
                     }
                 }
-
-                auto dst = reinterpret_cast<uint8_t *>(
-                        reinterpret_cast<uint8_t *>(destination) + y * stride);
-                dst[px] = maxR;
-                dst[px + 1] = maxG;
-                dst[px + 2] = maxB;
-                dst[px + 3] = maxA;
             }
-        });
+        }
+
+        dilationArbitrarySE(rVec.data(), rDstVec.data(), width, height,
+                            rowMajor.data(), rowMajor.rows(), rowMajor.cols(),
+                            cx, cy);
+        dilationArbitrarySE(gVec.data(), gDstVec.data(), width, height,
+                            rowMajor.data(), rowMajor.rows(), rowMajor.cols(),
+                            cx, cy);
+        dilationArbitrarySE(bVec.data(), bDstVec.data(), width, height,
+                            rowMajor.data(), rowMajor.rows(), rowMajor.cols(),
+                            cx, cy);
+        dilationArbitrarySE(aVec.data(), aDstVec.data(), width, height,
+                            rowMajor.data(), rowMajor.rows(), rowMajor.cols(),
+                            cx, cy);
+
+        merge(destination, rDstVec.data(), gDstVec.data(), bDstVec.data(), aDstVec.data(), stride, width, height);
     }
 
     template<class T>
-    void dilate(T *pixels, T *destination, int width, int height,
-                std::vector<std::vector<int>> &kernel) {
-        concurrency::parallel_for(6, height, [&](int y) {
-            const FixedTag<uint8_t, 16> du8x16;
-            const FixedTag<uint8_t, 8> du8x8;
-            const FixedTag<uint8_t, 4> du8x4;
-            const FixedTag<int16_t, 8> di16x8;
-            const FixedTag<int16_t, 4> di16x4;
-            const FixedTag<int32_t, 4> di32x4;
-            const FixedTag<int8_t, 4> di8x4;
-            using VU8x16 = Vec<decltype(du8x16)>;
-            using VU8x4 = Vec<decltype(du8x4)>;
+    void dilate(T *pixels, T *destination, int width, int height, Eigen::MatrixXi &kernel) {
+        Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajorBit> rowMajor(kernel.rows(), kernel.cols());
+        for (int i = 0; i < kernel.rows(); ++i) {
+            for (int j = 0; j < kernel.cols(); ++j) {
+                rowMajor(i, j) = kernel(i, j);
+            }
+        }
 
-            auto dst = reinterpret_cast<T *>(
-                    reinterpret_cast<uint8_t *>(destination) + y * width);
-            for (int x = 0; x < width; ++x) {
-                int mSize = kernel.size() / 2;
+        int cx = kernel.cols() / 2;
+        int cy = kernel.rows() / 2;
 
-                auto srcLocal = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(pixels) + y * width);
-
-                int px = x;
-                int maxValue = srcLocal[px];
-                for (int j = -mSize; j < mSize; ++j) {
-                    std::vector<int> sub = kernel[j + mSize];
-                    int nSize = sub.size() / 2;
-                    int i = -nSize;
-                    int newY = y + j;
-                    auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(pixels) + newY * width);
-                    if (newY >= 0 && newY < height) {
-                        for (; i + nSize + 16 < nSize && x + i + 16 < width; i += 16) {
-                            VU8x16 r;
-                            int newX = (clamp(x + i, 0, width - 1));
-                            r = LoadU(du8x16, &src[newX]);
-                            auto lowR = PromoteLowerTo(di16x8, r);
-
-                            auto vKernelHigh = LoadU(di32x4, &sub[i + nSize]);
-                            auto vKernelLow = LoadU(di32x4, &sub[i + nSize + 4]);
-
-                            auto vKernel = Combine(di16x8, DemoteTo(di16x4, vKernelHigh), DemoteTo(di16x4, vKernelLow));
-
-                            maxValue = std::max(int(maxValue), (int) ExtractLane(
-                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, UpperHalf(du8x8, r)), vKernel)), 0));
-
-                            vKernelHigh = LoadU(di32x4, &sub[i + nSize + 8]);
-                            vKernelLow = LoadU(di32x4, &sub[i + nSize + 12]);
-
-                            vKernel = Combine(di16x8, DemoteTo(di16x4, vKernelHigh), DemoteTo(di16x4, vKernelLow));
-
-                            maxValue = std::max(int(maxValue), (int) ExtractLane(
-                                    MaxOfLanes(di16x8, Mul(PromoteTo(di16x8, LowerHalf(r)), vKernel)), 0));
-                        }
-
-                        for (; i + nSize + 4 < nSize && x + i + 4 < width; i += 4) {
-                            int newX = std::clamp(x + i, 0, width - 1);
-                            auto vKernel = LoadU(di32x4, &sub[i + nSize]);
-                            VU8x4 r = LoadU(du8x4, reinterpret_cast<uint8_t *>(src) + newX);
-                            maxValue = std::max(int(maxValue), ExtractLane(
-                                    MaxOfLanes(di32x4, Mul(PromoteTo(di32x4, r), vKernel)), 0));
-                        }
-
-                        for (; i < nSize; ++i) {
-                            int newX = clamp(x + i, 0, width - 1);
-                            const auto kern = sub[i + nSize];
-                            if (newX >= 0 && newX < width) {
-                                const uint8_t itemR = src[newX] * kern;
-                                maxValue = std::max(itemR, uint8_t(maxValue));
-                            }
-                        }
+        if (rowMajor(cy, cx) == 0) {
+            for (int i = 0; i < kernel.rows(); ++i) {
+                for (int j = 0; j < kernel.cols(); ++j) {
+                    if (rowMajor(i, j) != 0) {
+                        cx = j;
+                        cy = i;
+                        break;
                     }
                 }
-
-                dst[px] = maxValue;
             }
-        });
+        }
+
+        dilationArbitrarySE(pixels, destination, width, height,
+                            rowMajor.data(), rowMajor.rows(), rowMajor.cols(),
+                            cx, cy);
     }
 
     template void
     dilate(uint8_t *pixels, uint8_t *destination, int width, int height,
-           std::vector<std::vector<int>> &kernel);
+           Eigen::MatrixXi &kernel);
 
     template
     void dilateRGBA(uint8_t *pixels, uint8_t *destination, int stride, int width, int height,

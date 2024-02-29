@@ -45,10 +45,11 @@ using namespace std;
 namespace aire {
 
     static Eigen::MatrixXf generate2DGaussianKernel(int size, double sigma) {
+        const float scale = 1.f / (std::sqrt(2 * M_PI) * sigma);
         Eigen::MatrixXf kernel2d(size, size);
         for (int row = 0; row < kernel2d.rows(); row++) {
             for (int col = 0; col < kernel2d.cols(); col++) {
-                double x = exp(-(row * row + col * col) / (2 * sigma * sigma));
+                double x = std::exp(-(std::sqrt(row * row + col * col)) / (2 * sigma * sigma)) * scale;
                 kernel2d(row, col) = x;
             }
         }

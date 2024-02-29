@@ -37,7 +37,7 @@
 namespace aire {
     template<class T>
     void dilate(T *pixels, T *destination, int width, int height,
-                std::vector<std::vector<int>> &kernel);
+                Eigen::MatrixXi &kernel);
 
     template<class T>
     void dilateRGBA(T *pixels, T *destination, int stride, int width, int height,

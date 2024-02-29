@@ -51,17 +51,13 @@ static vector<float> compute1DGaussianKernel(int width, float sigma) {
     vector<float> kernel(ceil(width));
     int mean = ceil(width) / 2;
     float sum = 0;
+    const float scale = 1.f / (std::sqrt(2 * M_PI) * sigma);
     for (int x = 0; x < width; x++) {
-        kernel[x] = (float) std::exp(-0.5 * pow((x - mean) / sigma, 2.0));
+        kernel[x] = std::exp(-0.5 * pow((x - mean) / sigma, 2.0)) * scale;
         sum += kernel[x];
     }
     for (int x = 0; x < width; x++)
         kernel[x] /= sum;
-    return std::move(kernel);
-}
-
-static std::vector<std::vector<int>> getStructuringKernel(int size) {
-    std::vector<std::vector<int>> kernel(size, std::vector<int>(size, 1));
     return std::move(kernel);
 }
 
