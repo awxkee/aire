@@ -10,7 +10,7 @@ afterEvaluate {
             create<MavenPublication>("mavenJava") {
                 groupId = "com.awxkee"
                 artifactId = "aire"
-                version = "0.9.51"
+                version = "0.9.84"
                 from(components["release"])
             }
         }

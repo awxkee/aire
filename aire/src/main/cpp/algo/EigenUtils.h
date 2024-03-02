@@ -33,6 +33,8 @@
 #include "Eigen/Eigen"
 #include <queue>
 #include <algorithm>
+#include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -230,7 +232,7 @@ static std::string matrixToString(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::
 
     for (int i = 0; i < matrix.rows(); ++i) {
         for (int j = 0; j < matrix.cols(); ++j) {
-            oss << matrix(i, j);
+            oss << std::fixed << std::setprecision(2) << matrix(i, j);
 
             // Add a separator (e.g., space) between elements
             if (j < matrix.cols() - 1) {

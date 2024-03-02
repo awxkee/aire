@@ -56,11 +56,8 @@ namespace aire {
                     for (int n = -nSize; n < nSize; ++n) {
                         int newX = x + m;
                         int newY = y + n;
-                        if (newX >= 0 && newX < width && newY >= 0 &&
-                            newY < height) {
-                            auto src = reinterpret_cast<uint32_t *>(
-                                    reinterpret_cast<uint8_t *>(pixels) +
-                                    newY * stride);
+                        if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
+                            auto src = reinterpret_cast<uint32_t *>(reinterpret_cast<uint8_t *>(pixels) + newY * stride);
                             const uint32_t item = src[newX] * kernel(m + mSize, n + nSize);
                             if (item < min) {
                                 min = item;

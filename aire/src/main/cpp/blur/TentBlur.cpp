@@ -27,6 +27,7 @@
  *  *
  *
  */
+
 #include "TentBlur.h"
 #include "base/Convolve1D.h"
 #include "base/Convolve1Db16.h"
@@ -36,6 +37,7 @@
 #include <thread>
 #include <algorithm>
 #include "base/Convolve2D.h"
+#include "EigenUtils.h"
 
 namespace aire {
 
@@ -74,27 +76,40 @@ namespace aire {
     }
 
     Eigen::MatrixXf generateTentFilter(int N) {
-        if (N % 2 == 0 || N < 1) {
-            throw AireError(
-                    "Invalid filter size. Please use an odd positive integer for N, but received: " +
-                    std::to_string(N));
-        }
+        int padding = N > 4 ? N * 0.2 : 0;
+        int newSize = (N - padding) / 2;
+        float maxDistance = newSize;
 
         Eigen::MatrixXf tentFilter(N, N);
-        float peakValue = 1.0f / ((N / 2) + 1);
+
+        float peakValue = static_cast<float>(N);
         for (int i = 0; i < N; ++i) {
             for (int j = 0; j < N; ++j) {
-                float distanceToCenter = std::min({i, j, N - 1 - i, N - 1 - j});
-                tentFilter(i, j) = peakValue * (1.0f - (distanceToCenter / (N / 2.0f)));
+                int dx = j - N / 2;
+                int dy = i - N / 2;
+                float distance = std::sqrt(dx * dx + dy * dy);
+                if (distance > maxDistance) {
+                    tentFilter(i, j) = 0;
+                } else {
+                    float distanceToCenter = std::min({i, j, N - 1 - i, N - 1 - j});
+                    tentFilter(i, j) = peakValue * distanceToCenter / (N / 2.0f);
+                }
             }
+        }
+
+        const float sum = tentFilter.sum();
+
+        if (sum != 0.f) {
+            tentFilter /= sum;
         }
 
         return tentFilter;
     }
 
     void tentBlur(uint8_t *data, int stride, int width, int height, const int size) {
-        auto gen1DKernel = generate1DTentFilterKernelNormalized(size);
-        convolve1D(data, stride, width, height, gen1DKernel, gen1DKernel);
+        auto kernel = generateTentFilter(size);
+        Convolve2D convolve2D(kernel);
+        convolve2D.convolve(data, stride, width, height);
     }
 
     void tentBlurF16(uint16_t *data, int stride, int width, int height, const int size) {

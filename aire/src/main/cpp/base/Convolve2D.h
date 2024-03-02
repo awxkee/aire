@@ -45,10 +45,12 @@ namespace aire {
     private:
         const Eigen::MatrixXf matrix;
 
-        void applyChannel(FF2DWorkspace *workspace, uint8_t *data, const int stride, const int chanIndex, const int width,
+        void applyChannel(FF2DWorkspace *workspace, uint8_t *data,
+                          const int stride, const int chanIndex, const int width,
                           const int height);
 
         void fftConvolve(uint8_t *data, int stride, int width, int height);
+
         void bruteForceConvolve(uint8_t *data, int stride, int width, int height);
     };
 }

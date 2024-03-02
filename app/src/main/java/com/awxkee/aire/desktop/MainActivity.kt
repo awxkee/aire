@@ -66,10 +66,10 @@ class MainActivity : ComponentActivity() {
 //                        }
 //
 //                        val d2Time = measureTimeMillis {
-////                            val blurred4 = Aire.gaussianBlur(bitmap, 75,  75f)
-////                            scope.launch {
-////                                imagesArray.add(blurred4)
-////                            }
+//                            val blurred4 = Aire.convex(bitmap, 1.7f)
+//                            scope.launch {
+//                                imagesArray.add(blurred4)
+//                            }
 //                        }
 //                        var radius = 5
 //                        repeat(25) {

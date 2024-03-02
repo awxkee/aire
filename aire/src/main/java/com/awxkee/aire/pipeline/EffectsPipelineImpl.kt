@@ -35,6 +35,11 @@ import androidx.annotation.IntRange
 import com.awxkee.aire.EffectsPipelines
 
 class EffectsPipelineImpl : EffectsPipelines {
+
+    override fun convex(bitmap: Bitmap, strength: Float): Bitmap {
+        return convexImpl(bitmap, strength)
+    }
+
     override fun bokeh(
         bitmap: Bitmap,
         @IntRange(from = 3.toLong()) kernelSize: Int,
@@ -84,6 +89,8 @@ class EffectsPipelineImpl : EffectsPipelines {
     override fun crystallize(bitmap: Bitmap, numClusters: Int, strokeColor: Int): Bitmap {
         return crystallizeImpl(bitmap, numClusters, strokeColor)
     }
+
+    private external fun convexImpl(bitmap: Bitmap, strength: Float): Bitmap
 
     private external fun bokehImpl(bitmap: Bitmap, kernelSize: Int, sides: Int, enhance: Boolean): Bitmap
 

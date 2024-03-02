@@ -68,7 +68,7 @@ Java_com_awxkee_aire_pipeline_YuvPipelinesImpl_Yuv420nV21ToRGBA(JNIEnv *env, job
             throwException(env, exception);
             return static_cast<jobject>(nullptr);
         }
-        copy(rgbaBuffer.begin(), rgbaBuffer.end(), dstBufferAddress);
+        std::copy(rgbaBuffer.begin(), rgbaBuffer.end(), dstBufferAddress);
         return dstBuffer;
     } catch (std::bad_alloc &err) {
         std::string exception = "Not enough memory to decode this image";
@@ -108,7 +108,7 @@ Java_com_awxkee_aire_pipeline_YuvPipelinesImpl_Yuv420nV21ToBGRImpl(JNIEnv *env, 
             throwException(env, exception);
             return static_cast<jobject>(nullptr);
         }
-        copy(rgbaBuffer.begin(), rgbaBuffer.end(), dstBufferAddress);
+        std::copy(rgbaBuffer.begin(), rgbaBuffer.end(), dstBufferAddress);
         return dstBuffer;
     } catch (std::bad_alloc &err) {
         std::string exception = "Not enough memory to decode this image";

@@ -37,6 +37,7 @@
 #include "effect/CrystallizeEffect.h"
 #include "effect/WaterEffect.h"
 #include "effect/PerlinDistortion.h"
+#include "effect/ConvexEffect.hpp"
 #include "base/Dilation.h"
 #include "blur/GaussBlur.h"
 #include "color/ConvolveToneMapper.h"
@@ -311,6 +312,40 @@ Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_bokehImpl(JNIEnv *env, jobject
                                                                          height,
                                                                          kernel);
                                                         input = output;
+                                                    }
+                                                    return {
+                                                            .data = input,
+                                                            .stride = stride,
+                                                            .width = width,
+                                                            .height = height,
+                                                            .pixelFormat = fmt
+                                                    };
+                                                });
+        return newBitmap;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_convexImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat strength) {
+    try {
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        jobject newBitmap = AcquireBitmapPixels(env,
+                                                bitmap,
+                                                formats,
+                                                false,
+                                                [&](
+                                                        std::vector<uint8_t> &input, int stride,
+                                                        int width, int height,
+                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    if (fmt == APF_RGBA8888) {
+                                                        aire::ConvexEffect convex(strength);
+                                                        convex.apply(input.data(), stride, width, height);
                                                     }
                                                     return {
                                                             .data = input,

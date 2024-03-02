@@ -36,6 +36,8 @@ import androidx.annotation.IntRange
 
 interface EffectsPipelines {
 
+    fun convex(bitmap: Bitmap, strength: Float = 1.7f): Bitmap
+
     fun bokeh(
         bitmap: Bitmap,
         @IntRange(from = 3) kernelSize: Int,
