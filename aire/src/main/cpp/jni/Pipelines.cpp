@@ -128,7 +128,7 @@ Java_com_awxkee_aire_pipeline_ProcessingPipelinesImpl_convolve2DImpl(JNIEnv *env
             return nullptr;
         }
 
-        int size = std::sqrt(length);
+        int size = std::sqrtf(length);
 
         Eigen::MatrixXf matrix(size, size);
         jfloat *inputElements = env->GetFloatArrayElements(kernel, 0);

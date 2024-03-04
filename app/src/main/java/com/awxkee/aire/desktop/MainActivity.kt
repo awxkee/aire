@@ -42,6 +42,7 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.util.UUID
 import java.util.concurrent.Executors
 import kotlin.math.PI
@@ -59,17 +60,26 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                                .scaleWith(0.4f)
+//                            BitmapFactory.decodeResource(resources, R.drawable.white_noise)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
-//                        val d2Time = measureTimeMillis {
-//                            val blurred4 = Aire.convex(bitmap, 1.7f)
-//                            scope.launch {
-//                                imagesArray.add(blurred4)
+//                        repeat(5) {
+//                            val d2Time = measureTimeMillis {
+////                            val blurred4 = Aire.gaussianBlur(bitmap, 121 * 2 + 1, (121 * 2) / 6.0f)
+////                            val blurred4 = Aire.convolve2D(bitmap, ConvolveKernels.gaussian(121 * 2 + 1, (121 * 2) / 6.0f))
+//                                var blurred4 = Aire.boxBlur(bitmap, 128 * 2 + 1)
+//                                scope.launch {
+//                                    imagesArray.add(blurred4)
+//                                }
+//                                val fos =
+//                                    FileOutputStream(File(cacheDir, "white_noise_boxes_many.png"))
+//                                blurred4.compress(Bitmap.CompressFormat.PNG, 100, fos)
+//                                fos.flush()
+//                                fos.close()
 //                            }
+//                            Log.d("AireMedian", "Radius 125 exec time $d2Time ms for 4D")
 //                        }
 //                        var radius = 5
 //                        repeat(25) {

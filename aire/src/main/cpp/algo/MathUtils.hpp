@@ -51,9 +51,9 @@ static vector<float> compute1DGaussianKernel(int width, float sigma) {
     vector<float> kernel(ceil(width));
     int mean = ceil(width) / 2;
     float sum = 0;
-    const float scale = 1.f / (std::sqrt(2 * M_PI) * sigma);
+    const float scale = 1.f / (std::sqrtf(2 * M_PI) * sigma);
     for (int x = 0; x < width; x++) {
-        kernel[x] = std::exp(-0.5 * pow((x - mean) / sigma, 2.0)) * scale;
+        kernel[x] = std::expf(-0.5 * std::powf((x - mean) / sigma, 2.0)) * scale;
         sum += kernel[x];
     }
     for (int x = 0; x < width; x++)
@@ -65,7 +65,7 @@ static bool isSquareRootInteger(float N) {
     if (N < 0)
         return false;
     float squareRootN = sqrt(N);
-    return std::pow(static_cast<int>(squareRootN), 2) == N;
+    return std::powf(static_cast<int>(squareRootN), 2) == N;
 }
 
 class LowPassFilter {

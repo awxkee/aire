@@ -96,7 +96,7 @@ namespace aire::HWY_NAMESPACE {
         }
 
     private:
-        const float maxColors = std::pow(2.0f, (float) 8.f) - 1.0f;
+        const float maxColors = std::powf(2.0f, (float) 8.f) - 1.0f;
     };
 
     class NearestRowSampler16Bit : public ScaleRowSampler<uint16_t> {

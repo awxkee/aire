@@ -25,7 +25,7 @@ namespace aire {
             const TFromD<D> tmp = TFromD<D>(2.f * cutoff);
             const TFromD<D> x = Cin + (tmp - Cin) * std::clamp(tmp - Cin, 0.f, 1.f) * (0.25f / cutoff) - cutoff;
             const TFromD<D> Cout = (x * (6.2f * x + 0.5f)) / (x * (6.2f * x + 1.7f) + 0.06f);
-            return std::pow(Cout, 2.4f);
+            return std::powf(Cout, 2.4f);
         }
 
         HWY_FAST_MATH_INLINE V aldridge(const V v) {

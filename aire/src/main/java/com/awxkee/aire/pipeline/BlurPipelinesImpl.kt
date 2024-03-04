@@ -101,7 +101,7 @@ class BlurPipelinesImpl : BlurPipelines {
     }
 
     override fun fastGaussian3Degree(bitmap: Bitmap, radius: Int): Bitmap {
-        return fastGaussian2DImpl(bitmap, radius)
+        return fastGaussian3DImpl(bitmap, radius)
     }
 
     override fun tentBlur(bitmap: Bitmap, kernelSize: Int): Bitmap {

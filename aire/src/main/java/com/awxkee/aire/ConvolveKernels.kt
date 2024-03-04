@@ -55,10 +55,14 @@ object ConvolveKernels {
     fun gaussian(kernelSize: Int, sigma: Float): FloatArray {
         var kernel = FloatArray(kernelSize * kernelSize) { _ -> 1.0f }
         var sum: Double = 0.0
+        val d2Sigma = 2.0f * sigma * sigma
+        val coeff: Float = 1.0f / (Math.PI.toFloat() * d2Sigma)
         for (row in 0..<kernelSize) {
             for (col in 0..<kernelSize) {
+                val yMean = row - kernelSize / 2
+                val xMean = col - kernelSize / 2
                 val x =
-                    exp(-((row * row).toDouble() + (col * col).toDouble()) / (2 * sigma * sigma))
+                    exp(-((yMean * yMean).toDouble() + (xMean * xMean).toDouble()) / d2Sigma) * coeff
                 kernel[row * kernelSize + col] = x.toFloat()
                 sum += x
             }

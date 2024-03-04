@@ -52,7 +52,7 @@ namespace aire {
             V Lin = Add(Add(rLuma, gLuma), bLuma);
 
             const TFromD<D> Lmax = this->maxLd;
-            const auto LwaP = Set(df_, Lwa / std::pow(1.f + bias - 0.85f, 5.f));
+            const auto LwaP = Set(df_, Lwa / std::powf(1.f + bias - 0.85f, 5.f));
             const auto LmaxP = Div(Set(df_, Lmax), LwaP);
             const auto LinP = Div(Lin, LwaP);
 
@@ -88,14 +88,14 @@ namespace aire {
             const float Lmax = this->maxLd * exposure;
 
             // Bias the world adaptation and scale other parameters accordingly
-            float LwaP = Lwa / std::pow(1.f + bias - 0.85f, 5.f),
+            float LwaP = Lwa / std::powf(1.f + bias - 0.85f, 5.f),
                     LmaxP = Lmax / LwaP,
                     LinP = Lin / LwaP;
 
             // Apply tonemapping curve to luminance
             float exponent = std::log(bias) / std::log(0.5f),
                     c1 = (0.01f * maxLd) / std::log10(1.f + LmaxP),
-                    c2 = std::log(1.f + LinP) / std::log(2.f + 8.f * std::pow(LinP / LmaxP, exponent)),
+                    c2 = std::log(1.f + LinP) / std::log(2.f + 8.f * std::powf(LinP / LmaxP, exponent)),
                     Lout = c1 * c2;
 
             const float scale = Lout / Lin;

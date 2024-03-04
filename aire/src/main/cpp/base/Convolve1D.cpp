@@ -28,6 +28,12 @@
  *
  */
 
+#undef HWY_TARGET_INCLUDE
+#define HWY_TARGET_INCLUDE "base/Convolve1D.cpp"
+
+#include "hwy/foreach_target.h"
+#include "hwy/highway.h"
+
 #include "Convolve1D.h"
 #include "hwy/highway.h"
 #include "jni/JNIUtils.h"
@@ -37,7 +43,8 @@
 #include "Eigen/Eigen"
 #include "FF1DWorkspace.hpp"
 
-namespace aire {
+HWY_BEFORE_NAMESPACE();
+namespace aire::HWY_NAMESPACE {
 
     using namespace hwy;
     using namespace std;
@@ -280,6 +287,11 @@ namespace aire {
         }
     }
 
+}
+HWY_AFTER_NAMESPACE();
+
+#if HWY_ONCE
+namespace aire {
     void fftConvolve(uint8_t *data, int stride, int width, int height, const Eigen::VectorXf &horizontal, const Eigen::VectorXf &vertical) {
         Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> rChannel(height, width);
         Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> gChannel(height, width);
@@ -369,6 +381,9 @@ namespace aire {
         });
     }
 
+    HWY_EXPORT(convolve1DHorizontalPass);
+    HWY_EXPORT(convolve1DVerticalPass);
+
     void convolve1D(uint8_t *data, int stride, int width, int height, const std::vector<float> &horizontal, const std::vector<float> &vertical) {
         std::vector<uint8_t> transient(stride * height);
 
@@ -387,16 +402,16 @@ namespace aire {
         if (width * height > fftPathThreshold && (horizontal.size() > 650 || vertical.size() > 650)) {
             fftConvolve(data, stride, width, height, horizontalKernel, verticalKernel);
         } else {
-            const int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                              height * width / (256 * 256)), 1, 12);
+            const int threadCount = std::clamp(std::min(static_cast<int>(std::thread::hardware_concurrency()),
+                                                          height * width / (256 * 256)), 1, 12);
             concurrency::parallel_for(threadCount, height, [&](int y) {
-                convolve1DHorizontalPass(transient, data, stride, y, width, height, horizontalKernel);
+                HWY_DYNAMIC_DISPATCH(convolve1DHorizontalPass)(transient, data, stride, y, width, height, horizontalKernel);
             });
 
             concurrency::parallel_for(threadCount, height, [&](int y) {
-                convolve1DVerticalPass(transient, data, stride, y, width, height, verticalKernel);
+                HWY_DYNAMIC_DISPATCH(convolve1DVerticalPass)(transient, data, stride, y, width, height, verticalKernel);
             });
         }
     }
-
 }
+#endif

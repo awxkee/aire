@@ -487,7 +487,7 @@ namespace aire::HWY_NAMESPACE {
     void RGBAF16To565HWY(const uint16_t *sourceData, int srcStride,
                          uint16_t *dst, int dstStride, int width,
                          int height) {
-        float maxColors = std::pow(2.f, static_cast<float>(8)) - 1;
+        float maxColors = std::powf(2.f, static_cast<float>(8)) - 1;
 
         auto mSrc = reinterpret_cast<const uint8_t *>(sourceData);
         auto mDst = reinterpret_cast<uint8_t *>(dst);

@@ -29,6 +29,8 @@
  */
 
 
+#include "hwy/foreach_target.h"
+#include "hwy/highway.h"
 #include "algo/support-inl.h"
 #include "base/Convolve1Db16.h"
 #include "base/Convolve2D.h"
@@ -40,14 +42,137 @@
 #include <thread>
 #include "base/Convolve1D.h"
 #include "jni/JNIUtils.h"
+#include "concurrency.hpp"
 
 using namespace std;
 
 namespace aire {
 
+    using namespace hwy;
+    using namespace hwy::HWY_NAMESPACE;
+
+    class BoxBlur {
+    public:
+        BoxBlur(uint8_t *data, int stride, int width, int height, int radius) :
+                data(data), stride(stride), width(width), height(height), radius(radius) {
+
+        }
+
+        void convolve() {
+            std::vector<uint8_t> transient(stride *height);
+            horizontalPass(data, transient.data());
+            verticalPass(transient.data(), data);
+        }
+
+    private:
+        uint8_t *data;
+        const int stride;
+        const int width;
+        const int height;
+        const int radius;
+
+        void horizontalPass(uint8_t *source, uint8_t *destination) {
+            const FixedTag<uint8_t, 4> du8;
+            const FixedTag<uint32_t, 4> du32x4;
+            const FixedTag<float32_t, 4> dfx4;
+            using VF = Vec<decltype(dfx4)>;
+            using VU = Vec<decltype(du8)>;
+            const auto max255 = Set(dfx4, 255.0f);
+            const VF zeros = Zero(dfx4);
+
+            const int halfOfKernel = radius / 2;
+            const bool isEven = radius % 2 == 0;
+            const int maxKernel = isEven ? halfOfKernel - 1 : halfOfKernel;
+
+            const VF mKernelScale = Set(dfx4, 1.f / radius);
+
+            const int threadCount = std::clamp(std::min(static_cast<int>(std::thread::hardware_concurrency()),
+                                                        width * height / (256 * 256)), 1, 12);
+
+            concurrency::parallel_for(threadCount, height, [&](int y) {
+                VF store = zeros;
+
+                auto dst = reinterpret_cast<uint8_t *>(destination + y * stride);
+
+                for (int j = -halfOfKernel; j <= maxKernel; ++j) {
+                    auto src = reinterpret_cast<uint8_t *>(source + y * stride);
+                    int pos = std::clamp(j, 0, width - 1) * 4;
+                    VU pixels = LoadU(du8, &src[pos]);
+                    store = Add(store, ConvertTo(dfx4, PromoteTo(du32x4, pixels)));
+                }
+
+                auto src = reinterpret_cast<uint8_t *>(source + y * stride);
+
+                for (int x = 0; x < width; ++x) {
+                    int pos = std::clamp(x - halfOfKernel, 0, width - 1) * 4;
+                    VU pixels = LoadU(du8, &src[pos]);
+                    store = Sub(store, ConvertTo(dfx4, PromoteTo(du32x4, pixels)));
+                    pos = std::clamp(x + halfOfKernel, 0, width - 1) * 4;
+                    pixels = LoadU(du8, &src[pos]);
+                    store = Add(store, ConvertTo(dfx4, PromoteTo(du32x4, pixels)));
+                    VF mPixel = Max(Min(Round(Mul(store, mKernelScale)), max255), zeros);
+                    VU pixelU = DemoteTo(du8, ConvertTo(du32x4, mPixel));
+
+                    StoreU(pixelU, du8, dst);
+
+                    dst += 4;
+                }
+            });
+
+        }
+
+        void verticalPass(uint8_t *source, uint8_t *destination) {
+            const FixedTag<uint8_t, 4> du8;
+            const FixedTag<uint32_t, 4> du32x4;
+            const FixedTag<float32_t, 4> dfx4;
+            using VF = Vec<decltype(dfx4)>;
+            using VU = Vec<decltype(du8)>;
+            const auto max255 = Set(dfx4, 255.0f);
+            const VF zeros = Zero(dfx4);
+
+            const int halfOfKernel = radius / 2;
+            const bool isEven = radius % 2 == 0;
+            const int maxKernel = isEven ? halfOfKernel - 1 : halfOfKernel;
+
+            const VF mKernelScale = Set(dfx4, 1.f / radius);
+
+            const int threadCount = std::clamp(std::min(static_cast<int>(std::thread::hardware_concurrency()),
+                                                        width * height / (256 * 256)), 1, 12);
+            concurrency::parallel_for(threadCount, width, [&](int x) {
+                VF store = zeros;
+
+                for (int j = -halfOfKernel; j <= maxKernel; ++j) {
+                    auto src = reinterpret_cast<uint8_t *>(source + std::clamp(j, 0, height - 1) * stride);
+                    int pos = x*4;
+                    VU pixels = LoadU(du8, &src[pos]);
+                    store = Add(store, ConvertTo(dfx4, PromoteTo(du32x4, pixels)));
+                }
+
+                for (int y = 0; y < height; ++y) {
+                    auto dst = reinterpret_cast<uint8_t *>(destination + y * stride);
+
+                    auto oldSrc = reinterpret_cast<uint8_t *>(source + std::clamp(y - halfOfKernel, 0, height - 1) * stride);
+
+                    int pos = x * 4;
+                    VU pixels = LoadU(du8, &oldSrc[pos]);
+                    store = Sub(store, ConvertTo(dfx4, PromoteTo(du32x4, pixels)));
+
+                    auto newSrc = reinterpret_cast<uint8_t *>(source + std::clamp(y + halfOfKernel, 0, height - 1) * stride);
+
+                    pixels = LoadU(du8, &newSrc[pos]);
+                    store = Add(store, ConvertTo(dfx4, PromoteTo(du32x4, pixels)));
+                    VF mPixel = Max(Min(Round(Mul(store, mKernelScale)), max255), zeros);
+                    VU pixelU = DemoteTo(du8, ConvertTo(du32x4, mPixel));
+
+                    StoreU(pixelU, du8, &dst[pos]);
+                }
+            });
+        }
+    };
+
     void boxBlurU8(uint8_t *data, int stride, int width, int height, int radius) {
-        const auto kernel = generateBoxKernel(radius);
-        convolve1D(data, stride, width, height, kernel, kernel);
+        BoxBlur boxBlur(data, stride, width, height, radius);
+        boxBlur.convolve();
     }
 
     void boxBlurF16(uint16_t *data, int stride, int width, int height, int radius) {

@@ -54,11 +54,11 @@ namespace aire {
         const FixedTag<float32_t, 4> dfx4;
         using VF = Vec<decltype(dfx4)>;
         std::vector<uint8_t> transient(stride * height);
-        std::vector<uint8_t> intensities(pow(2 * radius + 1, 2));
-        std::vector<uint8_t> rStore(pow(2 * radius + 1, 2));
-        std::vector<uint8_t> gStore(pow(2 * radius + 1, 2));
-        std::vector<uint8_t> bStore(pow(2 * radius + 1, 2));
-        std::vector<uint8_t> aStore(pow(2 * radius + 1, 2));
+        std::vector<uint8_t> intensities(std::powf(2 * radius + 1, 2));
+        std::vector<uint8_t> rStore(std::powf(2 * radius + 1, 2));
+        std::vector<uint8_t> gStore(std::powf(2 * radius + 1, 2));
+        std::vector<uint8_t> bStore(std::powf(2 * radius + 1, 2));
+        std::vector<uint8_t> aStore(std::powf(2 * radius + 1, 2));
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 int intensityIteration = 0;

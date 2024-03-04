@@ -149,7 +149,7 @@ namespace aire::HWY_NAMESPACE {
         }
 
     private:
-        const float maxColors = std::pow(2.0f, (float) 10.f) - 1.0f;
+        const float maxColors = std::powf(2.0f, (float) 10.f) - 1.0f;
         ScaleWeightSampler sampler;
 
         inline void parseToFloat(const uint32_t rgba1010102, float &r, float &g, float &b, float &a) {
@@ -345,7 +345,7 @@ namespace aire::HWY_NAMESPACE {
     private:
         typedef Vec<FixedTag<float32_t, 4>> (*ScaleWeightSamplerHWY)(FixedTag<float32_t, 4>, Vec<FixedTag<float32_t, 4>>);
 
-        const float maxColors = std::pow(2.0f, (float) 8.f) - 1.0f;
+        const float maxColors = std::powf(2.0f, (float) 8.f) - 1.0f;
         ScaleWeightSampler sampler;
         ScaleWeightSamplerHWY samplerHWY;
     };
@@ -517,7 +517,7 @@ namespace aire::HWY_NAMESPACE {
     private:
         typedef Vec<FixedTag<float32_t, 4>> (*ScaleWeightSamplerHWY)(FixedTag<float32_t, 4>, Vec<FixedTag<float32_t, 4>>);
 
-        const float maxColors = std::pow(2.0f, (float) 8.f) - 1.0f;
+        const float maxColors = std::powf(2.0f, (float) 8.f) - 1.0f;
         ScaleWeightSampler sampler;
         ScaleWeightSamplerHWY samplerHWY;
     };

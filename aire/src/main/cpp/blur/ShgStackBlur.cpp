@@ -116,7 +116,7 @@ namespace aire {
         int mul_sum = mul_table[radius];
         int shg_sum = shg_table[radius];
 
-        for (y = 0; y < height; y++) {
+        for (y = 0; y < height; ++y) {
             r_in_sum = g_in_sum = b_in_sum = r_sum = g_sum = b_sum = 0;
 
             r_out_sum = radiusPlus1 * (pr = pixels[yi]);

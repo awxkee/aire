@@ -68,8 +68,8 @@ namespace aire::HWY_NAMESPACE {
         const float c1 = 3424.0f / 4096.0f;
         const float c2 = (2413.0f / 4096.0f) * 32.0f;
         const float c3 = (2392.0f / 4096.0f) * 32.0f;
-        float p = pow(v, 1.0f / m2);
-        v = pow(max(p - c1, 0.0f) / (c2 - c3 * p), 1.0f / m1);
+        float p = std::powf(v, 1.0f / m2);
+        v = std::powf(max(p - c1, 0.0f) / (c2 - c3 * p), 1.0f / m1);
         v *= 10000.0f / sdrReferencePoint;
         return copysign(v, o);
     }
@@ -152,7 +152,7 @@ namespace aire::HWY_NAMESPACE {
         if (v <= 0.045f) {
             return v / 12.92f;
         } else {
-            return std::pow((v + 0.055f) / 1.055f, 2.4f);
+            return std::powf((v + 0.055f) / 1.055f, 2.4f);
         }
     }
 
@@ -160,7 +160,7 @@ namespace aire::HWY_NAMESPACE {
         if (linear <= 0.0031308f) {
             return 12.92f * linear;
         } else {
-            return 1.055f * std::pow(linear, 1.0f / 2.4f) - 0.055f;
+            return 1.055f * std::powf(linear, 1.0f / 2.4f) - 0.055f;
         }
     }
 
@@ -182,7 +182,7 @@ namespace aire::HWY_NAMESPACE {
         if (linear <= 0.018f) {
             return 4.5f * linear;
         } else {
-            return 1.099f * pow(linear, 0.45f) - 0.099f;
+            return 1.099f * std::powf(linear, 0.45f) - 0.099f;
         }
     }
 
@@ -204,7 +204,7 @@ namespace aire::HWY_NAMESPACE {
             return 0.0f;
         }
         constexpr float scale = 52.37f / 48.0f;
-        return pow(value, 2.6f) * scale;
+        return std::powf(value, 2.6f) * scale;
     }
 
     HWY_API float HLGEotf(float v) {
@@ -215,7 +215,7 @@ namespace aire::HWY_NAMESPACE {
         if (v <= 0.5f)
             v = v * v / 3.0f;
         else
-            v = (exp((v - c) / a) + b) / 12.f;
+            v = (std::expf((v - c) / a) + b) / 12.f;
         return v;
     }
 

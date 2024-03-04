@@ -126,7 +126,7 @@ namespace aire::HWY_NAMESPACE {
         }
 
     private:
-        const float maxColors = std::pow(2.0f, (float) 10.f) - 1.0f;
+        const float maxColors = std::powf(2.0f, (float) 10.f) - 1.0f;
 
         inline void parseToFloat(const uint32_t rgba1010102, float &r, float &g, float &b, float &a) {
             const uint32_t scalarMask = (1u << 10u) - 1u;
@@ -298,7 +298,7 @@ namespace aire::HWY_NAMESPACE {
         }
 
     private:
-        const float maxColors = std::pow(2.0f, (float) 8.f) - 1.0f;
+        const float maxColors = std::powf(2.0f, (float) 8.f) - 1.0f;
     };
 
     class HannRowSampler16Bit : public ScaleRowSampler<uint16_t> {

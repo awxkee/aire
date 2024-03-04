@@ -135,8 +135,8 @@ namespace aire::HWY_NAMESPACE {
                     // only kernel with size 3 is supported
                     constexpr int kernelSize = 2;
 
-                    float kx1 = floor(srcX);
-                    float ky1 = floor(srcY);
+                    float kx1 = std::floor(srcX);
+                    float ky1 = std::floor(srcY);
 
                     VF4 color = Set(dfx4, 0);
 
@@ -217,7 +217,7 @@ namespace aire::HWY_NAMESPACE {
     private:
         typedef Vec<FixedTag<float32_t, 4>> (*ScaleWeightSamplerHWY)(FixedTag<float32_t, 4>, Vec<FixedTag<float32_t, 4>>);
 
-        const float maxColors = std::pow(2.0f, (float) 8.f) - 1.0f;
+        const float maxColors = std::powf(2.0f, (float) 8.f) - 1.0f;
         ScaleWeightSampler sampler;
         ScaleWeightSamplerHWY samplerHWY;
     };
@@ -327,7 +327,7 @@ namespace aire::HWY_NAMESPACE {
     private:
         typedef Vec<FixedTag<float32_t, 4>> (*ScaleWeightSamplerHWY)(FixedTag<float32_t, 4>, Vec<FixedTag<float32_t, 4>>);
 
-        const float maxColors = std::pow(2.0f, (float) 10.f) - 1.0f;
+        const float maxColors = std::powf(2.0f, (float) 10.f) - 1.0f;
         ScaleWeightSampler sampler;
 
         inline void parseToFloat(const uint32_t rgba1010102, float &r, float &g, float &b, float &a) {

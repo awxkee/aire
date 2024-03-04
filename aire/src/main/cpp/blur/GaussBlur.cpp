@@ -40,16 +40,20 @@
 #include "flat_hash_map.hpp"
 #include "concurrency.hpp"
 
+#if defined(__clang__)
+#pragma clang fp contract(fast) exceptions(ignore) reassociate(on)
+#endif
+
 using namespace std;
 
 namespace aire {
 
     static Eigen::MatrixXf generate2DGaussianKernel(int size, double sigma) {
-        const float scale = 1.f / (std::sqrt(2 * M_PI) * sigma);
+        const float scale = 1.f / (2 * M_PI * sigma * sigma);
         Eigen::MatrixXf kernel2d(size, size);
         for (int row = 0; row < kernel2d.rows(); row++) {
             for (int col = 0; col < kernel2d.cols(); col++) {
-                double x = std::exp(-(std::sqrt(row * row + col * col)) / (2 * sigma * sigma)) * scale;
+                double x = std::expf(-((row * row + col * col)) / (2 * sigma * sigma)) * scale;
                 kernel2d(row, col) = x;
             }
         }
@@ -59,8 +63,6 @@ namespace aire {
         }
         return kernel2d;
     }
-
-    // https://zingl.github.io/blurring.pdf
 
     void vertical3Degree(uint8_t *data, const int stride, const int width, const int height, const int radius, const int channels, const int z) {
         const int radius3D = radius * radius * radius;
@@ -120,7 +122,8 @@ namespace aire {
     void vertical3Degree4Chan(uint8_t *data, const int stride, const int width, const int height, const int radius, const int start, const int end) {
         const float weight = 1.f / (static_cast<float>(radius) * static_cast<float>(radius) * static_cast<float>(radius));
 
-        ska::flat_hash_map<int, int> bufferR, bufferG, bufferB;
+        constexpr int bufLength = 1023;
+        int bufferR[bufLength + 1], bufferG[bufLength + 1], bufferB[bufLength + 1];
 
         const int channels = 4;
 
@@ -132,36 +135,44 @@ namespace aire {
                 auto src = reinterpret_cast<uint8_t *>(data) + y * stride;
                 int px = x * channels;
                 if (y >= 0) {
-                    difR += 3 * (bufferR[y] - bufferR[y + radius]) - bufferR[y - radius];
+                    int mpy = y & bufLength;
+                    int mpyPRadius = (y + radius) & bufLength;
+                    int mpyMRadius = (y - radius) & bufLength;
+                    difR += 3 * (bufferR[mpy] - bufferR[mpyPRadius]) - bufferR[mpyMRadius];
                     src[px] = sumR * weight;
 
-                    difG += 3 * (bufferG[y] - bufferG[y + radius]) - bufferG[y - radius];
-                    src[px + 1] = sumR * weight;
+                    difG += 3 * (bufferG[mpy] - bufferG[mpyPRadius]) - bufferG[mpyMRadius];
+                    src[px + 1] = sumG * weight;
 
-                    difB += 3 * (bufferB[y] - bufferB[y + radius]) - bufferB[y - radius];
-                    src[px + 2] = sumR * weight;
+                    difB += 3 * (bufferB[mpy] - bufferB[mpyPRadius]) - bufferB[mpyMRadius];
+                    src[px + 2] = sumB * weight;
                 } else if (y + radius >= 0) {
-                    difR += 3 * (bufferR[y] - bufferR[y + radius]);
-                    difG += 3 * (bufferG[y] - bufferG[y + radius]);
-                    difB += 3 * (bufferB[y] - bufferB[y + radius]);
+                    int mpy = y & bufLength;
+                    int mpyPRadius = (y + radius) & bufLength;
+                    difR += 3 * (bufferR[mpy] - bufferR[mpyPRadius]);
+                    difG += 3 * (bufferG[mpy] - bufferG[mpyPRadius]);
+                    difB += 3 * (bufferB[mpy] - bufferB[mpyPRadius]);
                 } else if (y + 2 * radius >= 0) {
-                    difR -= 3 * bufferR[y + radius];
-                    difG -= 3 * bufferG[y + radius];
-                    difB -= 3 * bufferB[y + radius];
+                    int mpyPRadius = (y + radius) & bufLength;
+                    difR -= 3 * bufferR[mpyPRadius];
+                    difG -= 3 * bufferG[mpyPRadius];
+                    difB -= 3 * bufferB[mpyPRadius];
                 }
+
+                int mPNextRad = (y + 2 * radius) & bufLength;
 
                 auto srcNext = reinterpret_cast<uint8_t *>(data) + std::clamp(y + 3 * radius / 2, 0, height - 1) * stride;
                 int pR = srcNext[px];
                 sumR += derR += difR += pR;
-                bufferR[y + 2 * radius] = pR;
+                bufferR[mPNextRad] = pR;
 
                 int pG = srcNext[px + 1];
                 sumG += derG += difG += pG;
-                bufferG[y + 2 * radius] = pG;
+                bufferG[mPNextRad] = pG;
 
                 int pB = srcNext[px + 2];
                 sumB += derB += difB += pB;
-                bufferB[y + 2 * radius] = pB;
+                bufferB[mPNextRad] = pB;
             }
         }
     }
@@ -170,49 +181,57 @@ namespace aire {
                                 const int start, const int end) {
         const float weight = 1.f / (static_cast<float>(radius) * static_cast<float>(radius) * static_cast<float>(radius));
 
-        ska::flat_hash_map<int, int> bufferR, bufferG, bufferB;
+        constexpr int bufLength = 1023;
+        int bufferR[bufLength + 1], bufferG[bufLength + 1], bufferB[bufLength + 1];
 
         const int channels = 4;
 
         for (int y = start; y < height && y < end; ++y) {
-            int difR = 0, derR = 0, difG = 0, derG = 0,
-                    difB = 0, derB = 0;
+            int difR = 0, derR = 0, difG = 0, derG = 0, difB = 0, derB = 0;
             float sumR = 0, sumG = 0, sumB = 0;
             for (int x = 0 - 3 * radius; x < width; ++x) {
                 auto src = reinterpret_cast<uint8_t *>(data) + y * stride;
                 if (x >= 0) {
+                    int mpy = x & bufLength;
+                    int mpyPRadius = (x + radius) & bufLength;
+                    int mpyMRadius = (x - radius) & bufLength;
                     int px = x * channels;
-                    difR += 3 * (bufferR[x] - bufferR[x + radius]) - bufferR[x - radius];
+                    difR += 3 * (bufferR[mpy] - bufferR[mpyPRadius]) - bufferR[mpyMRadius];
                     src[px] = sumR * weight;
 
-                    difG += 3 * (bufferG[x] - bufferG[x + radius]) - bufferG[x - radius];
-                    src[px + 1] = sumR * weight;
+                    difG += 3 * (bufferG[mpy] - bufferG[mpyPRadius]) - bufferG[mpyMRadius];
+                    src[px + 1] = sumG * weight;
 
-                    difB += 3 * (bufferB[x] - bufferB[x + radius]) - bufferB[x - radius];
-                    src[px + 2] = sumR * weight;
+                    difB += 3 * (bufferB[mpy] - bufferB[mpyPRadius]) - bufferB[mpyMRadius];
+                    src[px + 2] = sumB * weight;
                 } else if (x + radius >= 0) {
-                    difR += 3 * (bufferR[x] - bufferR[x + radius]);
-                    difG += 3 * (bufferG[x] - bufferG[x + radius]);
-                    difB += 3 * (bufferB[x] - bufferB[x + radius]);
+                    int mpy = x & bufLength;
+                    int mpyPRadius = (x + radius) & bufLength;
+                    difR += 3 * (bufferR[mpy] - bufferR[mpyPRadius]);
+                    difG += 3 * (bufferG[mpy] - bufferG[mpyPRadius]);
+                    difB += 3 * (bufferB[mpy] - bufferB[mpyPRadius]);
                 } else if (x + 2 * radius >= 0) {
-                    difR -= 3 * bufferR[x + radius];
-                    difG -= 3 * bufferG[x + radius];
-                    difB -= 3 * bufferB[x + radius];
+                    int mpyPRadius = (x + radius) & bufLength;
+                    difR -= 3 * bufferR[mpyPRadius];
+                    difG -= 3 * bufferG[mpyPRadius];
+                    difB -= 3 * bufferB[mpyPRadius];
                 }
+
+                int mPNextRad = (x + 2 * radius) & bufLength;
 
                 auto srcNext = reinterpret_cast<uint8_t *>(data) + y * stride;
                 int px = std::clamp(x + radius, 0, width - 1) * channels;
                 int pR = srcNext[px];
                 sumR += derR += difR += pR;
-                bufferR[x + 2 * radius] = pR;
+                bufferR[mPNextRad] = pR;
 
                 int pG = srcNext[px + 1];
                 sumG += derG += difG += pG;
-                bufferG[x + 2 * radius] = pG;
+                bufferG[mPNextRad] = pG;
 
                 int pB = srcNext[px + 2];
                 sumB += derB += difB += pB;
-                bufferB[x + 2 * radius] = pB;
+                bufferB[mPNextRad] = pB;
             }
         }
     }
@@ -226,7 +245,8 @@ namespace aire {
                               const int end) {
         const float weight = 1.f / (static_cast<float>(radius) * static_cast<float>(radius));
 
-        ska::flat_hash_map<int, int> bufferR, bufferG, bufferB;
+        constexpr int bufLength = 1023;
+        int bufferR[bufLength + 1], bufferG[bufLength + 1], bufferB[bufLength + 1];
 
         const int channels = 4;
 
@@ -237,31 +257,37 @@ namespace aire {
                 auto src = reinterpret_cast<uint8_t *>(data) + y * stride;
                 if (y >= 0) {
                     src[x * channels] = sumR * weight;
-                    difR += bufferR[y - radius] - 2 * bufferR[y];
+                    int arrIndex = (y - radius) & bufLength;
+                    int dArrIndex = y & bufLength;
+                    difR += bufferR[arrIndex] - 2 * bufferR[dArrIndex];
 
                     src[x * channels + 1] = sumG * weight;
-                    difG += bufferG[y - radius] - 2 * bufferG[y];
+                    difG += bufferG[arrIndex] - 2 * bufferG[dArrIndex];
 
                     src[x * channels + 2] = sumB * weight;
-                    difB += bufferB[y - radius] - 2 * bufferB[y];
+                    difB += bufferB[arrIndex] - 2 * bufferB[dArrIndex];
                 } else if (y + radius >= 0) {
-                    difR -= 2 * bufferR[y];
-                    difG -= 2 * bufferG[y];
-                    difB -= 2 * bufferB[y];
+                    int arrIndex = (y) & bufLength;
+                    difR -= 2 * bufferR[arrIndex];
+                    difG -= 2 * bufferG[arrIndex];
+                    difB -= 2 * bufferB[arrIndex];
                 }
 
                 auto srcNext = reinterpret_cast<uint8_t *>(data) + std::clamp(y + radius, 0, height - 1) * stride;
+
+                int arrIndex = (y + radius) & bufLength;
+
                 int pR = srcNext[x * channels];
                 sumR += difR += pR;
-                bufferR[y + radius] = pR;
+                bufferR[arrIndex] = pR;
 
                 int pG = srcNext[x * channels + 1];
                 sumG += difG += pG;
-                bufferG[y + radius] = pG;
+                bufferG[arrIndex] = pG;
 
                 int pB = srcNext[x * channels + 2];
                 sumB += difB += pB;
-                bufferB[y + radius] = pB;
+                bufferB[arrIndex] = pB;
             }
         }
     }
@@ -270,7 +296,8 @@ namespace aire {
                                 const int startY, const int endY) {
         const float weight = 1.f / (static_cast<float>(radius) * static_cast<float>(radius));
 
-        ska::flat_hash_map<int, int> bufferR, bufferG, bufferB;
+        constexpr int bufLength = 1023;
+        int bufferR[bufLength + 1], bufferG[bufLength + 1], bufferB[bufLength + 1];
 
         const int channels = 4;
 
@@ -280,33 +307,39 @@ namespace aire {
             for (int x = 0 - 2 * radius; x < width; ++x) {
                 auto src = reinterpret_cast<uint8_t *>(data) + y * stride;
                 if (x >= 0) {
+                    int arrIndex = (x - radius) & bufLength;
+                    int dArrIndex = x & bufLength;
+
                     src[x * channels] = sumR * weight;
-                    difR += bufferR[x - radius] - 2 * bufferR[x];
+                    difR += bufferR[arrIndex] - 2 * bufferR[dArrIndex];
 
                     src[x * channels + 1] = sumG * weight;
-                    difG += bufferG[x - radius] - 2 * bufferG[x];
+                    difG += bufferG[arrIndex] - 2 * bufferG[dArrIndex];
 
                     src[x * channels + 2] = sumB * weight;
-                    difB += bufferB[x - radius] - 2 * bufferB[x];
+                    difB += bufferB[arrIndex] - 2 * bufferB[dArrIndex];
                 } else if (x + radius >= 0) {
-                    difR -= 2 * bufferR[x];
-                    difG -= 2 * bufferG[x];
-                    difB -= 2 * bufferB[x];
+                    int dx = x & bufLength;
+                    difR -= 2 * bufferR[dx];
+                    difG -= 2 * bufferG[dx];
+                    difB -= 2 * bufferB[dx];
                 }
+
+                int arrIndex = (x + radius) & bufLength;
 
                 auto srcNext = reinterpret_cast<uint8_t *>(data) + y * stride;
                 int px = std::clamp(x + radius, 0, width - 1) * channels;
                 int pR = srcNext[px];
                 sumR += difR += pR;
-                bufferR[x + radius] = pR;
+                bufferR[arrIndex] = pR;
 
                 int pG = srcNext[px + 1];
                 sumG += difG += pG;
-                bufferG[x + radius] = pG;
+                bufferG[arrIndex] = pG;
 
                 int pB = srcNext[px + 2];
                 sumB += difB += pB;
-                bufferB[x + radius] = pB;
+                bufferB[arrIndex] = pB;
             }
         }
     }
@@ -370,7 +403,8 @@ namespace aire {
         radius4D *= radius4D;
         const float weight = 1.f / radius4D;
 
-        ska::flat_hash_map<int, float> bufferR, bufferG, bufferB;
+        constexpr int bufLength = 1023;
+        int bufferR[bufLength + 1], bufferG[bufLength + 1], bufferB[bufLength + 1];
 
         const int channels = 4;
 
@@ -380,44 +414,55 @@ namespace aire {
             for (int y = 0 - 4 * radius; y < height; ++y) {
                 auto src = reinterpret_cast<uint8_t *>(data) + y * stride;
                 if (y >= 0) {
-                    difR += -4 * (bufferR[y - radius] + bufferR[y + radius]) + 6 * bufferR[y] + bufferR[y - 2 * radius];
+
+                    int mpy = y & bufLength;
+                    int mpyPRadius = (y + radius) & bufLength;
+                    int mpyMRadius = (y - radius) & bufLength;
+                    int mpyM2Radius = (y - 2 * radius) & bufLength;
+
+                    difR += -4 * (bufferR[mpyMRadius] + bufferR[mpyPRadius]) + 6 * bufferR[mpy] + bufferR[mpyM2Radius];
                     src[x * channels] = sumR * weight;
 
-                    difG += -4 * (bufferG[y - radius] + bufferG[y + radius]) + 6 * bufferG[y] + bufferG[y - 2 * radius];
+                    difG += -4 * (bufferG[mpyMRadius] + bufferG[mpyPRadius]) + 6 * bufferG[mpy] + bufferG[mpyM2Radius];
                     src[x * channels + 1] = sumG * weight;
 
-                    difB += -4 * (bufferB[y - radius] + bufferB[y + radius]) + 6 * bufferB[y] + bufferB[y - 2 * radius];
+                    difB += -4 * (bufferB[mpyMRadius] + bufferB[mpyPRadius]) + 6 * bufferB[mpy] + bufferB[mpyM2Radius];
                     src[x * channels + 2] = sumB * weight;
                 } else {
                     if (y + 3 * radius >= 0) {
-                        difR -= 4 * bufferR[y + radius];
-                        difG -= 4 * bufferG[y + radius];
-                        difB -= 4 * bufferB[y + radius];
+                        int mpyPRadius = (y + radius) & bufLength;
+                        difR -= 4 * bufferR[mpyPRadius];
+                        difG -= 4 * bufferG[mpyPRadius];
+                        difB -= 4 * bufferB[mpyPRadius];
                     }
                     if (y + 2 * radius >= 0) {
-                        difR += 6 * bufferR[y];
-                        difG += 6 * bufferG[y];
-                        difB += 6 * bufferB[y];
+                        int mpy = y & bufLength;
+                        difR += 6 * bufferR[mpy];
+                        difG += 6 * bufferG[mpy];
+                        difB += 6 * bufferB[mpy];
                     }
                     if (y + radius >= 0) {
-                        difR -= 4 * bufferR[y - radius];
-                        difG -= 4 * bufferG[y - radius];
-                        difB -= 4 * bufferB[y - radius];
+                        int mpyMRadius = (y - radius) & bufLength;
+                        difR -= 4 * bufferR[mpyMRadius];
+                        difG -= 4 * bufferG[mpyMRadius];
+                        difB -= 4 * bufferB[mpyMRadius];
                     }
                 }
+
+                int mpyP2Radius = (y + 2 * radius) & bufLength;
 
                 auto srcNext = reinterpret_cast<uint8_t *>(data) + std::clamp(y + 2 * radius - 1, 0, height - 1) * stride;
                 int pR = srcNext[x * channels];
                 sumR += derR1 += derR2 += difR += pR;
-                bufferR[y + 2 * radius] = pR;
+                bufferR[mpyP2Radius] = pR;
 
                 int pG = srcNext[x * channels + 1];
                 sumG += derG1 += derG2 += difG += pG;
-                bufferG[y + 2 * radius] = pG;
+                bufferG[mpyP2Radius] = pG;
 
                 int pB = srcNext[x * channels + 2];
                 sumB += derB1 += derB2 += difB += pB;
-                bufferB[y + 2 * radius] = pB;
+                bufferB[mpyP2Radius] = pB;
             }
         }
     }
@@ -433,7 +478,8 @@ namespace aire {
         radius4D *= radius4D;
         const float weight = 1.f / radius4D;
 
-        ska::flat_hash_map<int, float> bufferR, bufferG, bufferB;
+        constexpr int bufLength = 1023;
+        int bufferR[bufLength + 1], bufferG[bufLength + 1], bufferB[bufLength + 1];
 
         const int channels = 4;
 
@@ -443,72 +489,88 @@ namespace aire {
             for (int x = 0 - 4 * radius; x < width; ++x) {
                 auto src = reinterpret_cast<uint8_t *>(data) + y * stride;
                 if (x >= 0) {
-                    difR += -4 * (bufferR[x - radius] + bufferR[x + radius]) + 6 * bufferR[x] + bufferR[x - 2 * radius];
+                    int mpy = x & bufLength;
+                    int mpyPRadius = (x + radius) & bufLength;
+                    int mpyMRadius = (x - radius) & bufLength;
+                    int mpyM2Radius = (x - 2 * radius) & bufLength;
+
+                    difR += -4 * (bufferR[mpyMRadius] + bufferR[mpyPRadius]) + 6 * bufferR[mpy] + bufferR[mpyM2Radius];
                     src[x * channels] = sumR * weight;
 
-                    difG += -4 * (bufferG[x - radius] + bufferG[x + radius]) + 6 * bufferG[x] + bufferG[x - 2 * radius];
+                    difG += -4 * (bufferG[mpyMRadius] + bufferG[mpyPRadius]) + 6 * bufferG[mpy] + bufferG[mpyM2Radius];
                     src[x * channels + 1] = sumG * weight;
 
-                    difB += -4 * (bufferB[x - radius] + bufferB[x + radius]) + 6 * bufferB[x] + bufferB[x - 2 * radius];
+                    difB += -4 * (bufferB[mpyMRadius] + bufferB[mpyPRadius]) + 6 * bufferB[mpy] + bufferB[mpyM2Radius];
                     src[x * channels + 2] = sumB * weight;
                 } else {
-                    if (y + 3 * radius >= 0) {
-                        difR -= 4 * bufferR[x + radius];
-                        difG -= 4 * bufferG[x + radius];
-                        difB -= 4 * bufferB[x + radius];
+                    if (x + 3 * radius >= 0) {
+                        int mpyPRadius = (x + radius) & bufLength;
+                        difR -= 4 * bufferR[mpyPRadius];
+                        difG -= 4 * bufferG[mpyPRadius];
+                        difB -= 4 * bufferB[mpyPRadius];
                     }
-                    if (y + 2 * radius >= 0) {
-                        difR += 6 * bufferR[x];
-                        difG += 6 * bufferG[x];
-                        difB += 6 * bufferB[x];
+                    if (x + 2 * radius >= 0) {
+                        int mpy = x & bufLength;
+                        difR += 6 * bufferR[mpy];
+                        difG += 6 * bufferG[mpy];
+                        difB += 6 * bufferB[mpy];
                     }
-                    if (y + radius >= 0) {
-                        difR -= 4 * bufferR[x - radius];
-                        difG -= 4 * bufferG[x - radius];
-                        difB -= 4 * bufferB[x - radius];
+                    if (x + radius >= 0) {
+                        int mpyMRadius = (x - radius) & bufLength;
+                        difR -= 4 * bufferR[mpyMRadius];
+                        difG -= 4 * bufferG[mpyMRadius];
+                        difB -= 4 * bufferB[mpyMRadius];
                     }
                 }
 
+                int mpyP2Radius = (x + 2 * radius) & bufLength;
+
                 auto srcNext = reinterpret_cast<uint8_t *>(data) + y * stride;
-                int px = std::clamp(x + 2 * radius - 1, 0, width - 1)*channels;
+                int px = std::clamp(x + 2 * radius - 1, 0, width - 1) * channels;
                 int pR = srcNext[px];
                 sumR += derR1 += derR2 += difR += pR;
-                bufferR[x + 2 * radius] = pR;
+                bufferR[mpyP2Radius] = pR;
 
                 int pG = srcNext[px + 1];
                 sumG += derG1 += derG2 += difG += pG;
-                bufferG[x + 2 * radius] = pG;
+                bufferG[mpyP2Radius] = pG;
 
                 int pB = srcNext[px + 2];
                 sumB += derB1 += derB2 += difB += pB;
-                bufferB[x + 2 * radius] = pB;
+                bufferB[mpyP2Radius] = pB;
             }
         }
     }
 
     void gaussianApproximation3D(uint8_t *data, int stride, int width, int height, int radius) {
-        concurrency::parallel_for_segment(8, width, [&](int start, int end) {
+        int threadCount = clamp(min(static_cast<int>(thread::hardware_concurrency()),
+                                    width * height / (256 * 256)), 1, 12);
+        concurrency::parallel_for_segment(threadCount, width, [&](int start, int end) {
             vertical3Degree4Chan(data, stride, width, height, radius, start, end);
         });
-        concurrency::parallel_for_segment(8, width, [&](int start, int end) {
+        concurrency::parallel_for_segment(threadCount, width, [&](int start, int end) {
             horizontal3Degree4Chan(data, stride, width, height, radius, start, end);
         });
     }
 
     void gaussianApproximation2D(uint8_t *data, int stride, int width, int height, int radius) {
-        concurrency::parallel_for_segment(8, width, [&](int start, int end) {
+        int threadCount = clamp(min(static_cast<int>(thread::hardware_concurrency()),
+                                    width * height / (256 * 256)), 1, 12);
+        concurrency::parallel_for_segment(threadCount, width, [&](int start, int end) {
             vertical2Degree4Chan(data, stride, width, height, radius, start, end);
         });
-        concurrency::parallel_for_segment(8, height, [&](int start, int end) {
+        concurrency::parallel_for_segment(threadCount, height, [&](int start, int end) {
             horizontal2Degree4Chan(data, stride, width, height, radius, start, end);
         });
     }
 
     void gaussianApproximation4D(uint8_t *data, int stride, int width, int height, int radius) {
-        concurrency::parallel_for_segment(1, width, [&](int start, int end) {
+        int threadCount = clamp(min(static_cast<int>(thread::hardware_concurrency()),
+                                    width * height / (256 * 256)), 1, 12);
+        concurrency::parallel_for_segment(threadCount, width, [&](int start, int end) {
             vertical4Degree4Chan(data, stride, width, height, radius, start, end);
         });
-        concurrency::parallel_for_segment(1, height, [&](int start, int end) {
+        concurrency::parallel_for_segment(threadCount, height, [&](int start, int end) {
             horizontal4Degree4Chan(data, stride, width, height, radius, start, end);
         });
     }

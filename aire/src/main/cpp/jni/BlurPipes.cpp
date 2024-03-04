@@ -606,9 +606,9 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_bokehBlurImpl(JNIEnv *env,
                                                         for (int i = 0; i < bokehKernel.rows(); ++i) {
                                                             for (int j = 0; j < bokehKernel.cols(); ++j) {
                                                                 if (bokehKernel(i, j) == 1.f) {
-                                                                    const float scale = 1.f / (std::sqrt(2 * M_PI) * sigma);
-                                                                    float distance = std::sqrt((i - center) * (i - center) + (j - center) * (j - center));
-                                                                    float value = std::exp(-(distance * distance) / (2.f * sigma * sigma)) * scale;
+                                                                    const float scale = 1.f / (std::sqrtf(2 * M_PI) * sigma);
+                                                                    float distance = (i - center) * (i - center) + (j - center) * (j - center);
+                                                                    float value = std::expf(-(distance * distance) / (2.f * sigma * sigma)) * scale;
                                                                     bokehKernel(i, j) = value;
                                                                 }
                                                             }

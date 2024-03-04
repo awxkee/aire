@@ -103,7 +103,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_dilatePipeline(JNIEnv *env, jobj
             return nullptr;
         }
 
-        int size = std::sqrt(length);
+        int size = std::sqrtf(length);
 
         Eigen::MatrixXi matrix(size, size);
         jfloat *inputElements = env->GetFloatArrayElements(kernel, 0);
@@ -599,7 +599,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_gammaImpl(JNIEnv *env, jobject t
                                                         const int TABLE_SIZE = 256;
                                                         uint8_t lookupTable[TABLE_SIZE];
                                                         for (int i = 0; i < 256; ++i) {
-                                                            lookupTable[i] = std::clamp(std::pow(float(i), gamma), 0.f, 255.f);
+                                                            lookupTable[i] = std::clamp(std::powf(float(i), gamma), 0.f, 255.f);
                                                         }
                                                         const aire::LUT8 lut(lookupTable);
                                                         lut.apply(input.data(), stride, width, height);

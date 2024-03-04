@@ -72,17 +72,21 @@ interface BlurPipelines {
     fun stackBlur(bitmap: Bitmap, radius: Int): Bitmap
 
     /*
-        Extended Binomial Filter of the Gaussian Blur 2 degree, extended box level, very fast compare to gaussian
+        Extended Binomial Filter of the Gaussian Blur 2 degree, extended box level, very fast compare to gaussian,
+        faster than stack blur, with better results
      */
     fun fastGaussian2Degree(bitmap: Bitmap, radius: Int): Bitmap
 
     /*
-        Extended Binomial Filter of the Gaussian Blur 3 degree, almost gaussian level, very fast compare to gaussian
+        Extended Binomial Filter of the Gaussian Blur 3 degree, almost gaussian level, very fast compare to gaussian,
+        faster than stack blur with much better results
     */
     fun fastGaussian3Degree(bitmap: Bitmap, radius: Int): Bitmap
 
     /*
-        Extended Binomial Filter of the Gaussian Blur 4 degree, very close level to gaussian, slower than regular 1D with separated kernel
+        Extended Binomial Filter of the Gaussian Blur 4 degree, very close level to gaussian,
+            very fast compare to gaussian,
+            slightly faster than stack blur with better results
     */
     fun fastGaussian4Degree(bitmap: Bitmap, radius: Int): Bitmap
 

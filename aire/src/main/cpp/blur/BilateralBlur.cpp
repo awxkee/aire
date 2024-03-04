@@ -102,7 +102,7 @@ namespace aire {
                                                        0);
                     float drIntensity = localIntensity - intensity;
 
-                    float weight = std::exp(
+                    float weight = std::expf(
                             spatialWeights(j + halfOfKernel, i + halfOfKernel) -
                             (drIntensity * drIntensity) / dRangeSigma);
 
@@ -121,8 +121,8 @@ namespace aire {
     template<class V>
     void bilateralBlur(V *data, int stride, int width, int height, const int size, float rangeSigma,
                        float spatialSigma) {
-        int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
-                                    height * width / (256 * 256)), 1, 12);
+        const int threadCount = clamp(min(static_cast<int>(std::thread::hardware_concurrency()),
+                                          height * width / (256 * 256)), 1, 12);
         std::vector<V> transient(stride * height);
 
         concurrency::parallel_for(threadCount, height, [&](int y) {

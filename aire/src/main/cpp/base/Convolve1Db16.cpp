@@ -28,6 +28,12 @@
  *
  */
 
+#undef HWY_TARGET_INCLUDE
+#define HWY_TARGET_INCLUDE "base/Convolve1Db16.cpp"
+
+#include "hwy/foreach_target.h"
+#include "hwy/highway.h"
+
 #include "Convolve1Db16.h"
 #include "hwy/highway.h"
 #include "jni/JNIUtils.h"

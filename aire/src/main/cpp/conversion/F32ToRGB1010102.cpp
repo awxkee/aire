@@ -70,7 +70,7 @@ namespace coder::HWY_NAMESPACE {
     void
     F32ToRGBA1010102RowC(const float *HWY_RESTRICT data, uint8_t *HWY_RESTRICT dst, int width,
                          const int *permuteMap) {
-        float range10 = std::pow(2.f, 10.f) - 1.f;
+        float range10 = std::powf(2.f, 10.f) - 1.f;
         const FixedTag<float32_t, 4> df;
         const Rebind<int32_t, FixedTag<float32_t, 4>> di32;
         const FixedTag<uint32_t, 4> du;

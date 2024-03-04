@@ -72,7 +72,7 @@ namespace aire::HWY_NAMESPACE {
         void sample(const int row);
 
     private:
-        const float maxColors = std::pow(2.0f, (float) 8.f) - 1.0f;;
+        const float maxColors = std::powf(2.0f, (float) 8.f) - 1.0f;
     };
 
     class BilinearRowSampler16Bit : public ScaleRowSampler<uint16_t> {
@@ -105,7 +105,7 @@ namespace aire::HWY_NAMESPACE {
         void sample(const int row);
 
     private:
-        const float maxColors = std::pow(2.0f, (float) 8.f) - 1.0f;
+        const float maxColors = std::powf(2.0f, (float) 8.f) - 1.0f;
     };
 
     class BilinearRowSampler8Bit : public ScaleRowSampler<uint8_t> {
@@ -138,7 +138,7 @@ namespace aire::HWY_NAMESPACE {
         void sample(const int row);
 
     private:
-        const float maxColors = std::pow(2.0f, (float) 8.f) - 1.0f;
+        const float maxColors = std::powf(2.0f, (float) 8.f) - 1.0f;
     };
 
     class BilinearRowSampler10Bit : public ScaleRowSampler<uint32_t> {
@@ -170,7 +170,7 @@ namespace aire::HWY_NAMESPACE {
         void sample(const int row);
 
     private:
-        const float maxColors = std::pow(2.0f, (float) 10.f) - 1.0f;
+        const float maxColors = std::powf(2.0f, (float) 10.f) - 1.0f;
 
         inline void parseToFloat(const uint32_t rgba1010102, float &r, float& g, float& b, float &a) {
             const uint32_t scalarMask = (1u << 10u) - 1u;
