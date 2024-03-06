@@ -18,7 +18,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         jni/Pipelines.cpp algo/median/QuickSelect.cpp algo/median/Wirth.cpp base/Arithmetics.cpp
         base/Erosion.cpp shift/WindStagger.cpp blur/AnisotropicDiffusion.cpp effect/MarbleEffect.cpp
         jni/EffectsPipelines.cpp effect/OilEffect.cpp effect/CrystallizeEffect.cpp blur/PoissonBlur.cpp
-        base/Grayscale.cpp base/Dilation.cpp base/Channels.cpp base/Threshold.cpp blur/TentBlur.cpp
+        base/Grayscale.cpp base/Dilation.cpp base/Channels.cpp base/Threshold.cpp
         pipelines/RemoveShadows.cpp blur/FastBilateral.cpp color/Gamut.cpp base/Convolve1D.cpp
         effect/FractalGlassEffect.cpp effect/WaterEffect.cpp jni/ScalePipelines.cpp jni/ToneMappingPipelines.cpp
         effect/PerlinDistortion.cpp base/Vibrance.cpp algo/sleef-hwy.cpp conversion/yuv/YuvConverter.cpp

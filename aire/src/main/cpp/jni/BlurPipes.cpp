@@ -39,7 +39,6 @@
 #include "blur/GaussBlur.h"
 #include "blur/PoissonBlur.h"
 #include <string>
-#include "blur/TentBlur.h"
 #include "blur/ZoomBlur.hpp"
 #include "blur/AnisotropicDiffusion.h"
 #include "base/Convolve2D.h"
@@ -86,6 +85,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_boxBlurPipeline(JNIEnv *env, job
     try {
         std::vector<AcquirePixelFormat> formats;
         formats.insert(formats.begin(), APF_RGBA8888);
+        formats.insert(formats.begin(), APF_F16);
         jobject newBitmap = AcquireBitmapPixels(env,
                                                 bitmap,
                                                 formats,
@@ -446,13 +446,20 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastGaussian2DImpl(JNIEnv *env, 
         jobject newBitmap = AcquireBitmapPixels(env,
                                                 bitmap,
                                                 formats,
-                                                true,
+                                                false,
                                                 [radius](std::vector<uint8_t> &input, int stride,
                                                          int width, int height,
                                                          AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::gaussianApproximation2D(input.data(), stride, width,
                                                                                       height, radius);
+                                                        return {
+                                                                .data = input,
+                                                                .stride = stride,
+                                                                .width = width,
+                                                                .height = height,
+                                                                .pixelFormat = APF_RGBA8888
+                                                        };
                                                     }
                                                     return {
                                                             .data = input,
@@ -486,6 +493,13 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastGaussian3DImpl(JNIEnv *env, 
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::gaussianApproximation3D(input.data(), stride, width,
                                                                                       height, radius);
+                                                        return {
+                                                                .data = input,
+                                                                .stride = stride,
+                                                                .width = width,
+                                                                .height = height,
+                                                                .pixelFormat = APF_RGBA8888
+                                                        };
                                                     }
                                                     return {
                                                             .data = input,
@@ -518,6 +532,13 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastGaussian4DImpl(JNIEnv *env, 
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::gaussianApproximation4D(input.data(), stride, width,
                                                                                       height, radius);
+                                                        return {
+                                                                .data = input,
+                                                                .stride = stride,
+                                                                .width = width,
+                                                                .height = height,
+                                                                .pixelFormat = APF_RGBA8888
+                                                        };
                                                     }
                                                     return {
                                                             .data = input,
@@ -558,6 +579,13 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_zoomBlurImpl(JNIEnv *env, jobjec
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::ZoomBlur zoom(kernelSize, sigma, centerX, centerY, strength, angle);
                                                         zoom.apply(input.data(), stride, width, height);
+                                                        return {
+                                                                .data = input,
+                                                                .stride = stride,
+                                                                .width = width,
+                                                                .height = height,
+                                                                .pixelFormat = APF_RGBA8888
+                                                        };
                                                     }
                                                     return {
                                                             .data = input,

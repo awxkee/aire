@@ -38,4 +38,14 @@ namespace aire {
     void boxBlurF16(uint16_t *data, int stride, int width, int height, int radius);
     std::vector<float> generateBoxKernel(int radius);
     Eigen::MatrixXf generateBoxKernel2D(const int radius);
+
+    Eigen::MatrixXf generateTentFilter(int N);
+
+    Eigen::MatrixXf generateTentFilterNormalized(int N);
+
+    std::vector<float> generate1DTentFilterKernelNormalized(int size);
+
+    void tentBlur(uint8_t *data, int stride, int width, int height, const int size);
+
+    void tentBlurF16(uint16_t *data, int stride, int width, int height, const int size);
 }

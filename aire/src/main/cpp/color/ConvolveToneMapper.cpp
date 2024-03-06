@@ -74,9 +74,9 @@ namespace aire {
             for (; x + 4 < width; x += 4) {
                 VU4 ru4, gu4, bu4, au4;
                 LoadInterleaved4(du16, &pixels[0], ru4, gu4, bu4, au4);
-                VF rf4 = Mul(ConvertToFloat(dfx4, ru4), vRevertScale);
-                VF gf4 = Mul(ConvertToFloat(dfx4, gu4), vRevertScale);
-                VF bf4 = Mul(ConvertToFloat(dfx4, bu4), vRevertScale);
+                VF rf4 = Mul(PromoteTo(dfx4, ru4), vRevertScale);
+                VF gf4 = Mul(PromoteTo(dfx4, gu4), vRevertScale);
+                VF bf4 = Mul(PromoteTo(dfx4, bu4), vRevertScale);
 
                 rf4 = aire::HWY_NAMESPACE::SRGBToLinear(dfx4, rf4);
                 gf4 = aire::HWY_NAMESPACE::SRGBToLinear(dfx4, gf4);
@@ -92,9 +92,9 @@ namespace aire {
                 gf4 = Clamp(Mul(gf4, vScale), zeros, vScale);
                 bf4 = Clamp(Mul(bf4, vScale), zeros, vScale);
 
-                ru4 = DemoteToU8(du, rf4);
-                gu4 = DemoteToU8(du, gf4);
-                bu4 = DemoteToU8(du, bf4);
+                ru4 = DemoteTo(du, rf4);
+                gu4 = DemoteTo(du, gf4);
+                bu4 = DemoteTo(du, bf4);
 
                 StoreInterleaved4(ru4, gu4, bu4, au4, du16, &pixels[0]);
 

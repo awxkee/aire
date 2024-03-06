@@ -65,7 +65,7 @@ namespace aire {
     }
 
     void vertical3Degree(uint8_t *data, const int stride, const int width, const int height, const int radius, const int channels, const int z) {
-        const int radius3D = radius * radius * radius;
+        const uint32_t radius3D = radius * radius * radius;
 
         ska::flat_hash_map<int, int> buffer;
 
@@ -93,7 +93,7 @@ namespace aire {
 
     void horizontal3Degree(uint8_t *data, const int stride, const int width, const int height, const int radius,
                            const int channels, const int z) {
-        int radius3D = radius * radius * radius;
+        uint32_t radius3D = radius * radius * radius;
 
         ska::flat_hash_map<int, int> buffer;
 
@@ -392,16 +392,10 @@ namespace aire {
         }
     }
 
-    void vertical4Degree4Chan(uint8_t *data,
-                              const int stride,
-                              const int width,
-                              const int height,
-                              const int radius,
-                              const int start,
-                              const int end) {
-        int radius4D = radius * radius;
-        radius4D *= radius4D;
-        const float weight = 1.f / radius4D;
+    void vertical4Degree4Chan(uint8_t *data, const int stride, const int width, const int height,
+                              const int radius, const int start, const int end) {
+        const uint32_t radius4D = radius * radius;
+        const float weight = 1.f / (static_cast<float>(radius4D) * static_cast<float>(radius4D));
 
         constexpr int bufLength = 1023;
         int bufferR[bufLength + 1], bufferG[bufLength + 1], bufferB[bufLength + 1];
@@ -414,7 +408,6 @@ namespace aire {
             for (int y = 0 - 4 * radius; y < height; ++y) {
                 auto src = reinterpret_cast<uint8_t *>(data) + y * stride;
                 if (y >= 0) {
-
                     int mpy = y & bufLength;
                     int mpyPRadius = (y + radius) & bufLength;
                     int mpyMRadius = (y - radius) & bufLength;
@@ -474,9 +467,8 @@ namespace aire {
                                 const int radius,
                                 const int start,
                                 const int end) {
-        int radius4D = radius * radius;
-        radius4D *= radius4D;
-        const float weight = 1.f / radius4D;
+        const uint32_t radius4D = radius * radius;
+        const float weight = 1.f / (static_cast<float>(radius4D) * static_cast<float>(radius4D));
 
         constexpr int bufLength = 1023;
         int bufferR[bufLength + 1], bufferG[bufLength + 1], bufferB[bufLength + 1];

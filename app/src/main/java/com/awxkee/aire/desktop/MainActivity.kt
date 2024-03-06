@@ -60,25 +60,44 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.white_noise)
-//                            .copy(Bitmap.Config.RGBA_F16, true)
+//                            .copy(Bitmap.Config.RGBA_1010102, true)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
 //                        repeat(15) {
 //                            val d2Time = measureTimeMillis {
-////                                var blurred4 = Aire.boxBlur(bitmap, 128 * 2 + 1)
-////                                blurred4 = Aire.boxBlur(blurred4, 128 * 2 + 1)
-////                                scope.launch {
-////                                    imagesArray.add(blurred4)
-////                                }
-//
-//                                var blurred5 = Aire.fastGaussian3Degree(bitmap, 25)
+//                                var blurred5 = Aire.tentBlur(bitmap, 128)
 //                                scope.launch {
 //                                    imagesArray.add(blurred5)
 //                                }
 //                            }
-//                            Log.d("AireMedian", "Radius 125 exec time $d2Time ms for 4D")
+//
+//                            val d3Time = measureTimeMillis {
+//                                var blurred5 = Aire.boxBlur(bitmap, 128)
+//                                scope.launch {
+//                                    imagesArray.add(blurred5)
+//                                }
+//                            }
+//
+//                            val d4Time = measureTimeMillis {
+//                                var blurred5 = Aire.fastGaussian2Degree(bitmap, 128)
+//                                scope.launch {
+//                                    imagesArray.add(blurred5)
+//                                }
+//                            }
+//
+//                            val d5Time = measureTimeMillis {
+//                                var blurred5 = Aire.gaussianBlur(bitmap, 128, (128 - 1) / 6f)
+//                                scope.launch {
+//                                    imagesArray.add(blurred5)
+//                                }
+//                            }
+//
+//                            Log.d(
+//                                "AireMedian",
+//                                "Radius 125 tent exec time $d2Time ms, box time ${d3Time}ms, gauss A ${d4Time}ms, gauss ${d5Time}ms"
+//                            )
 //                        }
 //                        var radius = 5
 //                        repeat(25) {

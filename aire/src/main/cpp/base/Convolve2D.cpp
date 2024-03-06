@@ -66,7 +66,7 @@ namespace aire {
             for (; x + 4 < width && x + dxR + 4 < dstWidth; x += 4) {
                 auto vec = LoadU(dfx4, &src[(y + dyR) * dstWidth + (x + dxR)]);
                 vec = Clamp(Mul(vec, max255), zeros, max255);
-                auto target = DemoteToU8(du8x4, vec);
+                auto target = DemoteTo(du8x4, vec);
                 dst[chanIndex] = ExtractLane(vec, 0);
                 dst[chanIndex + 4] = ExtractLane(vec, 1);
                 dst[chanIndex + 8] = ExtractLane(vec, 2);
@@ -115,122 +115,122 @@ namespace aire {
                     auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(data) + clamp(y + j, 0, height - 1) * stride);
                     if (cols == 3) {
                         int px = clamp(x - 1, 0, width - 1) * 4;
-                        auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        auto pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         auto weight = Set(dfx4, matrix(j + ySize, 0));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 1));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x + 1, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 2));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
                     } else if (cols == 5) {
                         int px = clamp(x - 2, 0, width - 1) * 4;
-                        auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        auto pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         auto weight = Set(dfx4, matrix(j + ySize, 0));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x - 1, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 1));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 2));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x + 1, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 3));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x + 2, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 4));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
                     } else if (cols == 7) {
                         int px = clamp(x - 3, 0, width - 1) * 4;
-                        auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        auto pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         auto weight = Set(dfx4, matrix(j + ySize, 0));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x - 2, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 1));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x - 1, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 2));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 3));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x + 1, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 4));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x + 2, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 5));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x + 3, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 6));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
                     } else if (cols == 9) {
                         int px = clamp(x - 4, 0, width - 1) * 4;
-                        auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        auto pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         auto weight = Set(dfx4, matrix(j + ySize, 0));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x - 3, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 1));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x - 2, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 2));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x - 1, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 3));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 4));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x + 1, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 5));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x + 2, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 6));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x + 3, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 7));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                         px = clamp(x + 4, 0, width - 1) * 4;
-                        pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                        pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                         weight = Set(dfx4, matrix(j + ySize, 8));
                         store = Add(store, Mul(Mul(pixels, revertScale), weight));
                     } else {
@@ -238,29 +238,29 @@ namespace aire {
 
                         for (; i + 4 < iMax && x + 4 < width; i += 4) {
                             int px = clamp(x + i, 0, width - 1) * 4;
-                            auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                            auto pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                             auto weight = Set(dfx4, matrix(j + ySize, i + xSize));
                             store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                             px = clamp(x + i + 1, 0, width - 1) * 4;
-                            pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                            pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                             weight = Set(dfx4, matrix(j + ySize, i + 1 + xSize));
                             store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                             px = clamp(x + i + 2, 0, width - 1) * 4;
-                            pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                            pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                             weight = Set(dfx4, matrix(j + ySize, i + 2 + xSize));
                             store = Add(store, Mul(Mul(pixels, revertScale), weight));
 
                             px = clamp(x + i + 3, 0, width - 1) * 4;
-                            pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                            pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                             weight = Set(dfx4, matrix(j + ySize, i + 3 + xSize));
                             store = Add(store, Mul(Mul(pixels, revertScale), weight));
                         }
 
                         for (; i <= iMax; ++i) {
                             int px = clamp(x + i, 0, width - 1) * 4;
-                            auto pixels = ConvertToFloat(dfx4, LoadU(du8, &src[px]));
+                            auto pixels = PromoteTo(dfx4, LoadU(du8, &src[px]));
                             auto weight = Set(dfx4, matrix(j + ySize, i + xSize));
                             store = Add(store, Mul(Mul(pixels, revertScale), weight));
                         }
@@ -269,7 +269,7 @@ namespace aire {
 
                 int px = x * 4;
 
-                StoreU(DemoteToU8(du8, Clamp(Round(Mul(store, max255)), zeros, max255)), du8, &dst[px]);
+                StoreU(DemoteTo(du8, Clamp(Round(Mul(store, max255)), zeros, max255)), du8, &dst[px]);
             }
         });
         std::copy(destination.begin(), destination.end(), data);

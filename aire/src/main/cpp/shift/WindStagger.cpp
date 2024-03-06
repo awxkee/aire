@@ -106,13 +106,13 @@ namespace aire {
                         auto row2 = reinterpret_cast<const uint8_t *>(
                                 reinterpret_cast<uint8_t *>(source) + y2 * stride);
 
-                        auto c1 = ConvertToFloat(dfx4, LoadU(du8, &row1[x1 * 4]));;
-                        auto c2 = ConvertToFloat(dfx4, LoadU(du8, &row1[x2 * 4]));
-                        auto c3 = ConvertToFloat(dfx4, LoadU(du8, &row2[x1 * 4]));
-                        auto c4 = ConvertToFloat(dfx4, LoadU(du8, &row2[x2 * 4]));
+                        auto c1 = PromoteTo(dfx4, LoadU(du8, &row1[x1 * 4]));;
+                        auto c2 = PromoteTo(dfx4, LoadU(du8, &row1[x2 * 4]));
+                        auto c3 = PromoteTo(dfx4, LoadU(du8, &row2[x1 * 4]));
+                        auto c4 = PromoteTo(dfx4, LoadU(du8, &row2[x2 * 4]));
 
                         auto result = Blerp(dfx4, c1, c2, c3, c4, Set(dfx4, dx), Set(dfx4, dy));
-                        auto px = DemoteToU8(du8, result);
+                        auto px = DemoteTo(du8, result);
                         StoreU(px, du8, reinterpret_cast<uint8_t *>(&dst[x * 4]));
                     }
                 } else {
@@ -135,13 +135,13 @@ namespace aire {
                         auto row2 = reinterpret_cast<const uint8_t *>(
                                 reinterpret_cast<uint8_t *>(source) + y2 * stride);
 
-                        auto c1 = ConvertToFloat(dfx4, LoadU(du8, &row1[x1 * 4]));;
-                        auto c2 = ConvertToFloat(dfx4, LoadU(du8, &row1[x2 * 4]));
-                        auto c3 = ConvertToFloat(dfx4, LoadU(du8, &row2[x1 * 4]));
-                        auto c4 = ConvertToFloat(dfx4, LoadU(du8, &row2[x2 * 4]));
+                        auto c1 = PromoteTo(dfx4, LoadU(du8, &row1[x1 * 4]));;
+                        auto c2 = PromoteTo(dfx4, LoadU(du8, &row1[x2 * 4]));
+                        auto c3 = PromoteTo(dfx4, LoadU(du8, &row2[x1 * 4]));
+                        auto c4 = PromoteTo(dfx4, LoadU(du8, &row2[x2 * 4]));
 
                         auto result = Blerp(dfx4, c1, c2, c3, c4, Set(dfx4, dx), Set(dfx4, dy));
-                        auto px = DemoteToU8(du8, result);
+                        auto px = DemoteTo(du8, result);
                         StoreU(px, du8, reinterpret_cast<uint8_t *>(&dst[x * 4]));
                     }
                 }

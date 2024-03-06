@@ -159,10 +159,10 @@ namespace aire {
             auto src = reinterpret_cast<uint8_t *>(reinterpret_cast<uint8_t *>(source) + y * width);
             int x = 0;
             for (; x + lanes < width; x += lanes) {
-                VF px = ConvertToFloat(dfx4, LoadU(du8, src));
+                VF px = PromoteTo(dfx4, LoadU(du8, src));
                 VF normalized = Mul(Sub(px, vGlobalMin), vGlobalRange);
                 VF rebalanced = Ceil(MulAdd(normalized, vNewRange, vNewMin));
-                StoreU(DemoteToU8(du8, rebalanced), du8, src);
+                StoreU(DemoteTo(du8, rebalanced), du8, src);
                 src += lanes;
             }
             for (; x < width; ++x) {
