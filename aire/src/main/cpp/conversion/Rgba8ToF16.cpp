@@ -47,40 +47,25 @@ HWY_BEFORE_NAMESPACE();
 
 namespace aire::HWY_NAMESPACE {
 
-    using hwy::HWY_NAMESPACE::Set;
-    using hwy::HWY_NAMESPACE::FixedTag;
-    using hwy::HWY_NAMESPACE::Vec;
-    using hwy::HWY_NAMESPACE::Mul;
-    using hwy::HWY_NAMESPACE::Max;
-    using hwy::HWY_NAMESPACE::Min;
-    using hwy::HWY_NAMESPACE::Zero;
-    using hwy::HWY_NAMESPACE::BitCast;
-    using hwy::HWY_NAMESPACE::ConvertTo;
-    using hwy::HWY_NAMESPACE::PromoteTo;
-    using hwy::HWY_NAMESPACE::DemoteTo;
-    using hwy::HWY_NAMESPACE::Combine;
-    using hwy::HWY_NAMESPACE::Rebind;
-    using hwy::HWY_NAMESPACE::LowerHalf;
-    using hwy::HWY_NAMESPACE::UpperHalf;
-    using hwy::HWY_NAMESPACE::LoadInterleaved4;
-    using hwy::HWY_NAMESPACE::StoreInterleaved4;
+    using namespace hwy::HWY_NAMESPACE;
     using hwy::float16_t;
     using hwy::float32_t;
 
     template<typename D, typename T = Vec<D>>
-    inline __attribute__((flatten)) T
-    ConvertRow(D d, T v, const Vec<FixedTag<float32_t, 4>> vScale) {
-        FixedTag<int32_t, 4> di32x4;
-        Rebind<float32_t, decltype(di32x4)> df32;
+    HWY_API T
+    ConvertRow(D d, T v, const Vec<Rebind<float32_t, Half<D>>> vScale) {
+        const Half<D> halfD;
+        Rebind<uint32_t , decltype(halfD)> du32;
+        Rebind<float32_t, decltype(halfD)> df32;
         Rebind<float16_t, decltype(df32)> dff16;
         Rebind<uint16_t, decltype(dff16)> du16;
 
         auto lower = BitCast(du16, DemoteTo(dff16,
-                                            Mul(ConvertTo(df32, PromoteLowerTo(di32x4, v)),
+                                            Mul(ConvertTo(df32, PromoteLowerTo(du32, v)),
                                                 vScale)));
         auto upper = BitCast(du16, DemoteTo(dff16,
                                             Mul(ConvertTo(df32,
-                                                          PromoteUpperTo(di32x4, v)),
+                                                          PromoteUpperTo(du32, v)),
                                                 vScale)));
         return Combine(d, upper, lower);
     }

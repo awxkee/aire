@@ -11,7 +11,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         blur/ShgStackBlur.cpp
         shift/TiltShift.cpp
         conversion/CopyUnaligned.cpp conversion/F32ToRGB1010102.cpp conversion/Rgb565.cpp conversion/Rgb1010102.cpp
-        conversion/Rgb1010102toF16.cpp conversion/Rgba2Rgb.cpp conversion/Rgba8ToF16.cpp conversion/Rgba16bitCopy.cpp
+        conversion/Rgb1010102toF16.cpp conversion/Rgba2Rgb.cpp conversion/Rgba8ToF16.cpp
         conversion/Rgba1010102toF32.cpp conversion/RgbaF16bitNBitU8.cpp conversion/RGBAlpha.cpp conversion/HalfFloats.cpp
         jni/AcquireBitmapPixels.cpp shift/Glitch.cpp halftone/Halftone.cpp color/ConvolveToneMapper.cpp
         scale/XScaler.cpp jni/BlurPipes.cpp jni/ShiftPipelines.cpp jni/Base.cpp

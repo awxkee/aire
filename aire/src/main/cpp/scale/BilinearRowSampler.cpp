@@ -219,13 +219,13 @@ namespace aire::HWY_NAMESPACE {
 
     void BilinearRowSampler4Chan8Bit::sample(const int row) {
         const FixedTag<float32_t, 4> dfx4;
-        const FixedTag<int32_t, 4> dix4;
+        const FixedTag<uint32_t, 4> dix4;
         const FixedTag<uint8_t, 4> du8x4;
         using VU8x4 = Vec<decltype(du8x4)>;
 
         using VI4 = Vec<decltype(dix4)>;
         using VF4 = Vec<decltype(dfx4)>;
-        const int shift[4] = {0, 1, 2, 3};
+        const uint32_t shift[4] = {0, 1, 2, 3};
         const VI4 shiftV = LoadU(dix4, shift);
         const FixedTag<uint32_t, 4> dux4;
         const VF4 xScaleV = Set(dfx4, xScale);
@@ -269,13 +269,13 @@ namespace aire::HWY_NAMESPACE {
                     auto row2 = reinterpret_cast<const uint8_t *>(src8 + ExtractLane(row2Add, i));
 
                     VU8x4 lane = LoadU(du8x4, reinterpret_cast<const uint8_t *>(&row1[ExtractLane(xi1, i) * components]));
-                    VF4 c1 = ConvertTo(dfx4, PromoteTo(dux4, lane));
+                    VF4 c1 = PromoteTo(dfx4, lane);
                     lane = LoadU(du8x4,reinterpret_cast<const uint8_t *>(&row1[ExtractLane(xi2, i) * components]));
-                    VF4 c2 = ConvertTo(dfx4, PromoteTo(dux4, lane));
+                    VF4 c2 = PromoteTo(dfx4,lane);
                     lane = LoadU(du8x4,reinterpret_cast<const uint8_t *>(&row2[ExtractLane(xi1, i) * components]));
-                    VF4 c3 = ConvertTo(dfx4, PromoteTo(dux4, lane));
+                    VF4 c3 = PromoteTo(dfx4, lane);
                     lane = LoadU(du8x4,reinterpret_cast<const uint8_t *>(&row2[ExtractLane(xi2, i) * components]));
-                    VF4 c4 = ConvertTo(dfx4, PromoteTo(dux4, lane));
+                    VF4 c4 = PromoteTo(dfx4, lane);
                     VF4 value = Blerp(dfx4, c1, c2, c3, c4, Set(dfx4, ExtractLane(dx, i)),
                                       Set(dfx4, ExtractLane(dy, i)));
                     VF4 sum = ClampRound(dfx4, value, vfZeros, maxColorsV);

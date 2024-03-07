@@ -72,7 +72,7 @@ namespace aire::HWY_NAMESPACE {
     using hwy::float16_t;
     using hwy::float32_t;
 
-    inline __attribute__((flatten)) Vec<FixedTag<uint8_t, 8>>
+    HWY_API Vec<FixedTag<uint8_t, 8>>
     ConvertRow(Vec<FixedTag<uint16_t, 8>> v, const float maxColors) {
         FixedTag<float16_t, 4> df16;
         FixedTag<uint16_t, 4> dfu416;

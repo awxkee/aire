@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.white_noise)
-//                            .copy(Bitmap.Config.RGBA_1010102, true)
+//                            .copy(Bitmap.Config.RGB_565, true)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }

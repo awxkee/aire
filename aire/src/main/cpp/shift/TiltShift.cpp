@@ -46,7 +46,7 @@ namespace aire {
         const int newHeight = std::abs(width * std::sin(angle)) + std::abs(height * std::cos(angle));
         float availableDistance;
 
-        const float rotationAngle = std::fmod(rotationAngle + M_PI, 2 * M_PI) - M_PI;
+        const float rotationAngle = std::fmod(angle + M_PI, 2 * M_PI) - M_PI;
 
         const float horizontalRangeMin = -M_PI / 4.0;  // -45 degrees in radians
         const float horizontalRangeMax = M_PI / 4.0;   // +45 degrees in radians

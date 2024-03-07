@@ -30,9 +30,7 @@ android {
             cmake {
                 ndkVersion = "26.2.11394342"
                 cppFlags.add ("-std=c++20")
-                abiFilters += setOf("arm64-v8a")
-
-//                abiFilters += setOf("armeabi-v7a", "arm64-v8a", "x86_64", "x86")
+                abiFilters += setOf("armeabi-v7a", "arm64-v8a", "x86_64", "x86")
             }
         }
 

@@ -70,7 +70,7 @@ static Eigen::Vector3i rgbToHSV(const Eigen::Vector3i &rgb) {
 
     if (delta > 0.0) {
         if (maxVal == rgb[0]) { // Red is dominant color
-            hue = 60.0 * fmod(((rgb[1] - rgb[2]) / delta), 6.0);
+            hue = 60.0 * std::fmod(((rgb[1] - rgb[2]) / delta), 6.0);
         } else if (maxVal == rgb[1]) { // Green is dominant color
             hue = 60.0 * (((rgb[2] - rgb[0]) / delta) + 2.0);
         } else { // Blue is dominant color
