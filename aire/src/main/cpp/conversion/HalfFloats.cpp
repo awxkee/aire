@@ -98,10 +98,10 @@ namespace coder::HWY_NAMESPACE {
         auto srcPixels = reinterpret_cast<const uint8_t *>(src);
         auto dstPixels = reinterpret_cast<uint8_t *>(dst);
 
-        concurrency::parallel_for(2, height, [&](int y){
+        concurrency::parallel_for(2, height, [&](int y) {
             RGBAF32ToF16RowHWY(reinterpret_cast<const float *>(srcPixels + srcStride * y),
-                    reinterpret_cast<uint16_t *>(dstPixels + dstStride * y),
-                    width);
+                               reinterpret_cast<uint16_t *>(dstPixels + dstStride * y),
+                               width);
         });
     }
 }

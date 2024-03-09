@@ -442,125 +442,6 @@ HWY_AFTER_NAMESPACE();
 
 #if HWY_ONCE
 
-void convertRGBA1010102ToU16_C(const uint8_t *src, int srcStride, uint16_t *dst, int dstStride,
-                               int width, int height) {
-    auto mDstPointer = reinterpret_cast<uint8_t *>(dst);
-    auto mSrcPointer = reinterpret_cast<const uint8_t *>(src);
-
-    uint32_t testValue = 0x01020304;
-
-    for (int y = 0; y < height; ++y) {
-
-        auto dstPointer = reinterpret_cast<uint8_t *>(mDstPointer);
-        auto srcPointer = reinterpret_cast<const uint8_t *>(mSrcPointer);
-
-        for (int x = 0; x < width; ++x) {
-            uint32_t rgba1010102 = reinterpret_cast<const uint32_t *>(srcPointer)[0];
-
-            const uint32_t mask = (1u << 10u) - 1u;
-            uint32_t b = (rgba1010102) & mask;
-            uint32_t g = (rgba1010102 >> 10) & mask;
-            uint32_t r = (rgba1010102 >> 20) & mask;
-
-            uint32_t a1 = (rgba1010102 >> 30);
-            uint32_t a = (a1 << 8) | (a1 << 6) | (a1 << 4) | (a1 << 2) | a1;
-
-            auto rUInt16 = static_cast<uint16_t>(r);
-            auto gUInt16 = static_cast<uint16_t>(g);
-            auto bUInt16 = static_cast<uint16_t>(b);
-            auto aUInt16 = static_cast<uint16_t>(a);
-
-            auto dstCast = reinterpret_cast<uint16_t *>(dstPointer);
-
-            dstCast[0] = rUInt16;
-            dstCast[1] = gUInt16;
-            dstCast[2] = bUInt16;
-            dstCast[3] = aUInt16;
-
-            srcPointer += 4;
-            dstPointer += 8;
-        }
-
-        mSrcPointer += srcStride;
-        mDstPointer += dstStride;
-    }
-}
-
-void convertRGBA1010102ToU8_C(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride,
-                              int width, int height) {
-    auto mDstPointer = reinterpret_cast<uint8_t *>(dst);
-    auto mSrcPointer = reinterpret_cast<const uint8_t *>(src);
-
-    uint32_t testValue = 0x01020304;
-    auto testBytes = reinterpret_cast<uint8_t *>(&testValue);
-
-    bool littleEndian = false;
-    if (testBytes[0] == 0x04) {
-        littleEndian = true;
-    } else if (testBytes[0] == 0x01) {
-        littleEndian = false;
-    }
-
-    const uint32_t mask = (1u << 10u) - 1u;
-
-    constexpr float valueScale = 255.f / 1023.0;
-    constexpr float alphaValueScale = 255.f / 3.f;
-
-    for (int y = 0; y < height; ++y) {
-
-        auto dstPointer = reinterpret_cast<uint8_t *>(mDstPointer);
-        auto srcPointer = reinterpret_cast<const uint8_t *>(mSrcPointer);
-
-        for (int x = 0; x < width; ++x) {
-            uint32_t rgba1010102 = reinterpret_cast<const uint32_t *>(srcPointer)[0];
-
-            uint32_t b = (rgba1010102) & mask;
-            uint32_t g = (rgba1010102 >> 10) & mask;
-            uint32_t r = (rgba1010102 >> 20) & mask;
-
-            uint32_t a1 = (rgba1010102 >> 30);
-
-            auto rFloat = clamp(static_cast<uint8_t>(std::roundf(r * valueScale)), (uint8_t) 0,
-                                (uint8_t) 255);
-            auto gFloat = clamp(static_cast<uint8_t>(std::roundf(g * valueScale)), (uint8_t) 0,
-                                (uint8_t) 255);
-            auto bFloat = clamp(static_cast<uint8_t>(std::roundf(b * valueScale)), (uint8_t) 0,
-                                (uint8_t) 255);
-            auto aFloat = clamp(static_cast<uint8_t>(std::roundf(a1 * alphaValueScale)), (uint8_t) 0,
-                                (uint8_t) 255);
-
-            auto dstCast = reinterpret_cast<uint8_t *>(dstPointer);
-            if (littleEndian) {
-                dstCast[0] = bFloat;
-                dstCast[1] = gFloat;
-                dstCast[2] = rFloat;
-                dstCast[3] = aFloat;
-            } else {
-                dstCast[0] = rFloat;
-                dstCast[1] = gFloat;
-                dstCast[2] = bFloat;
-                dstCast[3] = aFloat;
-            }
-
-            srcPointer += 4;
-            dstPointer += 4;
-        }
-
-        mSrcPointer += srcStride;
-        mDstPointer += dstStride;
-    }
-}
-
-void RGBA1010102ToU8(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride,
-                     int width, int height) {
-    convertRGBA1010102ToU8_C(src, srcStride, dst, dstStride, width, height);
-}
-
-void RGBA1010102ToU16(const uint8_t *src, int srcStride, uint16_t *dst, int dstStride,
-                      int width, int height) {
-    convertRGBA1010102ToU16_C(src, srcStride, dst, dstStride, width, height);
-}
-
 namespace aire {
     HWY_EXPORT(F16ToRGBA1010102HWY);
     HWY_EXPORT(F32ToRGBA1010102HWY);
@@ -594,20 +475,74 @@ namespace aire {
                                                     height, attenuateAlpha);
     }
 
+    template<typename V>
+    void RGBA1010102ToUnsigned(const uint8_t *__restrict__ src, const int srcStride,
+                               V *__restrict__ dst, const int dstStride,
+                               const int width, const int height, const int bitDepth) {
+        auto mDstPointer = reinterpret_cast<uint8_t *>(dst);
+        auto mSrcPointer = reinterpret_cast<const uint8_t *>(src);
+
+        const float maxColors = std::powf(2.f, bitDepth) - 1.f;
+        const float valueScale = maxColors / 1023.f;
+        const float alphaValueScale = maxColors / 3.f;
+
+        const uint32_t mask = (1u << 10u) - 1u;
+
+        for (int y = 0; y < height; ++y) {
+
+            auto dstPointer = reinterpret_cast<V *>(mDstPointer);
+            auto srcPointer = reinterpret_cast<const uint8_t *>(mSrcPointer);
+
+            for (int x = 0; x < width; ++x) {
+                uint32_t rgba1010102 = reinterpret_cast<const uint32_t *>(srcPointer)[0];
+
+                uint32_t r = (rgba1010102) & mask;
+                uint32_t g = (rgba1010102 >> 10) & mask;
+                uint32_t b = (rgba1010102 >> 20) & mask;
+                uint32_t a1 = (rgba1010102 >> 30);
+
+                V ru = std::clamp(static_cast<V>(std::roundf(r * valueScale)), static_cast<V>(0),
+                                  static_cast<V>(maxColors));
+                V gu = std::clamp(static_cast<V>(std::roundf(g * valueScale)), static_cast<V>(0),
+                                  static_cast<V>(maxColors));
+                V bu = std::clamp(static_cast<V>(std::roundf(b * valueScale)), static_cast<V>(0),
+                                  static_cast<V>(maxColors));
+                V au = std::clamp(static_cast<V>(std::roundf(a1 * alphaValueScale)),
+                                  static_cast<V>(0), static_cast<V>(maxColors));
+
+                // Alpha pre-multiplication for RGBA_8888
+                if (std::is_same<V, uint8_t>::value) {
+                    ru = (ru * au + 127) / 255;
+                    gu = (gu * au + 127) / 255;
+                    bu = (bu * au + 127) / 255;
+                }
+
+                dstPointer[0] = ru;
+                dstPointer[1] = gu;
+                dstPointer[2] = bu;
+                dstPointer[3] = au;
+
+                srcPointer += 4;
+                dstPointer += 4;
+            }
+
+            mSrcPointer += srcStride;
+            mDstPointer += dstStride;
+        }
+    }
+
+    template void RGBA1010102ToUnsigned(const uint8_t *__restrict__ src, const int srcStride,
+                                        uint8_t *__restrict__ dst, const int dstStride,
+                                        const int width, const int height, const int bitDepth);
+
+    template void RGBA1010102ToUnsigned(const uint8_t *__restrict__ src, const int srcStride,
+                                        uint16_t *__restrict__ dst, const int dstStride,
+                                        const int width, const int height, const int bitDepth);
+
     void RGBA1010102To565(const uint8_t *src, int srcStride, uint16_t *dst, int dstStride,
                           int width, int height) {
         auto mDstPointer = reinterpret_cast<uint16_t *>(dst);
         auto mSrcPointer = reinterpret_cast<const uint8_t *>(src);
-
-        uint32_t testValue = 0x01020304;
-        auto testBytes = reinterpret_cast<uint8_t *>(&testValue);
-
-        bool littleEndian = false;
-        if (testBytes[0] == 0x04) {
-            littleEndian = true;
-        } else if (testBytes[0] == 0x01) {
-            littleEndian = false;
-        }
 
         const uint32_t mask = (1u << 10u) - 1u;
 
@@ -625,21 +560,12 @@ namespace aire {
                 uint32_t g = (rgba1010102 >> 10) & mask;
                 uint32_t r = (rgba1010102 >> 20) & mask;
 
-                uint32_t a1 = (rgba1010102 >> 30);
-                uint32_t a = (a1 << 8) | (a1 << 6) | (a1 << 4) | (a1 << 2) | a1;
-
-                auto rFloat = clamp(static_cast<uint8_t>(r * valueScale), (uint8_t) 255,
-                                    (uint8_t) 0);
-                auto gFloat = clamp(static_cast<uint8_t>(g * valueScale), (uint8_t) 255,
-                                    (uint8_t) 0);
-                auto bFloat = clamp(static_cast<uint8_t>(b * valueScale), (uint8_t) 255,
-                                    (uint8_t) 0);
-                auto aFloat = clamp(static_cast<uint8_t>(a * valueScale), (uint8_t) 255,
-                                    (uint8_t) 0);
-
-//                r = (r * aFloat + 127) / 255;
-//                g = (g * aFloat + 127) / 255;
-//                b = (b * aFloat + 127) / 255;
+                uint8_t ru = std::clamp(static_cast<uint8_t>(std::roundf(r * valueScale)), static_cast<uint8_t>(0),
+                                  static_cast<uint8_t>(255));
+                uint8_t gu = std::clamp(static_cast<uint8_t>(std::roundf(g * valueScale)), static_cast<uint8_t>(0),
+                                  static_cast<uint8_t>(255));
+                uint8_t bu = std::clamp(static_cast<uint8_t>(std::roundf(b * valueScale)), static_cast<uint8_t>(0),
+                                  static_cast<uint8_t>(255));
 
                 uint16_t red565 = (r >> 3) << 11;
                 uint16_t green565 = (g >> 2) << 5;

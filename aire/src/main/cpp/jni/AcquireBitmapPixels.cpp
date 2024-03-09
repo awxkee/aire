@@ -201,12 +201,12 @@ jobject AcquireBitmapPixels(JNIEnv *env, jobject bitmap,
                 } else if (is888Allowed) {
                     imageStride = (int) info.width * 4 * (int) sizeof(uint8_t);
                     vector<uint8_t> r888Pixels(imageStride * info.height);
-                    RGBA1010102ToU8(reinterpret_cast<const uint8_t *>(rgbaPixels.data()),
-                                    (int) info.stride,
-                                    reinterpret_cast<uint8_t *>(r888Pixels.data()),
-                                    (int) imageStride,
-                                    (int) info.width,
-                                    (int) info.height);
+                    aire::RGBA1010102ToUnsigned(reinterpret_cast<const uint8_t *>(rgbaPixels.data()),
+                                                (int) info.stride,
+                                                reinterpret_cast<uint8_t *>(r888Pixels.data()),
+                                                (int) imageStride,
+                                                (int) info.width,
+                                                (int) info.height, 8);
                     usingFormat = APF_RGBA8888;
                     rgbaPixels = r888Pixels;
                 } else if (is565Allowed) {

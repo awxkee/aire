@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.white_noise)
-//                            .copy(Bitmap.Config.RGB_565, true)
+//                            .copy(Bitmap.Config.RGBA_1010102, true)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
@@ -72,32 +72,6 @@ class MainActivity : ComponentActivity() {
 //                                    imagesArray.add(blurred5)
 //                                }
 //                            }
-//
-//                            val d3Time = measureTimeMillis {
-//                                var blurred5 = Aire.boxBlur(bitmap, 128)
-//                                scope.launch {
-//                                    imagesArray.add(blurred5)
-//                                }
-//                            }
-//
-//                            val d4Time = measureTimeMillis {
-//                                var blurred5 = Aire.fastGaussian2Degree(bitmap, 128)
-//                                scope.launch {
-//                                    imagesArray.add(blurred5)
-//                                }
-//                            }
-//
-//                            val d5Time = measureTimeMillis {
-//                                var blurred5 = Aire.gaussianBlur(bitmap, 128, (128 - 1) / 6f)
-//                                scope.launch {
-//                                    imagesArray.add(blurred5)
-//                                }
-//                            }
-//
-//                            Log.d(
-//                                "AireMedian",
-//                                "Radius 125 tent exec time $d2Time ms, box time ${d3Time}ms, gauss A ${d4Time}ms, gauss ${d5Time}ms"
-//                            )
 //                        }
 //                        var radius = 5
 //                        repeat(25) {

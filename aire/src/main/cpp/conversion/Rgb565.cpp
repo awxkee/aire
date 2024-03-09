@@ -174,7 +174,7 @@ namespace aire::HWY_NAMESPACE {
         const VU16 greenBytes = Set(du16, 0b11111100000);
         const VU16 blueBytes = Set(du16, 0b11111);
         const VF16 bgPixel = Set(df16, 1.0);
-        const VF max8BitColors = ApproximateReciprocal(Set(df, 255));
+        const VF max8BitColors = ApproximateReciprocal(Set(df, 255.f));
 
         for (; x + pixels < width; x += pixels) {
             VU16 row = LoadU(du16, src);
@@ -333,7 +333,7 @@ namespace aire::HWY_NAMESPACE {
         using VU8 = Vec<decltype(du8)>;
 
         auto minColors = Zero(rf32);
-        auto vMaxColors = Set(rf32, (int) maxColors);
+        auto vMaxColors = Set(rf32, static_cast<float>(maxColors));
 
         auto lower = DemoteTo(ru8, ConvertTo(ri32,
                                              ClampRound(rf32, Mul(
