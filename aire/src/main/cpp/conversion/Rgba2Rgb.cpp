@@ -132,7 +132,7 @@ namespace aire {
 
     HWY_EXPORT(rgb8bit2RGBH);
 
-    void rgb8bit2RGB(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int width,
+    void rgba2RGB(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int width,
                      int height) {
         const int permuteMap[3] = {0, 1, 2};
         HWY_DYNAMIC_DISPATCH(rgb8bit2RGBH)(src, srcStride, dst, dstStride, width, height, permuteMap);

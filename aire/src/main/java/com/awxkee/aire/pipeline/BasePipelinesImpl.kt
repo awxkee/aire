@@ -147,9 +147,15 @@ class BasePipelinesImpl : BasePipelines {
         return warpAffineImpl(bitmap, transform, newWidth, newHeight)
     }
 
-    override fun toJPEG(bitmap: Bitmap, quality: Int): ByteArray {
+    override fun mozjpeg(bitmap: Bitmap, quality: Int): ByteArray {
         return toJPEGImpl(bitmap, quality)
     }
+
+    override fun jpegli(bitmap: Bitmap, quality: Int): ByteArray {
+        return compressJpegli(bitmap, quality)
+    }
+
+    private external fun compressJpegli(bitmap: Bitmap, quality: Int): ByteArray
 
     private external fun toJPEGImpl(bitmap: Bitmap, quality: Int): ByteArray
 

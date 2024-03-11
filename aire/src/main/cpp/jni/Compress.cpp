@@ -39,6 +39,7 @@
 #include "MathUtils.hpp"
 #include "base/JPEGEncoder.h"
 #include "EigenUtils.h"
+#include "aireli/JPEGEncoder.h"
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
@@ -159,6 +160,57 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_toJPEGImpl(JNIEnv *env, jobject 
                                     std::vector<uint8_t> original(input.size());
                                     aire::UnpremultiplyRGBA(input.data(), stride, original.data(), stride, width, height);
                                     aire::JPEGEncoder encoder(original.data(), stride, width, height);
+                                    encoder.setQuality(quality);
+                                    auto output = encoder.encode();
+                                    compressedData.resize(output.size());
+                                    std::copy(output.begin(), output.end(), compressedData.begin());
+                                }
+                                return {
+                                        .data = input,
+                                        .stride = stride,
+                                        .width = width,
+                                        .height = height,
+                                        .pixelFormat = fmt
+                                };
+                            });
+
+        jbyteArray byteArray = env->NewByteArray((jsize) compressedData.size());
+        char *memBuf = (char *) ((void *) compressedData.data());
+        env->SetByteArrayRegion(byteArray, 0, (jint) compressedData.size(),
+                                reinterpret_cast<const jbyte *>(memBuf));
+        compressedData.clear();
+        return byteArray;
+    } catch (AireError &err) {
+        std::string msg = err.what();
+        throwException(env, msg);
+        return nullptr;
+    }
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_compressJpegli(JNIEnv *env, jobject thiz, jobject bitmap, jint quality) {
+    try {
+        if (quality < 0 || quality > 100) {
+            std::string msg("Quality must be between 0...100 but received: " + std::to_string(quality));
+            throw AireError(msg);
+        }
+
+        std::vector<uint8_t> compressedData;
+        std::vector<AcquirePixelFormat> formats;
+        formats.insert(formats.begin(), APF_RGBA8888);
+        AcquireBitmapPixels(env,
+                            bitmap,
+                            formats,
+                            false,
+                            [&compressedData, quality](
+                                    std::vector<uint8_t> &input, int stride,
+                                    int width, int height,
+                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                if (fmt == APF_RGBA8888) {
+                                    std::vector<uint8_t> original(input.size());
+                                    aire::UnpremultiplyRGBA(input.data(), stride, original.data(), stride, width, height);
+                                    aire::JPEGLIEncoder encoder(original.data(), stride, width, height);
                                     encoder.setQuality(quality);
                                     auto output = encoder.encode();
                                     compressedData.resize(output.size());

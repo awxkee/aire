@@ -32,8 +32,7 @@
 #include <cstdint>
 
 namespace aire {
-    void rgb8bit2RGB(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int width,
-                     int height);
+    void rgba2RGB(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int width, int height);
 
     void rgb8bit2BGR(const uint8_t *src, int srcStride, uint8_t *dst, int dstStride, int width,
                      int height);

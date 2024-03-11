@@ -132,7 +132,7 @@ namespace aire::HWY_NAMESPACE {
                 float srcY = (float) y * yScale;
 
                 if (components == 4 && x + 8 < outputWidth) {
-                    // only kernel with size 3 is supported
+                    // only kernel with size 2 is supported
                     constexpr int kernelSize = 2;
 
                     float kx1 = std::floor(srcX);

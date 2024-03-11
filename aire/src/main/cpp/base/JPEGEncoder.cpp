@@ -49,63 +49,42 @@ namespace aire {
         longjmp(myerr->setjmp_buffer, 1);
     }
 
-    struct stdvector_destination_mgr {
-        struct jpeg_destination_mgr pub;
-        std::vector<uint8_t> *vec = nullptr;
-    };
-
-    void init_stdvector_destination(j_compress_ptr /*cinfo*/) {
-        // Nothing to do
-    }
-
-    boolean
-    empty_stdvector_output_buffer(j_compress_ptr cinfo) {
-        auto *dest = reinterpret_cast< stdvector_destination_mgr * >( cinfo->dest );
-
-        // Double vector capacity
-        const auto currentSize = dest->vec->size();
-        dest->vec->resize(currentSize * 2);
-
-        // Point to newly allocated data
-        dest->pub.next_output_byte = dest->vec->data() + currentSize;
-        dest->pub.free_in_buffer = currentSize;
-
-        return TRUE;
-    }
-
+    template<class T>
     void
-    term_stdvector_destination(j_compress_ptr cinfo) {
-        auto *dest = reinterpret_cast< stdvector_destination_mgr * >( cinfo->dest );
+    RgbaToRGB(const T *__restrict__ src, const uint32_t srcStride,
+              T *__restrict__ dst, const uint32_t newStride,
+              const uint32_t width, const uint32_t height,
+              const int *__restrict__ permuteMap) {
 
-        // Resize vector to number of bytes actually used
-        const auto used_bytes = dest->vec->capacity() - dest->pub.free_in_buffer;
-        dest->vec->resize(used_bytes);
-    }
+        const int idx1 = permuteMap[0];
+        const int idx2 = permuteMap[1];
+        const int idx3 = permuteMap[2];
 
-    void
-    jpeg_stdvector_dest(j_compress_ptr cinfo, std::vector<uint8_t> &vec) {
-        if (cinfo->dest == NULL) {
-            cinfo->dest = (struct jpeg_destination_mgr *) (*cinfo->mem->alloc_small)((j_common_ptr) cinfo, JPOOL_PERMANENT, sizeof(stdvector_destination_mgr));
+        for (int y = 0; y < height; ++y) {
+
+            auto srcPixels = reinterpret_cast<const T *>(reinterpret_cast<const uint8_t *>(src) + y * srcStride);
+            auto dstPixels = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(dst) + y * newStride);
+
+            int x = 0;
+
+            for (; x < width; ++x) {
+                T vec[3] = {srcPixels[0], srcPixels[1], srcPixels[2]};
+                dstPixels[0] = vec[idx1];
+                dstPixels[1] = vec[idx2];
+                dstPixels[2] = vec[idx3];
+
+                srcPixels += 4;
+                dstPixels += 3;
+            }
         }
-
-        auto *dest = reinterpret_cast< stdvector_destination_mgr * >( cinfo->dest );
-        dest->pub.init_destination = init_stdvector_destination;
-        dest->pub.empty_output_buffer = empty_stdvector_output_buffer;
-        dest->pub.term_destination = term_stdvector_destination;
-
-        // Set output buffer and initial size
-        dest->vec = &vec;
-        dest->vec->resize(4096);
-
-        // Initialize public buffer ptr and size
-        dest->pub.next_output_byte = dest->vec->data();
-        dest->pub.free_in_buffer = dest->vec->size();
     }
+
 
     std::vector<uint8_t> JPEGEncoder::encode() {
         int newStride = sizeof(uint8_t) * width * 3;
         std::vector<uint8_t> rgbData(newStride * height);
-        rgb8bit2BGR(data, stride, rgbData.data(), newStride, width, height);
+        int permuteMap[3] = {0, 1, 2};
+        rgba2RGB(data, stride, rgbData.data(), newStride, width, height);
 
         struct jpeg_compress_struct cinfo = {0};
         struct aire_jpeg_error_mng jerr = {0};
@@ -115,22 +94,28 @@ namespace aire {
 
         jpeg_create_compress(&cinfo);
 
+        unsigned char *outputBuffer = nullptr;
+        unsigned long outputSize = 0;
+
+        jpeg_mem_dest(&cinfo, &outputBuffer, &outputSize);
+
         if (setjmp(jerr.setjmp_buffer)) {
             jpeg_destroy_compress(&cinfo);
+            if (outputBuffer) {
+                free(outputBuffer);
+            }
             std::string msg("JPEG compression has failed");
             throw AireError(msg);
         }
 
-        std::vector<uint8_t> output;
-        jpeg_stdvector_dest(&cinfo, output);
-
         cinfo.image_width = width;
         cinfo.image_height = height;
         cinfo.input_components = 3;
-        cinfo.in_color_space = JCS_EXT_BGR;
+        cinfo.in_color_space = JCS_RGB;
 
         jpeg_set_defaults(&cinfo);
         jpeg_set_quality(&cinfo, quality, TRUE);
+        jpeg_simple_progression(&cinfo);
 
         jpeg_start_compress(&cinfo, TRUE);
 
@@ -143,6 +128,13 @@ namespace aire {
 
         jpeg_finish_compress(&cinfo);
         jpeg_destroy_compress(&cinfo);
+
+        std::vector<uint8_t> output(outputSize);
+        std::copy(outputBuffer, outputBuffer + outputSize, output.begin());
+
+        if (outputBuffer) {
+            free(outputBuffer);
+        }
 
         return output;
     }

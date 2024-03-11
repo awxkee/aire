@@ -99,9 +99,14 @@ interface BasePipelines {
     ): Bitmap
 
     /**
-     * Mozjpeg compression
+     * Mozjpeg jpeg compression
      */
-    fun toJPEG(bitmap: Bitmap, quality: Int = 76): ByteArray
+    fun mozjpeg(bitmap: Bitmap, quality: Int = 76): ByteArray
+
+    /**
+     * Jpegli jpeg compression
+     */
+    fun jpegli(bitmap: Bitmap, quality: Int = 76): ByteArray
 
     fun getStructuringKernel(kernelSize: Int): FloatArray {
         val kern = FloatArray(kernelSize * kernelSize) {

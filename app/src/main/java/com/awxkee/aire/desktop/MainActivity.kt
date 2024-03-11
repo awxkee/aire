@@ -60,16 +60,22 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.white_noise)
-//                            .copy(Bitmap.Config.RGBA_1010102, true)
+////                            .copy(Bitmap.Config.RGBA_1010102, true)
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
 //                        repeat(15) {
 //                            val d2Time = measureTimeMillis {
-//                                var blurred5 = Aire.tentBlur(bitmap, 128)
+//                                val compressedLi = Aire.jpegli(bitmap, 85)
+//                                val compressedJpeg = Aire.mozjpeg(bitmap, 85)
+//                                Log.d("AireMedian", "Compressed li size ${compressedLi.size} compressedJpeg ${compressedJpeg.size}")
 //                                scope.launch {
-//                                    imagesArray.add(blurred5)
+//                                    imagesArray.add(BitmapFactory.decodeByteArray(compressedLi, 0, compressedLi.size))
+//                                }
+//
+//                                scope.launch {
+//                                    imagesArray.add(BitmapFactory.decodeByteArray(compressedJpeg, 0, compressedJpeg.size))
 //                                }
 //                            }
 //                        }

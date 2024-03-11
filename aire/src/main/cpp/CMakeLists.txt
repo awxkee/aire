@@ -24,8 +24,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         effect/PerlinDistortion.cpp base/Vibrance.cpp algo/sleef-hwy.cpp conversion/yuv/YuvConverter.cpp
         jni/YuvPipelines.cpp pipelines/DehazeDarkChannel.cpp color/Adjustments.cpp
         base/Grain.cpp base/Sharpness.cpp base/Convolve2D.cpp base/LUT8.cpp
-        hwy/aligned_allocator.cc hwy/nanobenchmark.cc hwy/per_target.cc hwy/print.cc hwy/targets.cc
-        hwy/timer.cc
+        hwy/aligned_allocator.cc hwy/nanobenchmark.cc hwy/per_target.cc hwy/print.cc hwy/targets.cc hwy/timer.cc
         base/Convolve1Db16.cpp algo/MedianCut.cpp vendor/spng/spng.c base/PNGEncoder.cpp base/RemapPalette.cpp
         algo/WuQuantizer.cpp base/AffineTransform.cpp jni/Geometry.cpp base/WarpPerspective.cpp
         base/JPEGEncoder.cpp jni/Compress.cpp scale/BilinearRowSampler.cpp base/ArbitraryUtil.cpp)
@@ -56,6 +55,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DHWY_COMPILE_ONLY_STATIC)
 endif ()
 
+add_subdirectory(aireli)
+
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/algo ${CMAKE_SOURCE_DIR}/conversion
         ${CMAKE_SOURCE_DIR}/eigen ${CMAKE_SOURCE_DIR}/eigen/Core ${CMAKE_SOURCE_DIR}/vendor)
 
@@ -65,4 +66,5 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         libzlibng
         libturbojpeg
         libfftw
+        aireli
         -ljnigraphics)
