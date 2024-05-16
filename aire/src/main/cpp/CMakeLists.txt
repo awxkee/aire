@@ -27,7 +27,8 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         hwy/aligned_allocator.cc hwy/nanobenchmark.cc hwy/per_target.cc hwy/print.cc hwy/targets.cc hwy/timer.cc
         base/Convolve1Db16.cpp algo/MedianCut.cpp vendor/spng/spng.c base/PNGEncoder.cpp base/RemapPalette.cpp
         algo/WuQuantizer.cpp base/AffineTransform.cpp jni/Geometry.cpp base/WarpPerspective.cpp
-        base/JPEGEncoder.cpp jni/Compress.cpp scale/BilinearRowSampler.cpp base/ArbitraryUtil.cpp)
+        base/JPEGEncoder.cpp jni/Compress.cpp scale/BilinearRowSampler.cpp base/ArbitraryUtil.cpp
+)
 
 add_library(libzlibng STATIC IMPORTED)
 set_target_properties(${CMAKE_PROJECT_NAME} libzlibng PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libz.a)

@@ -59,8 +59,7 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                 true,
                                                 [dstHeight, dstWidth, scaleMode, antialias](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         const int lineWidth = dstWidth * sizeof(uint8_t) * 4;
                                                         const int alignment = 64;
@@ -81,11 +80,11 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                                 if (scaleMode == bilinear || scaleMode == nearest) {
                                                                     aire::gaussBlurU8(reinterpret_cast<uint8_t *>(input.data()),
                                                                                       stride,
-                                                                                      width, height, 3, 1.5f);
+                                                                                      width, height, 3, (3.f-1)/6.f);
                                                                 } else {
                                                                     aire::gaussBlurU8(reinterpret_cast<uint8_t *>(input.data()),
                                                                                       stride,
-                                                                                      width, height, 5, 1.55f);
+                                                                                      width, height, 5, (1.55f)/6.f);
                                                                 }
                                                             }
                                                         }
@@ -128,11 +127,11 @@ Java_com_awxkee_aire_pipeline_ScalePipelinesImpl_scaleImpl(JNIEnv *env, jobject 
                                                                 if (scaleMode == bilinear || scaleMode == nearest) {
                                                                     aire::gaussBlurF16(reinterpret_cast<uint16_t *>(input.data()),
                                                                                        stride,
-                                                                                       width, height, 1, 1.5f);
+                                                                                       width, height, 3, (3.f-1)/6.f);
                                                                 } else {
                                                                     aire::gaussBlurF16(reinterpret_cast<uint16_t *>(input.data()),
                                                                                        stride,
-                                                                                       width, height, 2, 1.55f);
+                                                                                       width, height, 5, (1.55f)/6.f);
                                                                 }
                                                             }
                                                         }

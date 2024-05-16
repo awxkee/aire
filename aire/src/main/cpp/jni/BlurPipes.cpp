@@ -58,8 +58,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_stackNativeBlurPipeline(JNIEnv *
                                                 formats,
                                                 false,
                                                 [radius](std::vector<uint8_t> &input, int stride,
-                                                         int width, int height,
-                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                         int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     aire::shgStackBlur(input.data(), width, height, radius);
                                                     return {
                                                             .data = input,
@@ -91,8 +90,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_boxBlurPipeline(JNIEnv *env, job
                                                 formats,
                                                 true,
                                                 [radius](std::vector<uint8_t> &input, int stride,
-                                                         int width, int height,
-                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                         int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::boxBlurU8(input.data(), stride, width,
                                                                         height, radius);
@@ -129,8 +127,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_medianBlurPipeline(JNIEnv *env, 
                                                 formats,
                                                 false,
                                                 [radius](std::vector<uint8_t> &input, int stride,
-                                                         int width, int height,
-                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                         int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::medianBlur(
                                                                 reinterpret_cast<uint8_t *>(input.data()),
@@ -166,8 +163,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_bilateralBlurPipeline(JNIEnv *en
                                                 false,
                                                 [radius, sigma, spatialSigma](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::bilateralBlur<uint8_t>(input.data(),
                                                                                      stride, width,
@@ -205,8 +201,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_gaussianBlurPipeline(JNIEnv *env
                                                 true,
                                                 [radius, sigma](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::gaussBlurU8(input.data(),
                                                                           stride, width,
@@ -247,8 +242,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_tentBlurPipeline(JNIEnv *env, jo
                                                 true,
                                                 [radius](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::tentBlur(input.data(),
                                                                        stride, width,
@@ -298,8 +292,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_anisotropicDiffusionPipeline(JNI
                                                 true,
                                                 [numOfSteps, conduction, diffusion](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::anisotropicDiffusion(input.data(),
                                                                                    stride, width,
@@ -333,8 +326,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastBilateralPipeline(JNIEnv *en
                                                 false,
                                                 [rangeSigma, spatialSigma](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         int xyzStride = width * 3 * sizeof(float);
                                                         std::vector<float> xyzBitmap(xyzStride * height);
@@ -488,8 +480,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastGaussian3DImpl(JNIEnv *env, 
                                                 formats,
                                                 true,
                                                 [&](std::vector<uint8_t> &input, int stride,
-                                                    int width, int height,
-                                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::gaussianApproximation3D(input.data(), stride, width,
                                                                                       height, radius);
@@ -527,8 +518,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_fastGaussian4DImpl(JNIEnv *env, 
                                                 formats,
                                                 true,
                                                 [&](std::vector<uint8_t> &input, int stride,
-                                                    int width, int height,
-                                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::gaussianApproximation4D(input.data(), stride, width,
                                                                                       height, radius);
@@ -574,8 +564,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_zoomBlurImpl(JNIEnv *env, jobjec
                                                 formats,
                                                 true,
                                                 [&](std::vector<uint8_t> &input, int stride,
-                                                    int width, int height,
-                                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::ZoomBlur zoom(kernelSize, sigma, centerX, centerY, strength, angle);
                                                         zoom.apply(input.data(), stride, width, height);
@@ -624,8 +613,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_bokehBlurImpl(JNIEnv *env,
                                                 formats,
                                                 true,
                                                 [&](std::vector<uint8_t> &input, int stride,
-                                                    int width, int height,
-                                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                    int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         auto krn = getBokehEffect(kernelSize, sides);
                                                         auto bokehKernel = krn.cast<float>().eval();

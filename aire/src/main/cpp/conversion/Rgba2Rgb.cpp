@@ -57,7 +57,7 @@ namespace aire::HWY_NAMESPACE {
         int x = 0;
         auto srcPixels = reinterpret_cast<const TFromD<D> *>(src);
         auto dstPixels = reinterpret_cast<TFromD<D> *>(dst);
-        int pixels = du.MaxLanes();
+        const int pixels = du.MaxLanes();
 
         int idx1 = permuteMap[0];
         int idx2 = permuteMap[1];

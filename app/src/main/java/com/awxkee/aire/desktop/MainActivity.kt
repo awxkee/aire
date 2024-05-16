@@ -59,26 +59,37 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.white_noise)
-////                            .copy(Bitmap.Config.RGBA_1010102, true)
-//                        scope.launch {
-//                            imagesArray.add(bitmap)
-//                        }
-//
-//                        repeat(15) {
-//                            val d2Time = measureTimeMillis {
-//                                val compressedLi = Aire.jpegli(bitmap, 85)
-//                                val compressedJpeg = Aire.mozjpeg(bitmap, 85)
-//                                Log.d("AireMedian", "Compressed li size ${compressedLi.size} compressedJpeg ${compressedJpeg.size}")
-//                                scope.launch {
-//                                    imagesArray.add(BitmapFactory.decodeByteArray(compressedLi, 0, compressedLi.size))
-//                                }
-//
-//                                scope.launch {
-//                                    imagesArray.add(BitmapFactory.decodeByteArray(compressedJpeg, 0, compressedJpeg.size))
-//                                }
-//                            }
-//                        }
+                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.haze)
+                            .copy(Bitmap.Config.RGBA_1010102, true)
+                            .scaleWith(0.3f)
+
+                        scope.launch {
+                            imagesArray.add(bitmap)
+                        }
+
+                        val executionsFast = mutableListOf<Long>()
+                        repeat(1) {
+                            val d2Time = measureTimeMillis {
+                                val compressedJpeg = Aire.equalizeHistHSV(bitmap)
+
+                                scope.launch {
+                                    imagesArray.add(compressedJpeg)
+                                }
+                            }
+                            executionsFast.add(d2Time)
+                        }
+
+                        repeat(1) {
+                            val d2Time = measureTimeMillis {
+                                val compressedJpeg = Aire.equalizeHist(bitmap)
+
+                                scope.launch {
+                                    imagesArray.add(compressedJpeg)
+                                }
+                            }
+                            executionsFast.add(d2Time)
+                        }
+                        Log.d("AireMedian", "Fast gaussian exec time ${executionsFast.average()}")
 //                        var radius = 5
 //                        repeat(25) {
 //                            val time = measureTimeMillis {

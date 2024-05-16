@@ -90,6 +90,14 @@ class EffectsPipelineImpl : EffectsPipelines {
         return crystallizeImpl(bitmap, numClusters, strokeColor)
     }
 
+    override fun equalizeHist(bitmap: Bitmap): Bitmap {
+        return equalizeHistImpl(bitmap)
+    }
+
+    override fun equalizeHistHSV(bitmap: Bitmap): Bitmap {
+        return equalizeHistHSVImpl(bitmap)
+    }
+
     private external fun convexImpl(bitmap: Bitmap, strength: Float): Bitmap
 
     private external fun bokehImpl(bitmap: Bitmap, kernelSize: Int, sides: Int, enhance: Boolean): Bitmap
@@ -130,4 +138,8 @@ class EffectsPipelineImpl : EffectsPipelines {
         clustersCount: Int,
         strokeColor: Int
     ): Bitmap
+
+    private external fun equalizeHistImpl(bitmap: Bitmap): Bitmap
+
+    private external fun equalizeHistHSVImpl(bitmap: Bitmap): Bitmap
 }

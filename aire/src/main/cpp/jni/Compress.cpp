@@ -72,8 +72,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_toPNGImpl(JNIEnv *env, jobject t
                             false,
                             [&compressedData, maxColors, quantize, dithering, strategy, compressionLevel](
                                     std::vector<uint8_t> &input, int stride,
-                                    int width, int height,
-                                    AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                    int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                 if (fmt == APF_RGBA8888) {
                                     std::vector<Eigen::Vector4i> palette;
                                     uint32_t colors = maxColors;
@@ -124,9 +123,8 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_toPNGImpl(JNIEnv *env, jobject t
                             });
 
         jbyteArray byteArray = env->NewByteArray((jsize) compressedData.size());
-        char *memBuf = (char *) ((void *) compressedData.data());
-        env->SetByteArrayRegion(byteArray, 0, (jint) compressedData.size(),
-                                reinterpret_cast<const jbyte *>(memBuf));
+        auto memBuf = reinterpret_cast<char *>(compressedData.data());
+        env->SetByteArrayRegion(byteArray, 0, (jint) compressedData.size(), reinterpret_cast<const jbyte *>(memBuf));
         compressedData.clear();
         return byteArray;
     } catch (AireError &err) {
@@ -175,9 +173,8 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_toJPEGImpl(JNIEnv *env, jobject 
                             });
 
         jbyteArray byteArray = env->NewByteArray((jsize) compressedData.size());
-        char *memBuf = (char *) ((void *) compressedData.data());
-        env->SetByteArrayRegion(byteArray, 0, (jint) compressedData.size(),
-                                reinterpret_cast<const jbyte *>(memBuf));
+        auto memBuf = reinterpret_cast<char *>(compressedData.data());
+        env->SetByteArrayRegion(byteArray, 0, (jint) compressedData.size(), reinterpret_cast<const jbyte *>(memBuf));
         compressedData.clear();
         return byteArray;
     } catch (AireError &err) {

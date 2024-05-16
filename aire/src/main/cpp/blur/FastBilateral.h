@@ -153,9 +153,3 @@ namespace aire {
 
     };
 }
-
-#ifdef PCL_NO_PRECOMPILE
-#include <pcl/filters/impl/fast_bilateral.hpp>
-#else
-#define PCL_INSTANTIATE_FastBilateralFilter(T) template class PCL_EXPORTS pcl::FastBilateralFilter<T>;
-#endif

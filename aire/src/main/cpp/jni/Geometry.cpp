@@ -52,8 +52,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_cropImpl(JNIEnv *env, jobject th
                                                 true,
                                                 [baseX, baseY, newWidth, newHeight](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         int newStride = computeStride(newWidth, sizeof(uint8_t), 4);
                                                         std::vector<uint8_t> output(newStride * newHeight);
@@ -104,8 +103,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_rotateImpl(JNIEnv *env, jobject 
                                                 true,
                                                 [angle, newWidth, newHeight, anchorPointX, anchorPointY](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         int newStride = computeStride(newWidth, sizeof(uint8_t), 4);
                                                         std::vector<uint8_t> output(newStride * newHeight);

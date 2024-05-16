@@ -35,12 +35,19 @@
 #include "jpegli/encode.h"
 #include <string>
 
+#include <hwy/foreach_target.h>  // IWYU pragma: keep
+#include <hwy/highway.h>
+#include "hwy/base.h"
+
 namespace aire {
 
     struct aire_jpeg_error_mng {
         struct jpeg_error_mgr pub;
         jmp_buf setjmp_buffer;
     };
+
+    using namespace hwy;
+    using namespace hwy::HWY_NAMESPACE;
 
     METHODDEF(void)
     handleJpegError(j_common_ptr cinfo) {
@@ -59,12 +66,31 @@ namespace aire {
         const int idx2 = permuteMap[1];
         const int idx3 = permuteMap[2];
 
+        ScalableTag<T> du;
+        using V = Vec<decltype(du)>;
+        const int pixels = du.MaxLanes();
+
         for (int y = 0; y < height; ++y) {
 
             auto srcPixels = reinterpret_cast<const T *>(reinterpret_cast<const uint8_t *>(src) + y * srcStride);
             auto dstPixels = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(dst) + y * newStride);
 
             int x = 0;
+
+            for (; x + pixels < width; x += pixels) {
+                V pixels1;
+                V pixels2;
+                V pixels3;
+                V pixels4;
+                LoadInterleaved4(du, srcPixels, pixels1, pixels2, pixels3, pixels4);
+
+                V map[3] = {pixels1, pixels2, pixels3};
+
+                StoreInterleaved3(map[idx1], map[idx2], map[idx3], du, dstPixels);
+
+                srcPixels += 4 * pixels;
+                dstPixels += 3 * pixels;
+            }
 
             for (; x < width; ++x) {
                 T vec[3] = {srcPixels[0], srcPixels[1], srcPixels[2]};

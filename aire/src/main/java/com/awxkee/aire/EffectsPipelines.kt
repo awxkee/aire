@@ -74,4 +74,8 @@ interface EffectsPipelines {
 
     /* Prefer relative clustering for ex. width*height * 0.01f = numClusters */
     fun crystallize(bitmap: Bitmap, numClusters: Int, strokeColor: Int = Color.TRANSPARENT): Bitmap
+
+    fun equalizeHist(bitmap: Bitmap): Bitmap
+
+    fun equalizeHistHSV(bitmap: Bitmap): Bitmap
 }

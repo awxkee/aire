@@ -51,6 +51,7 @@ object Aire : BlurPipelines by BlurPipelinesImpl(),
     YuvPipelines by YuvPipelinesImpl() {
     init {
         System.loadLibrary("aire")
+        System.loadLibrary("aire_filters")
     }
 
     private external fun initializeLibrary()

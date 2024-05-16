@@ -53,16 +53,12 @@ Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_tiltShiftImpl(JNIEnv *env, jobje
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     std::vector<uint8_t> blurred(input.size());
-                                                    std::copy(input.begin(), input.end(),
-                                                              blurred.begin());
+                                                    std::copy(input.begin(), input.end(), blurred.begin());
                                                     std::vector<uint8_t> output(input.size());
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::gaussBlurU8(blurred.data(),
-                                                                          stride,
-                                                                          width,
-                                                                          height,
-                                                                          radius,
-                                                                          sigma);
+                                                                          stride, width, height,
+                                                                          radius, sigma);
                                                         aire::tiltShift(output.data(),
                                                                         input.data(),
                                                                         blurred,
@@ -109,10 +105,7 @@ Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_glitchImpl(JNIEnv *env, jobject 
                                                         aire::glitchEffect(input.data(),
                                                                            stride, width,
                                                                            height, shiftX, shiftY,
-                                                                           corruptionSize,
-                                                                           corruptions,
-                                                                           cShiftX,
-                                                                           cShiftY);
+                                                                           corruptionSize, corruptions, cShiftX, cShiftY);
                                                     }
                                                     return {
                                                             .data = input,
@@ -147,14 +140,11 @@ Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_horizontalWindStaggerImpl(JNIEnv
                                                         int width, int height,
                                                         AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
-                                                        std::vector<uint8_t> output(
-                                                                stride * height);
+                                                        std::vector<uint8_t> output(stride * height);
                                                         aire::horizontalWindStagger(output.data(),
                                                                                     input.data(),
-                                                                                    stride, width,
-                                                                                    height,
-                                                                                    windStrength,
-                                                                                    streamsCount,
+                                                                                    stride, width, height,
+                                                                                    windStrength, streamsCount,
                                                                                     static_cast<uint32_t>(clearColor));
                                                         input = std::move(output);
                                                     }
@@ -177,8 +167,8 @@ Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_horizontalWindStaggerImpl(JNIEnv
 extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_horizontalTiltShiftImpl(JNIEnv *env, jobject thiz, jobject bitmap, jint radius, jfloat sigma,
-                                                                              jfloat anchorX, jfloat anchorY,
-                                                                              jfloat tiltRadius, jfloat angle) {
+                                                                        jfloat anchorX, jfloat anchorY,
+                                                                        jfloat tiltRadius, jfloat angle) {
 
     try {
         std::vector<AcquirePixelFormat> formats;
@@ -197,20 +187,17 @@ Java_com_awxkee_aire_pipeline_ShiftPipelineImpl_horizontalTiltShiftImpl(JNIEnv *
                                                     std::vector<uint8_t> output(input.size());
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::gaussBlurU8(blurred.data(),
-                                                                          stride,
-                                                                          width,
-                                                                          height,
-                                                                          radius,
-                                                                          sigma);
+                                                                          stride, width, height,
+                                                                          radius, sigma);
                                                         aire::horizontalTiltShift(output.data(),
-                                                                                        input.data(),
-                                                                                        blurred,
-                                                                                        stride, width,
-                                                                                        height,
-                                                                                        anchorX,
-                                                                                        anchorY,
-                                                                                        tiltRadius,
-                                                                                        angle);
+                                                                                  input.data(),
+                                                                                  blurred,
+                                                                                  stride, width,
+                                                                                  height,
+                                                                                  anchorX,
+                                                                                  anchorY,
+                                                                                  tiltRadius,
+                                                                                  angle);
                                                     }
                                                     blurred.clear();
                                                     return {

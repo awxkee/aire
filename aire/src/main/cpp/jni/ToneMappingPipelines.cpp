@@ -47,8 +47,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_logarithmicImpl(JNIEnv *env, job
                                                 true,
                                                 [exposure](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::logarithmic(input.data(),
                                                                           stride, width,
@@ -83,8 +82,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_acesFilmicImpl(JNIEnv *env, jobj
                                                 true,
                                                 [exposure](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::acesFilm(input.data(),
                                                                        stride, width,
@@ -119,8 +117,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_exposureImpl(JNIEnv *env, jobjec
                                                 true,
                                                 [exposure](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::exposure(input.data(),
                                                                        stride, width,
@@ -155,8 +152,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_hejlBurgessToneMappingImpl(JNIEn
                                                 true,
                                                 [exposure](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::hejlBurgess(input.data(),
                                                                           stride, width,
@@ -191,8 +187,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_hableFilmicImpl(JNIEnv *env, job
                                                 true,
                                                 [exposure](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height,  AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::hableFilmic(input.data(),
                                                                           stride, width,
@@ -227,8 +222,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_acesHillImpl(JNIEnv *env, jobjec
                                                 true,
                                                 [exposure](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::acesHill(input.data(),
                                                                        stride, width,
@@ -276,8 +270,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_monochromeImpl(JNIEnv *env, jobj
                                                 true,
                                                 [exposure, &color](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::monochrome(input.data(),
                                                                          stride, width,
@@ -313,8 +306,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_whiteBalanceImpl(JNIEnv *env, jo
                                                 true,
                                                 [temperature, tint](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::whiteBalance(input.data(),
                                                                          stride, width,
@@ -350,8 +342,7 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_saturationImpl(JNIEnv *env, jobj
                                                 true,
                                                 [saturation](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::saturation(input.data(),
                                                                            stride, width,
@@ -390,8 +381,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_mobiusImpl(JNIEnv *env, jobject 
                                                 true,
                                                 [exposure, transition, peak](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::mobius(input.data(),
                                                                        stride, width,
@@ -428,8 +418,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_uchimuraImpl(JNIEnv *env, jobjec
                                                 true,
                                                 [exposure](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::uchimura(input.data(),
                                                                      stride, width,
@@ -464,8 +453,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_aldridgeImpl(JNIEnv *env, jobjec
                                                 true,
                                                 [exposure, cutoff](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::aldridge(input.data(),
                                                                        stride, width,
@@ -501,8 +489,7 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_dragoImpl(JNIEnv *env, jobject t
                                                 true,
                                                 [exposure, sdrWhitePoint](
                                                         std::vector<uint8_t> &input, int stride,
-                                                        int width, int height,
-                                                        AcquirePixelFormat fmt) -> BuiltImagePresentation {
+                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
                                                     if (fmt == APF_RGBA8888) {
                                                         aire::drago(input.data(),
                                                                        stride, width,

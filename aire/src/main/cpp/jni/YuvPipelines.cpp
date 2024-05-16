@@ -59,8 +59,7 @@ Java_com_awxkee_aire_pipeline_YuvPipelinesImpl_Yuv420nV21ToRGBA(JNIEnv *env, job
         }
         int rgbaStride = (int) sizeof(uint8_t) * 4 * width;
         vector<uint8_t> rgbaBuffer(rgbaStride * height);
-        aire::NV21ToRGBA(rgbaBuffer.data(), rgbaStride, width, height, yBufferAddress, yStride,
-                         uvBufferAddress, uvStride);
+        aire::NV21ToRGBA(rgbaBuffer.data(), rgbaStride, width, height, yBufferAddress, yStride, uvBufferAddress, uvStride);
         auto dstBufferAddress = reinterpret_cast<uint8_t *>(env->GetDirectBufferAddress(dstBuffer));
         int dstLength = (int) env->GetDirectBufferCapacity(dstBuffer);
         if (dstBufferAddress == nullptr || (dstLength == -1 || dstLength != rgbaStride * height)) {
