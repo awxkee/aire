@@ -16,19 +16,11 @@ impl Xyz {
     }
 }
 
-fn srgb_to_linear(val: f32) -> f32 {
-    if val <= 0.04045 {
-        val / 12.92
-    } else {
-        ((val + 0.055) / 1.055).powf(2.4)
-    }
-}
-
 impl Xyz {
     pub fn from_rgb(rgb: &Rgb<u8>) -> Self {
-        let r = srgb_to_linear(rgb.r as f32 / 255f32);
-        let g = srgb_to_linear(rgb.g as f32 / 255f32);
-        let b = srgb_to_linear(rgb.b as f32 / 255f32);
+        let r = gamma_curve::rec709_to_linear(rgb.r as f32 / 255f32);
+        let g = gamma_curve::rec709_to_linear(rgb.g as f32 / 255f32);
+        let b = gamma_curve::rec709_to_linear(rgb.b as f32 / 255f32);
         Self::new(
             (0.4124 * r + 0.3576 * g + 0.1805 * b) * 100.0,
             (0.2126 * r + 0.7152 * g + 0.0722 * b) * 100.0,
@@ -47,7 +39,7 @@ impl Xyz {
         let b = x * 0.0556434 + y * -0.2040259 + z * 1.0572252;
         let r = 255f32 * gamma_curve::rec709_from_linear(r);
         let g = 255f32 * gamma_curve::rec709_from_linear(g);
-        let b = 255f32 *gamma_curve::rec709_from_linear(b);
+        let b = 255f32 * gamma_curve::rec709_from_linear(b);
         Rgb::new(r as u8, g as u8, b as u8)
     }
 }

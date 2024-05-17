@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.lin)
+                /*        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.lin)
                             .copy(Bitmap.Config.ARGB_8888, true)
 
                         scope.launch {
@@ -92,7 +92,7 @@ class MainActivity : ComponentActivity() {
                             scope.launch {
                                 imagesArray.add(compressedJpegsLinear)
                             }
-                        }
+                        }*/
 //
 //                        repeat(1) {
 //                            val d2Time = measureTimeMillis {
