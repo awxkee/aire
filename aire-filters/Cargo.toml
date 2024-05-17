@@ -1,0 +1,21 @@
+[package]
+name = "aire-filters"
+version = "0.1.0"
+edition = "2021"
+
+[target.'cfg(target_os="android")'.dependencies]
+jni = "0.21.1"
+ndk-sys = { version = "0.6.0", features = ["bitmap"] }
+ndk = "0.9.0"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+half = "2.4.1"
+num-traits = "0.2.19"
+yuvutils-rs = "0.1.4"
+
+[profile.release]
+strip = true
+opt-level = 3
