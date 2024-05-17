@@ -42,18 +42,19 @@
 
 namespace aire::HWY_NAMESPACE {
 
-    class NearestRowSampler : public ScaleRowSampler<uint8_t> {
+    template<class T>
+    class NearestRowSampler : public ScaleRowSampler<T> {
     public:
-        NearestRowSampler(const uint8_t *mSource,
+        NearestRowSampler(const T *mSource,
                           const int srcStride,
                           const int inputWidth,
                           const int inputHeight,
-                          uint8_t *mDestination,
+                          T *mDestination,
                           const int dstStride,
                           const int outputWidth,
                           const int outputHeight,
                           const int components) :
-                ScaleRowSampler<uint8_t>(mSource,
+                ScaleRowSampler<T>(mSource,
                                          srcStride,
                                          inputWidth,
                                          inputHeight,
@@ -65,35 +66,33 @@ namespace aire::HWY_NAMESPACE {
 
         }
 
-        void sample(const int row) {
-            auto dst = reinterpret_cast<uint8_t *>(mDestination + row * dstStride);
-            if (components == 4) {
-                for (int x = 0; x < outputWidth; ++x) {
-                    const float srcX = (float) x * xScale;
-                    const float srcY = (float) row * yScale;
+        void sample(const int row) override {
+            auto dst = reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(this->mDestination) + row * this->dstStride);
+            if (this->components == 4 && std::is_same<T, uint8_t>::value) {
+                for (int x = 0; x < this->outputWidth; ++x) {
+                    const float srcX = (float) x * this->xScale;
+                    const float srcY = (float) row * this->yScale;
 
-                    const int x1 = std::clamp(static_cast<int>(std::floor(srcX)), 0, inputWidth - 1);
-                    const int y1 = std::clamp(static_cast<int>(std::floor(srcY)), 0, inputHeight - 1);
-                    auto srcRow = reinterpret_cast<const uint8_t *>(mSource + y1 * srcStride);
+                    const int x1 = std::clamp(static_cast<int>(std::floor(srcX)), 0, this->inputWidth - 1);
+                    const int y1 = std::clamp(static_cast<int>(std::floor(srcY)), 0, this->inputHeight - 1);
+                    auto srcRow = reinterpret_cast<const T *>(reinterpret_cast<const uint8_t *>(this->mSource) + y1 * this->srcStride);
                     reinterpret_cast<uint32_t *>(dst)[x] = reinterpret_cast<const uint32_t *>(srcRow)[x1];
                 }
             } else {
-                for (int x = 0; x < outputWidth; ++x) {
-                    const float srcX = (float) x * xScale;
-                    const float srcY = (float) row * yScale;
+                for (int x = 0; x < this->outputWidth; ++x) {
+                    const float srcX = (float) x * this->xScale;
+                    const float srcY = (float) row * this->yScale;
 
-                    const int x1 = std::clamp(static_cast<int>(std::floor(srcX)), 0, inputWidth - 1);
-                    const int y1 = std::clamp(static_cast<int>(std::floor(srcY)), 0, inputHeight - 1);
-                    auto srcRow = reinterpret_cast<const uint8_t *>(mSource + y1 * srcStride);
-                    auto srcPtr = &srcRow[x1 * components];
-                    std::copy(srcPtr, srcPtr + sizeof(uint8_t) * components, &dst[x * components]);
+                    const int x1 = std::clamp(static_cast<int>(std::floor(srcX)), 0, this->inputWidth - 1);
+                    const int y1 = std::clamp(static_cast<int>(std::floor(srcY)), 0, this->inputHeight - 1);
+                    auto srcRow = reinterpret_cast<const T *>(reinterpret_cast<const uint8_t *>(this->mSource) + y1 * this->srcStride);
+                    auto srcPtr = &srcRow[x1 * this->components];
+                    std::copy(srcPtr, srcPtr + sizeof(uint8_t) * this->components, &dst[x * this->components]);
                 }
             }
         }
 
-        ~NearestRowSampler() {
-
-        }
+        ~NearestRowSampler() override = default;
 
     private:
         const float maxColors = std::powf(2.0f, (float) 8.f) - 1.0f;
@@ -122,7 +121,7 @@ namespace aire::HWY_NAMESPACE {
 
         }
 
-        void sample(const int row) {
+        void sample(const int row) override {
             auto dst = reinterpret_cast<uint16_t *>(reinterpret_cast<uint8_t *>(mDestination) + row * dstStride);
             for (int x = 0; x < outputWidth; ++x) {
                 const float srcX = (float) x * xScale;
@@ -136,10 +135,7 @@ namespace aire::HWY_NAMESPACE {
             }
         }
 
-        ~NearestRowSampler16Bit() {
-
-        }
-
+        ~NearestRowSampler16Bit() override = default;
     };
 
     class NearestRowSampler10Bit : public ScaleRowSampler<uint32_t> {
@@ -164,7 +160,7 @@ namespace aire::HWY_NAMESPACE {
 
         }
 
-        void sample(const int row) {
+        void sample(const int row) override {
             auto dst = reinterpret_cast<uint32_t *>(reinterpret_cast<uint8_t *>(mDestination) + row * dstStride);
             for (int x = 0; x < outputWidth; ++x) {
                 const float srcX = (float) x * xScale;
@@ -177,9 +173,7 @@ namespace aire::HWY_NAMESPACE {
             }
         }
 
-        ~NearestRowSampler10Bit() {
-
-        }
+        ~NearestRowSampler10Bit() override = default;
 
     private:
     };

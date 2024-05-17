@@ -38,6 +38,6 @@ interface ScalePipelines {
         dstWidth: Int,
         dstHeight: Int,
         scaleMode: BitmapScaleMode,
-        antialias: Boolean,
+        colorSpace: ScaleColorSpace,
     ): Bitmap
 }

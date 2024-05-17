@@ -59,11 +59,9 @@ namespace aire {
             yScale = static_cast<float>(inputHeight) / static_cast<float>(outputHeight);
         }
 
-        virtual void sample(const int row) = 0;
+        virtual void sample(int row) = 0;
 
-        virtual ~ScaleRowSampler() {
-
-        };
+        virtual ~ScaleRowSampler() = default;
 
     protected:
         const T *mSource;

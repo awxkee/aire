@@ -32,6 +32,7 @@ package com.awxkee.aire.pipeline
 
 import android.graphics.Bitmap
 import com.awxkee.aire.BitmapScaleMode
+import com.awxkee.aire.ScaleColorSpace
 import com.awxkee.aire.ScalePipelines
 
 class ScalePipelinesImpl : ScalePipelines {
@@ -40,9 +41,9 @@ class ScalePipelinesImpl : ScalePipelines {
         dstWidth: Int,
         dstHeight: Int,
         scaleMode: BitmapScaleMode,
-        antialias: Boolean
+        colorSpace: ScaleColorSpace,
     ): Bitmap {
-        return scaleImpl(bitmap, dstWidth, dstHeight, scaleMode.value, antialias)
+        return scaleImpl(bitmap, dstWidth, dstHeight, scaleMode.value, colorSpace.value)
     }
 
     private external fun scaleImpl(
@@ -50,6 +51,6 @@ class ScalePipelinesImpl : ScalePipelines {
         dstWidth: Int,
         dstHeight: Int,
         scaleMode: Int,
-        antialias: Boolean,
+        colorSpace: Int,
     ): Bitmap
 }

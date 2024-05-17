@@ -27,11 +27,14 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         hwy/aligned_allocator.cc hwy/nanobenchmark.cc hwy/per_target.cc hwy/print.cc hwy/targets.cc hwy/timer.cc
         base/Convolve1Db16.cpp algo/MedianCut.cpp vendor/spng/spng.c base/PNGEncoder.cpp base/RemapPalette.cpp
         algo/WuQuantizer.cpp base/AffineTransform.cpp jni/Geometry.cpp base/WarpPerspective.cpp
-        base/JPEGEncoder.cpp jni/Compress.cpp scale/BilinearRowSampler.cpp base/ArbitraryUtil.cpp
+        base/JPEGEncoder.cpp jni/Compress.cpp base/ArbitraryUtil.cpp
 )
 
+add_library(aire_filters STATIC IMPORTED)
+set_target_properties(aire aire_filters PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libaire_filters.a)
+
 add_library(libzlibng STATIC IMPORTED)
-set_target_properties(${CMAKE_PROJECT_NAME} libzlibng PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libz.a)
+set_target_properties(aire libzlibng PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libz.a)
 
 add_library(libturbojpeg STATIC IMPORTED)
 set_target_properties(${CMAKE_PROJECT_NAME} libturbojpeg PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libturbojpeg.a)
@@ -68,4 +71,5 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         libturbojpeg
         libfftw
         aireli
+        aire_filters
         -ljnigraphics)

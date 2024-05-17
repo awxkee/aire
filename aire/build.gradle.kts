@@ -40,6 +40,12 @@ android {
                 withJavadocJar()
             }
         }
+
+        sourceSets.named("main") {
+            this.jniLibs {
+                this.srcDir("src/main/cpp/lib")
+            }
+        }
     }
 
     buildTypes {
@@ -55,6 +61,12 @@ android {
         cmake {
             path("src/main/cpp/CMakeLists.txt")
             version = "3.22.1"
+        }
+    }
+
+    sourceSets.named("main") {
+        this.jniLibs {
+            this.srcDir("src/main/cpp/lib")
         }
     }
 
