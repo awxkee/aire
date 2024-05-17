@@ -169,14 +169,10 @@ class WeightedRowSampler : public ScaleRowSampler<T> {
           const uint32_t px = std::clamp(xi,
                                          static_cast<uint32_t >(0),
                                          static_cast<uint32_t>(this->inputWidth - 1)) * this->components;
-          for (int c = 0; c < std::min(this->components, 3); ++c) {
+          for (int c = 0; c < this->components; ++c) {
             auto clrf = static_cast<float>(row[px + c]);
             float clr = clrf * weight;
             rgb[c] += clr;
-          }
-
-          if (this->components == 4) {
-            alphaStore += row[px + 3];
           }
         }
       }
@@ -184,26 +180,20 @@ class WeightedRowSampler : public ScaleRowSampler<T> {
       const int px = x * this->components;
 
       if (std::is_same<T, uint8_t>::value) {
-        for (int c = 0; c < std::min(this->components, 3); ++c) {
+        for (int c = 0; c < this->components; ++c) {
           if (weightSum != 0.f) {
             dst[px + c] = static_cast<uint8_t>(std::clamp(::roundf(rgb[c] / weightSum), 0.0f, maxColors));
           } else {
             dst[px + c] = 0;
           }
         }
-        if (this->components == 4) {
-          dst[px + 3] = std::clamp(static_cast<float>(alphaStore) * totalIterations, 0.f, maxColors);
-        }
       } else if (std::is_same<T, float>::value) {
-        for (int c = 0; c < std::min(this->components, 3); ++c) {
+        for (int c = 0; c < this->components; ++c) {
           if (weightSum != 0.f) {
             dst[px + c] = rgb[c] / weightSum;
           } else {
             dst[px + c] = 0.f;
           }
-        }
-        if (this->components == 4) {
-          dst[px + 3] = static_cast<float>(alphaStore) * totalIterations;
         }
       }
     }
@@ -438,8 +428,6 @@ class WeightedWindow4RowSampler16Bit : public ScaleRowSampler<uint16_t> {
     const int filterLength = filterBase * std::max(static_cast<int>(filterScale), 1) + 1;
     const float iFilterScale = 1.0f / static_cast<float>(filterScale);
 
-    const float totalIterations = 1.f / (static_cast<float>(filterLength) * 2.f + 1.f) * (static_cast<float>(filterLength) * 2.f + 1.f);
-
     const int mMaxWidth = inputWidth - 1;
 
     const auto src8 = reinterpret_cast<const uint8_t *>(mSource);
@@ -453,8 +441,6 @@ class WeightedWindow4RowSampler16Bit : public ScaleRowSampler<uint16_t> {
       std::fill(rgb, rgb + 4, 0.0f);
 
       float weightSum = 0.f;
-
-      float alphaStore = 0.f;
 
       const auto sourceX = static_cast<uint32_t>(::floorf(centerX));
       const auto sourceY = static_cast<uint32_t>(::floorf(centerY));
@@ -475,32 +461,23 @@ class WeightedWindow4RowSampler16Bit : public ScaleRowSampler<uint16_t> {
 
           const uint32_t px = std::clamp(xi, static_cast<uint32_t >(0), static_cast<uint32_t>(inputWidth - 1)) * components;
 
-          for (int c = 0; c < std::min(components, 3); ++c) {
+          for (int c = 0; c < this->components; ++c) {
             float clrf = hwy::F32FromF16(hwy::float16_t::FromBits(row[px + c]));
             float clr = (float) clrf * weight;
             rgb[c] += clr;
-          }
-
-          if (components == 4) {
-            float clrf = hwy::F32FromF16(hwy::float16_t::FromBits(row[px + 3]));
-            alphaStore += clrf;
           }
         }
       }
 
       int px = x * components;
 
-      for (int c = 0; c < std::min(components, 3); ++c) {
+      for (int c = 0; c < this->components; ++c) {
         float newColor = rgb[c];
         if (weightSum != 0.f) {
           dst16[px + c] = hwy::F16FromF32(newColor / weightSum).bits;
         } else {
           dst16[px + c] = hwy::F16FromF32(0.f).bits;
         }
-      }
-
-      if (this->components == 4) {
-        dst16[px + 3] = hwy::F16FromF32(static_cast<float>(alphaStore) * totalIterations).bits;
       }
 
     }
