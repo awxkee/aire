@@ -98,9 +98,39 @@ class EffectsPipelineImpl : EffectsPipelines {
         return equalizeHistHSVImpl(bitmap)
     }
 
+    override fun equalizeHistAdaptive(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap {
+        return equalizeHistAdaptiveImpl(bitmap, gridSizeHorizontal, gridSizeVertical)
+    }
+
+    override fun equalizeHistSquares(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap {
+        return equalizeHistSquaresImpl(bitmap, gridSizeHorizontal, gridSizeVertical)
+    }
+
+    override fun clahe(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap {
+        return claheImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical)
+    }
+
     private external fun convexImpl(bitmap: Bitmap, strength: Float): Bitmap
 
-    private external fun bokehImpl(bitmap: Bitmap, kernelSize: Int, sides: Int, enhance: Boolean): Bitmap
+    private external fun bokehImpl(
+        bitmap: Bitmap,
+        kernelSize: Int,
+        sides: Int,
+        enhance: Boolean
+    ): Bitmap
 
     private external fun perlinDistortionImpl(
         bitmap: Bitmap,
@@ -142,4 +172,23 @@ class EffectsPipelineImpl : EffectsPipelines {
     private external fun equalizeHistImpl(bitmap: Bitmap): Bitmap
 
     private external fun equalizeHistHSVImpl(bitmap: Bitmap): Bitmap
+
+    private external fun equalizeHistAdaptiveImpl(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap
+
+    private external fun equalizeHistSquaresImpl(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap
+
+    private external fun claheImpl(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap
 }

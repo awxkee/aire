@@ -2,6 +2,7 @@ use yuvutils_rs::{
     rgb_to_yuv444, rgba_to_yuv444, yuv444_to_rgb, yuv444_to_rgba, YuvRange, YuvStandardMatrix,
 };
 
+use crate::clahe::ClaheGridSize;
 use crate::histogram::{make_histogram_1_channel, make_histogram_channel_3_region};
 use crate::hsl::Rgb;
 use crate::hsv::Hsv;
@@ -43,7 +44,7 @@ pub fn minmax(slice: &[u64]) -> (u64, u64) {
     return (min_value, max_value);
 }
 
-fn cdf(arr: &mut [u64]) {
+pub fn cdf(arr: &mut [u64]) {
     let mut sum: u64 = 0u64;
     for i in 0..arr.len() {
         sum += arr[i];
@@ -121,8 +122,6 @@ fn equalize_histogram_region_yuv<const CHANNELS: u8>(
     let histogram = make_histogram_1_channel(&y_plane, width, width, height);
     let mut bins = histogram.bins;
 
-    clip_hist(&mut bins);
-
     cdf(&mut bins);
 
     let pixels_count = width * height;
@@ -179,18 +178,6 @@ fn equalize_histogram_region_yuv<const CHANNELS: u8>(
                 YuvRange::Full,
                 YuvStandardMatrix::Bt709,
             );
-        }
-    }
-}
-
-fn clip_hist(bins: &mut [u64]) {
-    let sums: u64 = bins.iter().sum();
-    let mean: u64 = (sums as f64 / bins.len() as f64).round() as u64;
-    let threshold_value: f64 = mean as f64 * 1.5f64;
-    let clip_limit = mean + threshold_value as u64;
-    for i in 0..bins.len() {
-        if bins[i] > clip_limit {
-            bins[i] = clip_limit;
         }
     }
 }
@@ -261,8 +248,6 @@ fn equalize_histogram_region_hsv<const CHANNELS: u8>(
     );
     let mut bins = histogram.bins;
 
-    clip_hist(&mut bins);
-
     cdf(&mut bins);
 
     let pixels_count = hist_width * hist_height;
@@ -309,4 +294,55 @@ fn equalize_histogram_region_hsv<const CHANNELS: u8>(
         y_shift += stride as usize;
         hsl_shift += hist_width * 3usize;
     }
+}
+
+#[allow(dead_code)]
+pub fn equalize_histogram_squares<const CHANNELS: u8>(
+    in_place: &mut [u8],
+    stride: u32,
+    width: u32,
+    height: u32,
+    clahe_grid_size: ClaheGridSize,
+) {
+    if clahe_grid_size.w == 0 || clahe_grid_size.h == 0 {
+        panic!("zero sized grid is not accepted");
+    }
+    let horizontal_tile_size = width / clahe_grid_size.w;
+    let vertical_tile_size = height / clahe_grid_size.h;
+    let tiles_horizontal = width / horizontal_tile_size;
+    let tiles_vertical = height / vertical_tile_size;
+    for w in 0..tiles_horizontal {
+        for h in 0..tiles_vertical {
+            let start_x = w * horizontal_tile_size;
+            let start_y = h * vertical_tile_size;
+            let mut end_x = (w + 1) * horizontal_tile_size;
+            if w + 1 == tiles_horizontal {
+                end_x = width;
+            }
+            let mut end_y = (h + 1) * vertical_tile_size;
+            if h + 1 == tiles_vertical {
+                end_y = height;
+            }
+            equalize_histogram_region_hsv::<CHANNELS>(
+                in_place, stride, start_x, end_x, start_y, end_y, width, height,
+            );
+        }
+    }
+}
+
+#[allow(dead_code)]
+pub fn equalize_histogram_squares_rgba(
+    dst: &mut [u8],
+    dst_stride: u32,
+    width: u32,
+    height: u32,
+    clahe_grid_size: ClaheGridSize,
+) {
+    equalize_histogram_squares::<{ Channels4 as u8 }>(
+        dst,
+        dst_stride,
+        width,
+        height,
+        clahe_grid_size,
+    );
 }

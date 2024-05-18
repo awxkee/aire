@@ -60,13 +60,35 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.abstract_alpha)
+//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
 //                            .copy(Bitmap.Config.ARGB_8888, true)
 //
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
+//                        val clahe = Aire.clahe(bitmap, 0.5f, 34, 6)
+//                        scope.launch {
+//                            imagesArray.add(clahe)
+//                        }
+//                        val ahe = Aire.equalizeHistAdaptive(bitmap, 3, 3)
+//                        scope.launch {
+//                            imagesArray.add(ahe)
+//                        }
+//
+//                        val hsv = Aire.equalizeHistHSV(bitmap)
+//                        scope.launch {
+//                            imagesArray.add(hsv)
+//                        }
+//                        val hh = Aire.equalizeHistHSV(bitmap)
+//                        scope.launch {
+//                            imagesArray.add(hh)
+//                        }
+//                        val sqr = Aire.equalizeHistSquares(bitmap)
+//                        scope.launch {
+//                            imagesArray.add(sqr)
+//                        }
+
 //                        val values = BitmapScaleMode.entries.toTypedArray()
 //                        values.forEach { mode ->
 //                            val compressedJpegsRGB = Aire.scale(bitmap,

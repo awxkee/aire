@@ -78,4 +78,20 @@ interface EffectsPipelines {
     fun equalizeHist(bitmap: Bitmap): Bitmap
 
     fun equalizeHistHSV(bitmap: Bitmap): Bitmap
+
+    /**
+     * @throws Exception if horizontal grid or vertical <= 0
+     */
+    fun equalizeHistSquares(bitmap: Bitmap, gridSizeHorizontal: Int = 8, gridSizeVertical: Int = 8): Bitmap
+
+    /**
+     * @throws Exception if horizontal grid or vertical <= 0
+     */
+    fun equalizeHistAdaptive(bitmap: Bitmap, gridSizeHorizontal: Int = 3, gridSizeVertical: Int = 3): Bitmap
+
+    /**
+     * @param threshold - negative or positive reasonable values ~-10...+10
+     * @throws Exception if horizontal grid or vertical <= 0
+     */
+    fun clahe(bitmap: Bitmap, threshold: Float = 0.5f, gridSizeHorizontal: Int = 8, gridSizeVertical: Int = 8): Bitmap
 }

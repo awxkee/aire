@@ -61,3 +61,27 @@ pub fn make_histogram_channel_3_region(
     };
     hist
 }
+
+pub fn make_histogram_region(
+    in_place: &[u8],
+    stride: u32,
+    start_x: u32,
+    end_x: u32,
+    start_y: u32,
+    end_y: u32,
+) -> ImageSingleHistogram {
+    let mut bins: [u64; 256] = [0u64; 256];
+    let mut y_shift = (stride * start_y) as usize;
+
+    for _ in start_y as usize..end_y as usize {
+        for x in start_x as usize..end_x as usize {
+            bins[in_place[y_shift + x] as usize] += 1u64;
+        }
+        y_shift += stride as usize;
+    }
+
+    let hist = ImageSingleHistogram {
+        bins
+    };
+    hist
+}
