@@ -90,6 +90,11 @@ interface EffectsPipelines {
     fun equalizeHistAdaptive(bitmap: Bitmap, gridSizeHorizontal: Int = 3, gridSizeVertical: Int = 3): Bitmap
 
     /**
+     * @throws Exception if horizontal grid or vertical <= 0
+     */
+    fun equalizeHistAdaptiveLUV(bitmap: Bitmap, gridSizeHorizontal: Int = 3, gridSizeVertical: Int = 3): Bitmap
+
+    /**
      * @param threshold - negative or positive reasonable values ~-10...+10
      * @throws Exception if horizontal grid or vertical <= 0
      */

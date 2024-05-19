@@ -1,4 +1,4 @@
-use crate::android_rgba::{Rgb565, Rgba, Rgba1010102, ToRgba8};
+use colorutils_rs::{Rgb565, Rgba, Rgba1010102, ToRgba8};
 use half::f16;
 use num_traits::FromPrimitive;
 

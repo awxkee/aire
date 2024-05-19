@@ -1,10 +1,5 @@
 use std::slice;
-use crate::android_rgba::{Rgba, ToRgba8, ToRgbaF32};
-
-use crate::gamma_curves::gamma_curve;
-use crate::hsl::Rgb;
-use crate::lab::Lab;
-use crate::luv::Luv;
+use colorutils_rs::{Lab, Luv, Rgb, Rgba, srgb_from_linear, srgb_to_linear, ToRgba8, ToRgbaF32};
 
 pub fn reformat_surface_u8_to_linear(
     original: &[u8],
@@ -33,10 +28,10 @@ pub fn reformat_surface_u8_to_linear(
             );
             let gamma_pixel = src_pixel.to_rgba_f32();
             let linear_pixel = Rgba::<f32>::new(
-                gamma_curve::srgb_to_linear(gamma_pixel.r),
-                gamma_curve::srgb_to_linear(gamma_pixel.g),
-                gamma_curve::srgb_to_linear(gamma_pixel.b),
-                gamma_curve::srgb_to_linear(gamma_pixel.a),
+                srgb_to_linear(gamma_pixel.r),
+                srgb_to_linear(gamma_pixel.g),
+                srgb_to_linear(gamma_pixel.b),
+                srgb_to_linear(gamma_pixel.a),
             );
             dst_slice[px] = linear_pixel.r;
             dst_slice[px + 1] = linear_pixel.g;
@@ -73,10 +68,10 @@ pub fn reformat_surface_linear_to_u8(
                 src_slice[px + 3],
             );
             let gamma_pixel = Rgba::<f32>::new(
-                gamma_curve::srgb_from_linear(linear_pixel.r),
-                gamma_curve::srgb_from_linear(linear_pixel.g),
-                gamma_curve::srgb_from_linear(linear_pixel.b),
-                gamma_curve::srgb_from_linear(linear_pixel.a),
+                srgb_from_linear(linear_pixel.r),
+                srgb_from_linear(linear_pixel.g),
+                srgb_from_linear(linear_pixel.b),
+                srgb_from_linear(linear_pixel.a),
             );
             let final_pixel = gamma_pixel.to_rgba8();
             dst_slice[px] = final_pixel.r;

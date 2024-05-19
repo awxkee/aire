@@ -6,6 +6,7 @@ version = 3
 name = "aire-filters"
 version = "0.1.0"
 dependencies = [
+ "colorutils-rs",
  "half",
  "jni",
  "ndk",
@@ -43,6 +44,15 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "colorutils-rs"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "784e5402fbe2532708a6c3e728d9e6cf1db0ea63367bd80c79a84a2496e4bf35"
+dependencies = [
+ "half",
+]
 
 [[package]]
 name = "combine"

@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
-////
+//
 //                        val clahe = Aire.clahe(bitmap, 0.5f, 6, 6)
 //                        scope.launch {
 //                            imagesArray.add(clahe)
@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
 //                        scope.launch {
 //                            imagesArray.add(claheLAB)
 //                        }
-//
+
 //                        val ahe = Aire.equalizeHistAdaptive(bitmap, 3, 3)
 //                        scope.launch {
 //                            imagesArray.add(ahe)
@@ -85,6 +85,11 @@ class MainActivity : ComponentActivity() {
 //                        val hh = Aire.equalizeHistAdaptiveLAB(bitmap)
 //                        scope.launch {
 //                            imagesArray.add(hh)
+//                        }
+//
+//                        val hluv = Aire.equalizeHistAdaptiveLUV(bitmap)
+//                        scope.launch {
+//                            imagesArray.add(hluv)
 //                        }
 //                        val sqr = Aire.equalizeHistSquares(bitmap)
 //                        scope.launch {

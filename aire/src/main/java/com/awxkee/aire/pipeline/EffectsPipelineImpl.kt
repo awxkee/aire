@@ -114,6 +114,14 @@ class EffectsPipelineImpl : EffectsPipelines {
         return equalizeHistAdaptiveLABImpl(bitmap, gridSizeHorizontal, gridSizeVertical)
     }
 
+    override fun equalizeHistAdaptiveLUV(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap {
+        return equalizeHistAdaptiveLUVImpl(bitmap, gridSizeHorizontal, gridSizeVertical)
+    }
+
     override fun equalizeHistSquares(
         bitmap: Bitmap,
         gridSizeHorizontal: Int,
@@ -226,6 +234,12 @@ class EffectsPipelineImpl : EffectsPipelines {
     ): Bitmap
 
     private external fun equalizeHistAdaptiveLABImpl(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap
+
+    private external fun equalizeHistAdaptiveLUVImpl(
         bitmap: Bitmap,
         gridSizeHorizontal: Int,
         gridSizeVertical: Int

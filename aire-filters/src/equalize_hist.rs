@@ -1,11 +1,10 @@
+use colorutils_rs::{Hsv, Rgb};
 use yuvutils_rs::{
     rgb_to_yuv444, rgba_to_yuv444, yuv444_to_rgb, yuv444_to_rgba, YuvRange, YuvStandardMatrix,
 };
 
 use crate::clahe::ClaheGridSize;
 use crate::histogram::{make_histogram_1_channel, make_histogram_channel_3_region};
-use crate::hsl::Rgb;
-use crate::hsv::Hsv;
 use EqualizeHistogramChannels::{Channels3, Channels4};
 
 #[repr(u8)]

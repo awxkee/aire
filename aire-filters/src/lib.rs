@@ -1,16 +1,9 @@
 mod android_bitmap;
-mod android_rgba;
 mod bitmap_helper;
 mod clahe;
 mod equalize_hist;
-mod gamma_curves;
 mod histogram;
-mod hsl;
-mod hsv;
-mod lab;
 mod surface_type;
-mod xyz;
-mod luv;
 
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]

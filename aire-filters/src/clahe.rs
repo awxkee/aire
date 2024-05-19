@@ -1,12 +1,10 @@
+use colorutils_rs::{Lab, Luv, Rgb};
 use crate::clahe::AheImplementation::{Ahe, Clahe};
 use crate::equalize_hist::EqualizeHistogramChannels::{Channels3, Channels4};
 use crate::equalize_hist::{cdf, minmax, EqualizeHistogramChannels};
 use crate::histogram::{
     make_histogram_region, make_histogram_region_f32, ImageSingle100Histogram, ImageSingleHistogram,
 };
-use crate::hsl::Rgb;
-use crate::lab::Lab;
-use crate::luv::Luv;
 use yuvutils_rs::{
     rgb_to_yuv444, rgba_to_yuv444, yuv444_to_rgb, yuv444_with_alpha_to_rgba, YuvRange,
     YuvStandardMatrix,
