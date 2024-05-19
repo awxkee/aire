@@ -123,6 +123,15 @@ class EffectsPipelineImpl : EffectsPipelines {
         return claheImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical)
     }
 
+    override fun claheLUV(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap {
+        return claheLUVImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical)
+    }
+
     private external fun convexImpl(bitmap: Bitmap, strength: Float): Bitmap
 
     private external fun bokehImpl(
@@ -186,6 +195,13 @@ class EffectsPipelineImpl : EffectsPipelines {
     ): Bitmap
 
     private external fun claheImpl(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap
+
+    private external fun claheLUVImpl(
         bitmap: Bitmap,
         threshold: Float,
         gridSizeHorizontal: Int,

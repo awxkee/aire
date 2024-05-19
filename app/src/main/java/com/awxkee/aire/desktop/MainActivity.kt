@@ -66,11 +66,12 @@ class MainActivity : ComponentActivity() {
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
-//
-//                        val clahe = Aire.clahe(bitmap, 0.5f, 34, 6)
+////
+//                        val clahe = Aire.claheLUV(bitmap, 0.5f, 6, 6)
 //                        scope.launch {
 //                            imagesArray.add(clahe)
 //                        }
+
 //                        val ahe = Aire.equalizeHistAdaptive(bitmap, 3, 3)
 //                        scope.launch {
 //                            imagesArray.add(ahe)
@@ -91,29 +92,37 @@ class MainActivity : ComponentActivity() {
 
 //                        val values = BitmapScaleMode.entries.toTypedArray()
 //                        values.forEach { mode ->
-//                            val compressedJpegsRGB = Aire.scale(bitmap,
-//                                bitmap.width / 3, bitmap.height / 3,
-//                                mode, ScaleColorSpace.SRGB)
+////                            val compressedJpegsRGB = Aire.scale(bitmap,
+////                                bitmap.width / 3, bitmap.height / 3,
+////                                mode, ScaleColorSpace.SRGB)
+////
+////                            scope.launch {
+////                                imagesArray.add(compressedJpegsRGB)
+////                            }
 //
-//                            scope.launch {
-//                                imagesArray.add(compressedJpegsRGB)
-//                            }
+////                            val compressedJpegsLAB = Aire.scale(bitmap,
+////                                bitmap.width / 3, bitmap.height / 3,
+////                                mode, ScaleColorSpace.LAB)
+////
+////                            scope.launch {
+////                                imagesArray.add(compressedJpegsLAB)
+////                            }
 //
-//                            val compressedJpegsLAB = Aire.scale(bitmap,
-//                                bitmap.width / 3, bitmap.height / 3,
-//                                mode, ScaleColorSpace.LAB)
-//
-//                            scope.launch {
-//                                imagesArray.add(compressedJpegsLAB)
-//                            }
-//
-//                            val compressedJpegsLinear = Aire.scale(bitmap,
+//                            val compressedJpegsLUV = Aire.scale(bitmap,
 //                                bitmap.width / 3, bitmap.height / 3,
 //                                mode, ScaleColorSpace.LINEAR)
 //
 //                            scope.launch {
-//                                imagesArray.add(compressedJpegsLinear)
+//                                imagesArray.add(compressedJpegsLUV)
 //                            }
+//
+////                            val compressedJpegsLinear = Aire.scale(bitmap,
+////                                bitmap.width / 3, bitmap.height / 3,
+////                                mode, ScaleColorSpace.LINEAR)
+////
+////                            scope.launch {
+////                                imagesArray.add(compressedJpegsLinear)
+////                            }
 //                        }
 //
 //                        repeat(1) {

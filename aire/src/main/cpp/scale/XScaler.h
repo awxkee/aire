@@ -48,6 +48,7 @@ enum XScalingColorSpace {
   sRGB = 0,
   LAB = 1,
   LINEAR = 2,
+  LUV = 3
 };
 
 namespace aire {

@@ -1,5 +1,6 @@
 use crate::hsv::Hsv;
 use crate::lab::Lab;
+use crate::luv::Luv;
 
 #[allow(dead_code)]
 pub struct Hsl {
@@ -27,6 +28,10 @@ impl Rgb<u8> {
 
     pub fn to_lab(&self) -> Lab {
         Lab::from_rgb(self)
+    }
+
+    pub fn to_luv(&self) -> Luv {
+        Luv::from_rgb(self)
     }
 }
 

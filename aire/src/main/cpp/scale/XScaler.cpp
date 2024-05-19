@@ -376,6 +376,10 @@ void scaleImageUseTransient(const uint8_t *input,
     aire_reformat_surface_u8_to_laba(input, srcStride,
                                      pixels.data(), linearStride,
                                      inputWidth, inputHeight);
+  } else if (space == LUV) {
+    aire_reformat_surface_u8_to_luva(input, srcStride,
+                                     pixels.data(), linearStride,
+                                     inputWidth, inputHeight);
   }
 
   auto src8 = reinterpret_cast<const uint8_t *>(input);
@@ -528,6 +532,10 @@ void scaleImageUseTransient(const uint8_t *input,
                                        outputWidth, outputHeight);
   } else if (space == LAB) {
     aire_reformat_surface_laba_to_u8(transient.data(), transientRescaledStride,
+                                     output, dstStride,
+                                     outputWidth, outputHeight);
+  } else if (space == LUV) {
+    aire_reformat_surface_luva_to_u8(transient.data(), transientRescaledStride,
                                      output, dstStride,
                                      outputWidth, outputHeight);
   }

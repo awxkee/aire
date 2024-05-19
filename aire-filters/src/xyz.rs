@@ -16,11 +16,13 @@ impl Xyz {
     }
 }
 
+static XYZ_SCALE_U8: f32 = 1f32 / 255f32;
+
 impl Xyz {
     pub fn from_rgb(rgb: &Rgb<u8>) -> Self {
-        let r = gamma_curve::rec709_to_linear(rgb.r as f32 / 255f32);
-        let g = gamma_curve::rec709_to_linear(rgb.g as f32 / 255f32);
-        let b = gamma_curve::rec709_to_linear(rgb.b as f32 / 255f32);
+        let r = gamma_curve::srgb_to_linear(rgb.r as f32 * XYZ_SCALE_U8);
+        let g = gamma_curve::srgb_to_linear(rgb.g as f32 * XYZ_SCALE_U8);
+        let b = gamma_curve::srgb_to_linear(rgb.b as f32 * XYZ_SCALE_U8);
         Self::new(
             (0.4124 * r + 0.3576 * g + 0.1805 * b) * 100.0,
             (0.2126 * r + 0.7152 * g + 0.0722 * b) * 100.0,
@@ -37,9 +39,9 @@ impl Xyz {
         let r = x * 3.2404542 + y * -1.5371385 + z * -0.4985314;
         let g = x * -0.9692660 + y * 1.8760108 + z * 0.0415560;
         let b = x * 0.0556434 + y * -0.2040259 + z * 1.0572252;
-        let r = 255f32 * gamma_curve::rec709_from_linear(r);
-        let g = 255f32 * gamma_curve::rec709_from_linear(g);
-        let b = 255f32 * gamma_curve::rec709_from_linear(b);
+        let r = 255f32 * gamma_curve::srgb_from_linear(r);
+        let g = 255f32 * gamma_curve::srgb_from_linear(g);
+        let b = 255f32 * gamma_curve::srgb_from_linear(b);
         Rgb::new(r as u8, g as u8, b as u8)
     }
 }
