@@ -53,4 +53,8 @@ impl Lab {
         let z = 108.883 * if z3 > 0.008856 { z3 } else { (z - 16.0 / 116.0) / 7.787 };
         Xyz::new(x, y, z).to_rgb()
     }
+
+    pub fn to_rgb(&self) -> Rgb<u8> {
+        self.to_rgb8()
+    }
 }

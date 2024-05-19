@@ -1,84 +1,4 @@
 //! # Luv
-//!
-//! Tools for converting colours between sRGB, L\*u\*v\* and LCh(uv) colour
-//! spaces and comparing differences in colour.
-//!
-//! sRGB colors, for this crate at least, are considered to be composed of `u8`
-//! values from 0 to 255, while L\*u\*v\* colors are represented by its own
-//! struct that uses `f32` values.  The crate is biased towards sRGB thus it
-//! also assumes that L\*u\*v\* uses D65 reference white point.
-//!
-//! # Usage
-//!
-//! ## Converting single values
-//!
-//! To convert a single value, use one of the functions
-//!
-//! * `luv::Luv::from_rgb(rgb: &[u8; 3]) -> Luv`
-//! * `luv::Luv::from_rgba(rgba: &[u8; 4]) -> Luv` (drops the fourth alpha byte)
-//! * `luv::Luv::to_rgb(&self) -> [u8; 3]`
-//!
-//! ```rust
-//! let pink = luv::Luv::from_rgb(&[253, 120, 138]);
-//! assert_eq!(luv::Luv { l: 66.6377, u: 93.02939, v: 9.430343 }, pink);
-//! ```
-//!
-//! ## Converting multiple values
-//!
-//! To convert slices of values
-//!
-//! * `luv::rgbs_to_luvs(rgbs: &[[u8; 3]]) -> Vec<Luv>`
-//! * `luv::luvs_to_rgbs(luvs: &[Luv]) -> Vec<[u8; 3]>`
-//! * `luv::rgb_bytes_to_luvs(bytes: &[u8]) -> Vec<Luv>`
-//! * `luv::luvs_to_rgb_bytes(luvs: &[Luv]) -> Vec<u8>`
-//!
-//! ```rust
-//! let rgbs = vec![
-//!     [0xFF, 0x69, 0xB6],
-//!     [0xE7, 0x00, 0x00],
-//!     [0xFF, 0x8C, 0x00],
-//!     [0xFF, 0xEF, 0x00],
-//!     [0x00, 0x81, 0x1F],
-//!     [0x00, 0xC1, 0xC1],
-//!     [0x00, 0x44, 0xFF],
-//!     [0x76, 0x00, 0x89],
-//! ];
-//!
-//! let luvs = luv::rgbs_to_luvs(&rgbs);
-//! ```
-//!
-//! ```rust
-//! use luv::rgb_bytes_to_luvs;
-//!
-//! let rgbs = vec![
-//!     0xFF, 0x69, 0xB6,
-//!     0xE7, 0x00, 0x00,
-//!     0xFF, 0x8C, 0x00,
-//!     0xFF, 0xEF, 0x00,
-//!     0x00, 0x81, 0x1F,
-//!     0x00, 0xC1, 0xC1,
-//!     0x00, 0x44, 0xFF,
-//!     0x76, 0x00, 0x89,
-//! ];
-//!
-//! let luvs = rgb_bytes_to_luvs(&rgbs);
-//! ```
-//!
-//! # Features
-//!
-//! The crate defines an `approx` feature.  If enabled, approximate equality as
-//! defined by [`approx` crate](https://crates.io/crates/approx) will be
-//! implemented for the `Luv` and `LCh` types.
-//!
-//! # Other crates
-//!
-//! The design — and to some degree code — of this crate has been based on the
-//! [`lab` crate](https://crates.io/crates/lab) which provides routines for
-//! converting colours between sRGB, L\*a\*\b and LCh(ab) colour spaces.
-//!
-//! For conversion between sRGB and XYZ colour spaces this crate relies on the
-//! [`srgb` crate](https://crates.io/crates/srgb).
-
 /// Struct representing a color in CIALuv, a.k.a. L\*u\*v\*, color space
 #[derive(Debug, Copy, Clone, Default)]
 pub struct Luv {
@@ -139,46 +59,6 @@ const CUTOFF_FORWARD_Y: f32 = (6f32 / 29f32) * (6f32 / 29f32) * (6f32 / 29f32);
 const MULTIPLIER_FORWARD_Y: f32 = (29f32 / 3f32) * (29f32 / 3f32) * (29f32 / 3f32);
 const SCALE_XYZ_FORWARD: f32 = 1f32 / 100f32;
 const MULTIPLIER_INVERSE_Y: f32 = (3f32 / 29f32) * (3f32 / 29f32) * (3f32 / 29f32);
-
-fn luv_from_xyz(xyz: Xyz) -> Luv {
-    let [x, y, z] = [
-        xyz.x * SCALE_XYZ_FORWARD,
-        xyz.y * SCALE_XYZ_FORWARD,
-        xyz.z * SCALE_XYZ_FORWARD,
-    ];
-
-    let l = (if y < CUTOFF_FORWARD_Y {
-        MULTIPLIER_FORWARD_Y * y
-    } else {
-        116f32 * y.cbrt() - 16f32
-    }).min(100f32).max(0f32);
-    let u_prime = 4.0 * x / (x + 15.0 * y + 3.0 * z);
-    let v_prime = 9.0 * y / (x + 15.0 * y + 3.0 * z);
-    let u = 13f32 * l * (u_prime - WHITE_U_PRIME);
-    let v = 13f32 * l * (v_prime - WHITE_V_PRIME);
-
-    Luv { l, u, v }
-}
-
-fn xyz_from_luv(luv: &Luv) -> Xyz {
-    if luv.l <= 0f32 {
-        return Xyz::new(0f32, 0f32, 0f32);
-    }
-    let l13 = 1f32 / (13f32 * luv.l);
-    let u = luv.u * l13 + WHITE_U_PRIME;
-    let v = luv.v * l13 + WHITE_V_PRIME;
-    let y = if luv.l > 8f32 {
-        ((luv.l + 16f32) / 116f32).powf(3f32)
-    } else {
-        luv.l * MULTIPLIER_INVERSE_Y
-    };
-    let den = 1f32 / (4f32 * v);
-    let x = y * 9f32 * u * den;
-    let z = y * (12.0 - 3.0 * u - 20.0 * v) * den;
-
-    Xyz::new(x * 100f32, y * 100f32, z * 100f32)
-}
-
 impl Luv {
     /// Constructs a new `Luv` from a three-element array of `u8`s
     ///
@@ -190,7 +70,23 @@ impl Luv {
     /// ```
     pub fn from_rgb(rgb: &Rgb<u8>) -> Self {
         let xyz = Xyz::from_rgb(rgb);
-        luv_from_xyz(xyz)
+        let [x, y, z] = [
+            xyz.x * SCALE_XYZ_FORWARD,
+            xyz.y * SCALE_XYZ_FORWARD,
+            xyz.z * SCALE_XYZ_FORWARD,
+        ];
+
+        let l = (if y < CUTOFF_FORWARD_Y {
+            MULTIPLIER_FORWARD_Y * y
+        } else {
+            116f32 * y.cbrt() - 16f32
+        }).min(100f32).max(0f32);
+        let u_prime = 4.0 * x / (x + 15.0 * y + 3.0 * z);
+        let v_prime = 9.0 * y / (x + 15.0 * y + 3.0 * z);
+        let u = 13f32 * l * (u_prime - WHITE_U_PRIME);
+        let v = 13f32 * l * (v_prime - WHITE_V_PRIME);
+
+        Luv { l, u, v }
     }
 
     /// Constructs a new `Luv` from a four-element array of `u8`s
@@ -219,7 +115,22 @@ impl Luv {
     /// ```
     #[allow(dead_code)]
     pub fn to_rgb(&self) -> Rgb<u8> {
-        xyz_from_luv(self).to_rgb()
+        if self.l <= 0f32 {
+            return Xyz::new(0f32, 0f32, 0f32).to_rgb();
+        }
+        let l13 = 1f32 / (13f32 * self.l);
+        let u = self.u * l13 + WHITE_U_PRIME;
+        let v = self.v * l13 + WHITE_V_PRIME;
+        let y = if self.l > 8f32 {
+            ((self.l + 16f32) / 116f32).powf(3f32)
+        } else {
+            self.l * MULTIPLIER_INVERSE_Y
+        };
+        let den = 1f32 / (4f32 * v);
+        let x = y * 9f32 * u * den;
+        let z = y * (12.0 - 3.0 * u - 20.0 * v) * den;
+
+        Xyz::new(x * 100f32, y * 100f32, z * 100f32).to_rgb()
     }
 
     pub fn new(l: f32, u: f32, v: f32) -> Luv {

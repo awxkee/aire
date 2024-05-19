@@ -100,4 +100,16 @@ interface EffectsPipelines {
      * @throws Exception if horizontal grid or vertical <= 0
      */
     fun claheLUV(bitmap: Bitmap, threshold: Float = 0.5f, gridSizeHorizontal: Int = 8, gridSizeVertical: Int = 8): Bitmap
+
+    /**
+     * @param threshold - negative or positive reasonable values ~-10...+10
+     * @throws Exception if horizontal grid or vertical <= 0
+     */
+    fun claheLAB(bitmap: Bitmap, threshold: Float = 0.5f, gridSizeHorizontal: Int = 8, gridSizeVertical: Int = 8): Bitmap
+
+    /**
+     * @throws Exception if horizontal grid or vertical <= 0
+     */
+    fun equalizeHistAdaptiveLAB(bitmap: Bitmap, gridSizeHorizontal: Int = 3, gridSizeVertical: Int = 3): Bitmap
+
 }

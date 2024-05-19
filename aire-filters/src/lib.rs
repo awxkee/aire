@@ -18,7 +18,7 @@ pub mod android {
     extern crate jni;
 
     use crate::bitmap_helper::android_bitmap;
-    use crate::clahe::{ahe_luv_rgba, ahe_yuv_rgba, clahe_luv_rgba, clahe_yuv_rgba, ClaheGridSize};
+    use crate::clahe::{ahe_lab_rgba, ahe_luv_rgba, ahe_yuv_rgba, clahe_lab_rgba, clahe_luv_rgba, clahe_yuv_rgba, ClaheGridSize};
     use jni::sys::{jfloat, jint, jobject};
     use jni::JNIEnv;
 
@@ -382,6 +382,127 @@ pub mod android {
         match bitmap_info {
             Ok(mut info) => {
                 ahe_luv_rgba(
+                    &mut info.data,
+                    info.stride,
+                    info.width,
+                    info.height,
+                    1f32,
+                    ClaheGridSize::new(grid_size_w as u32, grid_size_h as u32),
+                );
+
+                let new_bitmap_r = android_bitmap::create_bitmap(
+                    &mut env,
+                    &info.data,
+                    info.stride,
+                    info.width,
+                    info.height,
+                );
+
+                return match new_bitmap_r {
+                    Ok(new_bitmap) => new_bitmap.as_raw(),
+                    Err(error_message) => {
+                        let clazz = env
+                            .find_class("java/lang/Exception")
+                            .expect("Found exception class");
+                        env.throw_new(clazz, error_message)
+                            .expect("Failed to access JNI");
+                        bitmap
+                    }
+                };
+            }
+            Err(error_message) => {
+                let clazz = env
+                    .find_class("java/lang/Exception")
+                    .expect("Found exception class");
+                env.throw_new(clazz, error_message)
+                    .expect("Failed to access JNI");
+                bitmap
+            }
+        }
+    }
+
+    #[no_mangle]
+    pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_claheLABImpl(
+        mut env: JNIEnv,
+        _: jobject,
+        bitmap: jobject,
+        threshold: jfloat,
+        grid_size_w: jint,
+        grid_size_h: jint,
+    ) -> jobject {
+        if grid_size_w <= 0 || grid_size_h <= 0 {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Grid Size zeros or negative is not supported")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
+        match bitmap_info {
+            Ok(mut info) => {
+                clahe_lab_rgba(
+                    &mut info.data,
+                    info.stride,
+                    info.width,
+                    info.height,
+                    threshold,
+                    ClaheGridSize::new(grid_size_w as u32, grid_size_h as u32),
+                );
+
+                let new_bitmap_r = android_bitmap::create_bitmap(
+                    &mut env,
+                    &info.data,
+                    info.stride,
+                    info.width,
+                    info.height,
+                );
+
+                return match new_bitmap_r {
+                    Ok(new_bitmap) => new_bitmap.as_raw(),
+                    Err(error_message) => {
+                        let clazz = env
+                            .find_class("java/lang/Exception")
+                            .expect("Found exception class");
+                        env.throw_new(clazz, error_message)
+                            .expect("Failed to access JNI");
+                        bitmap
+                    }
+                };
+            }
+            Err(error_message) => {
+                let clazz = env
+                    .find_class("java/lang/Exception")
+                    .expect("Found exception class");
+                env.throw_new(clazz, error_message)
+                    .expect("Failed to access JNI");
+                bitmap
+            }
+        }
+    }
+
+    #[no_mangle]
+    pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_equalizeHistAdaptiveLABImpl(
+        mut env: JNIEnv,
+        _: jobject,
+        bitmap: jobject,
+        grid_size_w: jint,
+        grid_size_h: jint,
+    ) -> jobject {
+        if grid_size_w <= 0 || grid_size_h <= 0 {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Grid Size zeros or negative is not supported")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
+        match bitmap_info {
+            Ok(mut info) => {
+                ahe_lab_rgba(
                     &mut info.data,
                     info.stride,
                     info.width,

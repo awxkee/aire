@@ -106,6 +106,14 @@ class EffectsPipelineImpl : EffectsPipelines {
         return equalizeHistAdaptiveImpl(bitmap, gridSizeHorizontal, gridSizeVertical)
     }
 
+    override fun equalizeHistAdaptiveLAB(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap {
+        return equalizeHistAdaptiveLABImpl(bitmap, gridSizeHorizontal, gridSizeVertical)
+    }
+
     override fun equalizeHistSquares(
         bitmap: Bitmap,
         gridSizeHorizontal: Int,
@@ -130,6 +138,15 @@ class EffectsPipelineImpl : EffectsPipelines {
         gridSizeVertical: Int
     ): Bitmap {
         return claheLUVImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical)
+    }
+
+    override fun claheLAB(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap {
+        return claheLABImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical)
     }
 
     private external fun convexImpl(bitmap: Bitmap, strength: Float): Bitmap
@@ -202,6 +219,19 @@ class EffectsPipelineImpl : EffectsPipelines {
     ): Bitmap
 
     private external fun claheLUVImpl(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap
+
+    private external fun equalizeHistAdaptiveLABImpl(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int
+    ): Bitmap
+
+    private external fun claheLABImpl(
         bitmap: Bitmap,
         threshold: Float,
         gridSizeHorizontal: Int,
