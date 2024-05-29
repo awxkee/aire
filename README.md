@@ -96,7 +96,6 @@ Aire.gaussianBlur(
     * Spline
     * BSpline
     * Hann
-    * Lanczos3 ( Jinc )
 
 ### Effects:
 
@@ -111,6 +110,9 @@ Aire.gaussianBlur(
 - [x] Wind Stagger
 - [x] Monochrome
 - [x] Grain
+- [x] CLAHE ( Contrast limited histogram equalization )
+- [x] Histogram Equalization
+- [x] Adaptive Histogram Equalization
 
 ### Postprocessing:
 
