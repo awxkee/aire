@@ -60,12 +60,12 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.lin)
-                            .copy(Bitmap.Config.ARGB_8888, true)
-
-                        scope.launch {
-                            imagesArray.add(bitmap)
-                        }
+//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.lin)
+//                            .copy(Bitmap.Config.ARGB_8888, true)
+//
+//                        scope.launch {
+//                            imagesArray.add(bitmap)
+//                        }
 //
 //                        val clahe = Aire.clahe(bitmap, 0.5f, 6, 6)
 //                        scope.launch {
@@ -96,42 +96,42 @@ class MainActivity : ComponentActivity() {
 //                            imagesArray.add(sqr)
 //                        }
 
-                        val values = BitmapScaleMode.entries.toTypedArray()
-                        values.forEach { mode ->
-                            val compressedJpegsRGB = Aire.scale(
-                                bitmap,
-                                bitmap.width / 3, bitmap.height / 3,
-                                mode, ScaleColorSpace.SRGB
-                            )
-
-                            scope.launch {
-                                imagesArray.add(compressedJpegsRGB)
-                            }
-
-                            val compressedJpegsLAB = Aire.scale(bitmap,
-                                bitmap.width / 3, bitmap.height / 3,
-                                mode, ScaleColorSpace.LAB)
-
-                            scope.launch {
-                                imagesArray.add(compressedJpegsLAB)
-                            }
-//
-//                            val compressedJpegsLUV = Aire.scale(bitmap,
-//                                bitmap.width / 5, bitmap.height / 5,
-//                                mode, ScaleColorSpace.LUV)
+//                        val values = BitmapScaleMode.entries.toTypedArray()
+//                        values.forEach { mode ->
+//                            val compressedJpegsRGB = Aire.scale(
+//                                bitmap,
+//                                bitmap.width / 3, bitmap.height / 3,
+//                                mode, ScaleColorSpace.SRGB
+//                            )
 //
 //                            scope.launch {
-//                                imagesArray.add(compressedJpegsLUV)
+//                                imagesArray.add(compressedJpegsRGB)
 //                            }
-
-                            val compressedJpegsLinear = Aire.scale(bitmap,
-                                bitmap.width / 3, bitmap.height / 3,
-                                mode, ScaleColorSpace.LINEAR)
-
-                            scope.launch {
-                                imagesArray.add(compressedJpegsLinear)
-                            }
-                        }
+//
+//                            val compressedJpegsLAB = Aire.scale(bitmap,
+//                                bitmap.width / 3, bitmap.height / 3,
+//                                mode, ScaleColorSpace.LAB)
+//
+//                            scope.launch {
+//                                imagesArray.add(compressedJpegsLAB)
+//                            }
+////
+////                            val compressedJpegsLUV = Aire.scale(bitmap,
+////                                bitmap.width / 5, bitmap.height / 5,
+////                                mode, ScaleColorSpace.LUV)
+////
+////                            scope.launch {
+////                                imagesArray.add(compressedJpegsLUV)
+////                            }
+//
+//                            val compressedJpegsLinear = Aire.scale(bitmap,
+//                                bitmap.width / 3, bitmap.height / 3,
+//                                mode, ScaleColorSpace.LINEAR)
+//
+//                            scope.launch {
+//                                imagesArray.add(compressedJpegsLinear)
+//                            }
+//                        }
 //
 //                        repeat(1) {
 //                            val d2Time = measureTimeMillis {
