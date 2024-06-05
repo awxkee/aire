@@ -37,7 +37,7 @@ interface ScalePipelines {
         bitmap: Bitmap,
         dstWidth: Int,
         dstHeight: Int,
-        scaleMode: BitmapScaleMode,
+        scaleMode: ResizeFunction,
         colorSpace: ScaleColorSpace,
     ): Bitmap
 }

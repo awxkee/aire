@@ -68,14 +68,13 @@ pub mod android_bitmap {
         let original_slice: &mut [u8] = unsafe {
             slice::from_raw_parts_mut(pixels, info.stride as usize * info.height as usize)
         };
-
-        let mut dst_vec: Vec<u8> = vec![];
         let new_stride = if format == AndroidBitmapFormat::ANDROID_BITMAP_FORMAT_RGBA_8888 {
             info.stride as usize
         } else {
             info.width as usize * 4usize * std::mem::size_of::<u8>()
         };
-        dst_vec.resize(new_stride * info.height as usize, 0u8);
+
+        let mut dst_vec: Vec<u8> = vec![0u8; new_stride * info.height as usize];
 
         if format == AndroidBitmapFormat::ANDROID_BITMAP_FORMAT_RGBA_8888 {
             copy_image::<u8>(

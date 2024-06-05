@@ -23,16 +23,18 @@ pub fn convert_rgbaf16_to_rgba8888(
         for x in 0..width as usize {
             let px = x * 4;
             let src_pixel = Rgba::<f16>::new(
-                src_slice[px],
-                src_slice[px + 1],
-                src_slice[px + 2],
-                src_slice[px + 3],
+                unsafe { *src_slice.get_unchecked(px) },
+                unsafe { *src_slice.get_unchecked(px + 1) },
+                unsafe { *src_slice.get_unchecked(px + 2) },
+                unsafe { *src_slice.get_unchecked(px + 3) },
             );
             let dst_pixel = src_pixel.to_rgba8();
-            dst_slice[px] = dst_pixel.r;
-            dst_slice[px + 1] = dst_pixel.g;
-            dst_slice[px + 2] = dst_pixel.b;
-            dst_slice[px + 3] = dst_pixel.a;
+            unsafe {
+                *dst_slice.get_unchecked_mut(px) = dst_pixel.r;
+                *dst_slice.get_unchecked_mut(px + 1) = dst_pixel.g;
+                *dst_slice.get_unchecked_mut(px + 2) = dst_pixel.b;
+                *dst_slice.get_unchecked_mut(px + 3) = dst_pixel.a;
+            }
         }
         dst_shift += dst_stride as usize;
         src_shift += src_stride as usize;
@@ -59,12 +61,14 @@ pub fn convert_rgb565_to_rgba8888(
 
         for x in 0..width as usize {
             let px = x * 4;
-            let src_pixel = Rgb565::new(src_slice[x]);
+            let src_pixel = Rgb565::new(unsafe { *src_slice.get_unchecked(x) });
             let dst_pixel = src_pixel.to_rgba8();
-            dst_slice[px] = dst_pixel.r;
-            dst_slice[px + 1] = dst_pixel.g;
-            dst_slice[px + 2] = dst_pixel.b;
-            dst_slice[px + 3] = dst_pixel.a;
+            unsafe {
+                *dst_slice.get_unchecked_mut(px) = dst_pixel.r;
+                *dst_slice.get_unchecked_mut(px + 1) = dst_pixel.g;
+                *dst_slice.get_unchecked_mut(px + 2) = dst_pixel.b;
+                *dst_slice.get_unchecked_mut(px + 3) = dst_pixel.a;
+            }
         }
         dst_shift += dst_stride as usize;
         src_shift += src_stride as usize;
@@ -91,12 +95,14 @@ pub fn convert_rgb1010102_to_rgba8888(
 
         for x in 0..width as usize {
             let px = x * 4;
-            let src_pixel = Rgba1010102::new(src_slice[x]);
+            let src_pixel = Rgba1010102::new(unsafe { *src_slice.get_unchecked(x) });
             let dst_pixel = src_pixel.to_rgba8();
-            dst_slice[px] = dst_pixel.r;
-            dst_slice[px + 1] = dst_pixel.g;
-            dst_slice[px + 2] = dst_pixel.b;
-            dst_slice[px + 3] = dst_pixel.a;
+            unsafe {
+                *dst_slice.get_unchecked_mut(px) = dst_pixel.r;
+                *dst_slice.get_unchecked_mut(px + 1) = dst_pixel.g;
+                *dst_slice.get_unchecked_mut(px + 2) = dst_pixel.b;
+                *dst_slice.get_unchecked_mut(px + 3) = dst_pixel.a;
+            }
         }
         dst_shift += dst_stride as usize;
         src_shift += src_stride as usize;

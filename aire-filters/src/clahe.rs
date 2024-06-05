@@ -127,14 +127,11 @@ fn clahe_yuv_impl<const CHANNELS: u8, const IMPLEMENTATION: u8>(
         }
     }
 
-    let mut y_plane: Vec<u8> = Vec::new();
-    y_plane.resize(width as usize * height as usize, 0u8);
+    let mut y_plane: Vec<u8> = vec![0u8; width as usize * height as usize];
 
-    let mut u_plane: Vec<u8> = Vec::new();
-    u_plane.resize(width as usize * height as usize, 0u8);
+    let mut u_plane: Vec<u8> = vec![0u8; width as usize * height as usize];
 
-    let mut v_plane: Vec<u8> = Vec::new();
-    v_plane.resize(width as usize * height as usize, 0u8);
+    let mut v_plane: Vec<u8> = vec![0u8; width as usize * height as usize];
 
     let mut a_plane: Vec<u8> = Vec::new();
     if h_channels == Channels4 {
@@ -177,7 +174,9 @@ fn clahe_yuv_impl<const CHANNELS: u8, const IMPLEMENTATION: u8>(
             let mut y_shift = 0usize;
             for _ in 0usize..height as usize {
                 for x in 0usize..width as usize {
-                    a_plane[a_shift + x] = in_place[y_shift + x * channels + 3];
+                    unsafe {
+                        *a_plane.get_unchecked_mut(a_shift + x) = *in_place.get_unchecked(y_shift + x * channels + 3);
+                    }
                 }
                 y_shift += stride as usize;
                 a_shift += width as usize;
@@ -248,7 +247,7 @@ fn clahe_yuv_impl<const CHANNELS: u8, const IMPLEMENTATION: u8>(
             let y1 = (y as f32 - ((r_y_f as i64) as f32 + 0.5f32) * vertical_tile_size as f32)
                 / vertical_tile_size as f32;
 
-            let value = y_plane[width as usize * y + x] as usize;
+            let value = unsafe { *y_plane.get_unchecked(width as usize * y + x) } as usize;
 
             let r_y = r_y_f.max(0f32) as i64;
             let c_x = c_x_f.max(0f32) as i64;
@@ -262,9 +261,9 @@ fn clahe_yuv_impl<const CHANNELS: u8, const IMPLEMENTATION: u8>(
                 histograms[(r + 1).min(tiles_vertical as usize - 1usize)][c].bins[value] as f32;
             let bin4 = histograms[(r + 1).min(tiles_vertical as usize - 1usize)]
                 [(c + 1).min(tiles_horizontal as usize - 1usize)]
-            .bins[value] as f32;
+                .bins[value] as f32;
             let interpolated = blerp(bin1, bin2, bin3, bin4, x1, y1);
-            y_plane[width as usize * y + x] = interpolated as u8;
+            *unsafe { y_plane.get_unchecked_mut(width as usize * y + x) } = interpolated as u8;
         }
     }
 
@@ -395,14 +394,16 @@ fn clahe_luv_impl<const CHANNELS: u8, const IMPLEMENTATION: u8>(
             let h_px = j * 3usize;
 
             let rgb = Rgb::<u8>::new(
-                in_place[y_shift + px],
-                in_place[y_shift + px + 1],
-                in_place[y_shift + px + 2],
+                unsafe { *in_place.get_unchecked(y_shift + px) },
+                unsafe { *in_place.get_unchecked(y_shift + px + 1) },
+                unsafe { *in_place.get_unchecked(y_shift + px + 2) },
             );
             let luv = rgb.to_luv();
-            luv_image[luv_shift + h_px] = luv.l;
-            luv_image[luv_shift + h_px + 1] = luv.u;
-            luv_image[luv_shift + h_px + 2] = luv.v;
+            unsafe {
+                *luv_image.get_unchecked_mut(luv_shift + h_px) = luv.l;
+                *luv_image.get_unchecked_mut(luv_shift + h_px + 1) = luv.u;
+                *luv_image.get_unchecked_mut(luv_shift + h_px + 2) = luv.v;
+            }
         }
         y_shift += stride as usize;
         luv_shift += luv_stride;
@@ -494,9 +495,9 @@ fn clahe_luv_impl<const CHANNELS: u8, const IMPLEMENTATION: u8>(
                 histograms[(r + 1).min(tiles_vertical as usize - 1usize)][c].bins[value] as f32;
             let bin4 = histograms[(r + 1).min(tiles_vertical as usize - 1usize)]
                 [(c + 1).min(tiles_horizontal as usize - 1usize)]
-            .bins[value] as f32;
+                .bins[value] as f32;
             let interpolated = blerp(bin1, bin2, bin3, bin4, x1, y1).min(100f32).max(0f32);
-            luv_image[luv_stride * y + px] = interpolated.min(100f32).max(0f32);
+            *unsafe { luv_image.get_unchecked_mut(luv_stride * y + px) } = interpolated.min(100f32).max(0f32);
         }
     }
 
@@ -508,15 +509,17 @@ fn clahe_luv_impl<const CHANNELS: u8, const IMPLEMENTATION: u8>(
             let h_px = j * 3;
 
             let hsv = Luv::new(
-                luv_image[luv_shift + h_px],
-                luv_image[luv_shift + h_px + 1],
-                luv_image[luv_shift + h_px + 2],
+                unsafe { *luv_image.get_unchecked(luv_shift + h_px) },
+                unsafe { *luv_image.get_unchecked(luv_shift + h_px + 1) },
+                unsafe { *luv_image.get_unchecked(luv_shift + h_px + 2) },
             );
             let rgb = hsv.to_rgb();
 
-            in_place[y_shift + px] = rgb.r;
-            in_place[y_shift + px + 1] = rgb.g;
-            in_place[y_shift + px + 2] = rgb.b;
+            unsafe {
+                *in_place.get_unchecked_mut(y_shift + px) = rgb.r;
+                *in_place.get_unchecked_mut(y_shift + px + 1) = rgb.g;
+                *in_place.get_unchecked_mut(y_shift + px + 2) = rgb.b;
+            }
         }
         y_shift += stride as usize;
         luv_shift += luv_stride;
@@ -587,14 +590,16 @@ fn clahe_lab_impl<const CHANNELS: u8, const IMPLEMENTATION: u8>(
             let h_px = j * 3usize;
 
             let rgb = Rgb::<u8>::new(
-                in_place[y_shift + px],
-                in_place[y_shift + px + 1],
-                in_place[y_shift + px + 2],
+                unsafe { *in_place.get_unchecked(y_shift + px) },
+                unsafe { *in_place.get_unchecked(y_shift + px + 1) },
+                unsafe { *in_place.get_unchecked(y_shift + px + 2) },
             );
             let luv = rgb.to_lab();
-            luv_image[luv_shift + h_px] = luv.l;
-            luv_image[luv_shift + h_px + 1] = luv.a;
-            luv_image[luv_shift + h_px + 2] = luv.b;
+            unsafe {
+                *luv_image.get_unchecked_mut(luv_shift + h_px) = luv.l;
+                *luv_image.get_unchecked_mut(luv_shift + h_px + 1) = luv.a;
+                *luv_image.get_unchecked_mut(luv_shift + h_px + 2) = luv.b;
+            }
         }
         y_shift += stride as usize;
         luv_shift += luv_stride;
@@ -672,7 +677,7 @@ fn clahe_lab_impl<const CHANNELS: u8, const IMPLEMENTATION: u8>(
 
             let px = x * 3;
 
-            let value = luv_image[luv_stride * y + px].min(100f32).max(0f32) as usize;
+            let value = unsafe { *luv_image.get_unchecked(luv_stride * y + px) }.min(100f32).max(0f32) as usize;
 
             let r_y = r_y_f.max(0f32) as i64;
             let c_x = c_x_f.max(0f32) as i64;
@@ -686,9 +691,9 @@ fn clahe_lab_impl<const CHANNELS: u8, const IMPLEMENTATION: u8>(
                 histograms[(r + 1).min(tiles_vertical as usize - 1usize)][c].bins[value] as f32;
             let bin4 = histograms[(r + 1).min(tiles_vertical as usize - 1usize)]
                 [(c + 1).min(tiles_horizontal as usize - 1usize)]
-            .bins[value] as f32;
+                .bins[value] as f32;
             let interpolated = blerp(bin1, bin2, bin3, bin4, x1, y1);
-            luv_image[luv_stride * y + px] = interpolated.min(100f32).max(0f32);
+            unsafe { *luv_image.get_unchecked_mut(luv_stride * y + px) = interpolated.min(100f32).max(0f32) };
         }
     }
 
@@ -700,15 +705,17 @@ fn clahe_lab_impl<const CHANNELS: u8, const IMPLEMENTATION: u8>(
             let h_px = j * 3;
 
             let hsv = Lab::new(
-                luv_image[luv_shift + h_px],
-                luv_image[luv_shift + h_px + 1],
-                luv_image[luv_shift + h_px + 2],
+                unsafe { *luv_image.get_unchecked(luv_shift + h_px) },
+                unsafe { *luv_image.get_unchecked(luv_shift + h_px + 1) },
+                unsafe { *luv_image.get_unchecked(luv_shift + h_px + 2) },
             );
             let rgb = hsv.to_rgb();
 
-            in_place[y_shift + px] = rgb.r;
-            in_place[y_shift + px + 1] = rgb.g;
-            in_place[y_shift + px + 2] = rgb.b;
+            unsafe {
+                *in_place.get_unchecked_mut(y_shift + px) = rgb.r;
+                *in_place.get_unchecked_mut(y_shift + px + 1) = rgb.g;
+                *in_place.get_unchecked_mut(y_shift + px + 2) = rgb.b;
+            }
         }
         y_shift += stride as usize;
         luv_shift += luv_stride;

@@ -2,11 +2,7 @@ package com.awxkee.aire.desktop
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.Matrix
-import android.hardware.HardwareBuffer
 import android.os.Bundle
-import android.os.FileUtils
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,27 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.graphics.BitmapCompat
-import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.scale
 import com.awxkee.aire.Aire
-import com.awxkee.aire.AireColorMapper
-import com.awxkee.aire.AirePaletteDithering
-import com.awxkee.aire.AireQuantize
-import com.awxkee.aire.BitmapScaleMode
-import com.awxkee.aire.ColorMatrices
-import com.awxkee.aire.ConvolveKernels
+import com.awxkee.aire.ResizeFunction
 import com.awxkee.aire.ScaleColorSpace
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.util.UUID
 import java.util.concurrent.Executors
-import kotlin.math.PI
 import kotlin.system.measureTimeMillis
 
 class MainActivity : ComponentActivity() {
@@ -60,13 +43,36 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-//                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.lin)
-//                            .copy(Bitmap.Config.ARGB_8888, true)
+//                        val bitmap =
+//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                                .copy(Bitmap.Config.ARGB_8888, true)
 //
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
+//                        val entries = ResizeFunction.entries
+//                        for (entry in entries) {
+//                            val scaled: Bitmap
+//                            Log.d("AireMedian", "Started $entry")
+//                            val time = measureTimeMillis {
+//                                scaled = Aire.scale(
+//                                    bitmap,
+//                                    bitmap.width / 6,
+//                                    bitmap.height / 6,
+//                                    entry,
+//                                    ScaleColorSpace.SRGB
+//                                )
+//                            }
+//                            Log.d("AireMedian", "$entry done in ${time}ms")
+//
+//                            scope.launch {
+//                                imagesArray.add(
+//                                    scaled
+//                                )
+//                            }
+//                        }
+
 //                        val clahe = Aire.clahe(bitmap, 0.5f, 6, 6)
 //                        scope.launch {
 //                            imagesArray.add(clahe)
@@ -75,6 +81,11 @@ class MainActivity : ComponentActivity() {
 //                        val claheLAB = Aire.claheLAB(bitmap, 0.5f, 6, 6)
 //                        scope.launch {
 //                            imagesArray.add(claheLAB)
+//                        }
+//
+//                        val claheLUV = Aire.claheLUV(bitmap, 0.5f, 6, 6)
+//                        scope.launch {
+//                            imagesArray.add(claheLUV)
 //                        }
 
 //                        val ahe = Aire.equalizeHistSquares(bitmap, 5, 5)

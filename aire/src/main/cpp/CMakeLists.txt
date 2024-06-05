@@ -14,13 +14,13 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         conversion/Rgb1010102toF16.cpp conversion/Rgba2Rgb.cpp conversion/Rgba8ToF16.cpp
         conversion/Rgba1010102toF32.cpp conversion/RgbaF16bitNBitU8.cpp conversion/RGBAlpha.cpp conversion/HalfFloats.cpp
         jni/AcquireBitmapPixels.cpp shift/Glitch.cpp halftone/Halftone.cpp color/ConvolveToneMapper.cpp
-        scale/XScaler.cpp jni/BlurPipes.cpp jni/ShiftPipelines.cpp jni/Base.cpp
+        jni/BlurPipes.cpp jni/ShiftPipelines.cpp jni/Base.cpp
         jni/Pipelines.cpp algo/median/QuickSelect.cpp algo/median/Wirth.cpp base/Arithmetics.cpp
         base/Erosion.cpp shift/WindStagger.cpp blur/AnisotropicDiffusion.cpp effect/MarbleEffect.cpp
         jni/EffectsPipelines.cpp effect/OilEffect.cpp effect/CrystallizeEffect.cpp blur/PoissonBlur.cpp
         base/Grayscale.cpp base/Dilation.cpp base/Channels.cpp base/Threshold.cpp
         pipelines/RemoveShadows.cpp blur/FastBilateral.cpp color/Gamut.cpp base/Convolve1D.cpp
-        effect/FractalGlassEffect.cpp effect/WaterEffect.cpp jni/ScalePipelines.cpp jni/ToneMappingPipelines.cpp
+        effect/FractalGlassEffect.cpp effect/WaterEffect.cpp jni/ToneMappingPipelines.cpp
         effect/PerlinDistortion.cpp base/Vibrance.cpp algo/sleef-hwy.cpp conversion/yuv/YuvConverter.cpp
         jni/YuvPipelines.cpp pipelines/DehazeDarkChannel.cpp color/Adjustments.cpp
         base/Grain.cpp base/Sharpness.cpp base/Convolve2D.cpp base/LUT8.cpp
@@ -29,9 +29,6 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         algo/WuQuantizer.cpp base/AffineTransform.cpp jni/Geometry.cpp base/WarpPerspective.cpp
         base/JPEGEncoder.cpp jni/Compress.cpp base/ArbitraryUtil.cpp
 )
-
-add_library(aire_filters STATIC IMPORTED)
-set_target_properties(aire aire_filters PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libaire_filters.a)
 
 add_library(libzlibng STATIC IMPORTED)
 set_target_properties(aire libzlibng PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libz.a)
@@ -71,5 +68,4 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         libturbojpeg
         libfftw
         aireli
-        aire_filters
         -ljnigraphics)

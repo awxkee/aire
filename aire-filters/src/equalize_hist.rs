@@ -140,7 +140,9 @@ fn equalize_histogram_region_yuv<const CHANNELS: u8>(
     let mut y_shift = 0usize;
     for _ in 0usize..height as usize {
         for x in 0usize..width as usize {
-            y_plane[y_shift + x] = bins[y_plane[y_shift + x] as usize] as u8;
+            unsafe {
+                *y_plane.get_unchecked_mut(y_shift + x) = bins[*y_plane.get_unchecked(y_shift + x) as usize] as u8;
+            }
         }
         y_shift += width as usize;
     }
@@ -224,14 +226,16 @@ fn equalize_histogram_region_hsv<const CHANNELS: u8>(
             let h_px = j * 3usize;
 
             let rgb = Rgb::<u8>::new(
-                in_place[y_shift + px],
-                in_place[y_shift + px + 1],
-                in_place[y_shift + px + 2],
+                unsafe { *in_place.get_unchecked(y_shift + px) },
+                unsafe { *in_place.get_unchecked(y_shift + px + 1) },
+                unsafe { *in_place.get_unchecked(y_shift + px + 2) },
             );
             let hsv = rgb.to_hsv();
-            hsl_image[hsl_shift + h_px] = hsv.get_hue();
-            hsl_image[hsl_shift + h_px + 1] = hsv.get_saturation();
-            hsl_image[hsl_shift + h_px + 2] = hsv.get_value();
+            unsafe {
+                *hsl_image.get_unchecked_mut(hsl_shift + h_px) = hsv.get_hue();
+                *hsl_image.get_unchecked_mut(hsl_shift + h_px + 1) = hsv.get_saturation();
+                *hsl_image.get_unchecked_mut(hsl_shift + h_px + 2) = hsv.get_value();
+            }
         }
         y_shift += stride as usize;
         hsl_shift += hist_width * 3usize;
@@ -273,22 +277,26 @@ fn equalize_histogram_region_hsv<const CHANNELS: u8>(
             let px = x * channels;
             let h_px = j * 3;
 
-            let vl = (hsl_image[hsl_shift + h_px + 2] * 100f32)
+            let vl = (unsafe { *hsl_image.get_unchecked(hsl_shift + h_px + 2) } * 100f32)
                 .round()
                 .min(100f32)
                 .max(0f32) as usize;
-            hsl_image[hsl_shift + h_px + 2] = f_bins[vl];
+            unsafe {
+                *hsl_image.get_unchecked_mut(hsl_shift + h_px + 2) = *f_bins.get_unchecked(vl);
+            }
 
             let hsv = Hsv::from_components(
-                hsl_image[hsl_shift + h_px],
-                hsl_image[hsl_shift + h_px + 1],
-                hsl_image[hsl_shift + h_px + 2],
+                unsafe { *hsl_image.get_unchecked(hsl_shift + h_px) },
+                unsafe { *hsl_image.get_unchecked(hsl_shift + h_px + 1) },
+                unsafe { *hsl_image.get_unchecked(hsl_shift + h_px + 2) },
             );
             let rgb = hsv.to_rgb8();
 
-            in_place[y_shift + px] = rgb.r;
-            in_place[y_shift + px + 1] = rgb.g;
-            in_place[y_shift + px + 2] = rgb.b;
+            unsafe {
+                *in_place.get_unchecked_mut(y_shift + px) = rgb.r;
+                *in_place.get_unchecked_mut(y_shift + px + 1) = rgb.g;
+                *in_place.get_unchecked_mut(y_shift + px + 2) = rgb.b;
+            }
         }
         y_shift += stride as usize;
         hsl_shift += hist_width * 3usize;
