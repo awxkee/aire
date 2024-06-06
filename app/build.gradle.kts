@@ -50,7 +50,7 @@ android {
 }
 
 dependencies {
-//    implementation("com.github.awxkee:aire:0.9.80")
+//    implementation("com.github.awxkee:aire:0.11.0")
     implementation(project(":aire"))
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")

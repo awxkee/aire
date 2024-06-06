@@ -44,13 +44,30 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                            BitmapFactory.decodeResource(resources, R.drawable.lin)
 //                                .copy(Bitmap.Config.ARGB_8888, true)
 //
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
+//                        val srgb = Aire.scale(bitmap, bitmap.width / 2, bitmap.height / 2, ResizeFunction.EwaQuadric, ScaleColorSpace.SRGB)
+//                        scope.launch {
+//                            imagesArray.add(srgb)
+//                        }
+//                        val linear = Aire.scale(bitmap, bitmap.width / 2, bitmap.height / 2, ResizeFunction.EwaRobidoux, ScaleColorSpace.LINEAR)
+//                        scope.launch {
+//                            imagesArray.add(linear)
+//                        }
+//                        val lab = Aire.scale(bitmap, bitmap.width / 2, bitmap.height / 2, ResizeFunction.EwaLanczos3Jinc, ScaleColorSpace.LAB)
+//                        scope.launch {
+//                            imagesArray.add(lab)
+//                        }
+//                        val luv = Aire.scale(bitmap, bitmap.width / 2, bitmap.height / 2, ResizeFunction.EwaBlackman, ScaleColorSpace.LUV)
+//                        scope.launch {
+//                            imagesArray.add(luv)
+//                        }
+
 //                        val entries = ResizeFunction.entries
 //                        for (entry in entries) {
 //                            val scaled: Bitmap
