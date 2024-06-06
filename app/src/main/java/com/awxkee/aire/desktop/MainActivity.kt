@@ -44,26 +44,26 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.lin)
+//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
 //                                .copy(Bitmap.Config.ARGB_8888, true)
 //
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
-//                        val srgb = Aire.scale(bitmap, bitmap.width / 2, bitmap.height / 2, ResizeFunction.EwaQuadric, ScaleColorSpace.SRGB)
+//                        val srgb = Aire.scale(bitmap, 2000, 4000, ResizeFunction.EwaLanczosSoft, ScaleColorSpace.SRGB)
 //                        scope.launch {
 //                            imagesArray.add(srgb)
 //                        }
-//                        val linear = Aire.scale(bitmap, bitmap.width / 2, bitmap.height / 2, ResizeFunction.EwaRobidoux, ScaleColorSpace.LINEAR)
+//                        val linear = Aire.scale(bitmap, 2000, 4000, ResizeFunction.EwaLanczos4Sharpest, ScaleColorSpace.LINEAR)
 //                        scope.launch {
 //                            imagesArray.add(linear)
 //                        }
-//                        val lab = Aire.scale(bitmap, bitmap.width / 2, bitmap.height / 2, ResizeFunction.EwaLanczos3Jinc, ScaleColorSpace.LAB)
+//                        val lab = Aire.scale(bitmap, 2000, 4000, ResizeFunction.EwaGinseng, ScaleColorSpace.LAB)
 //                        scope.launch {
 //                            imagesArray.add(lab)
 //                        }
-//                        val luv = Aire.scale(bitmap, bitmap.width / 2, bitmap.height / 2, ResizeFunction.EwaBlackman, ScaleColorSpace.LUV)
+//                        val luv = Aire.scale(bitmap, 2000, 4000, ResizeFunction.HaasnSoft, ScaleColorSpace.LUV)
 //                        scope.launch {
 //                            imagesArray.add(luv)
 //                        }
