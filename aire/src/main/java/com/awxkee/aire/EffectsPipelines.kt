@@ -32,6 +32,7 @@ package com.awxkee.aire
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 
 interface EffectsPipelines {
@@ -77,44 +78,149 @@ interface EffectsPipelines {
 
     fun equalizeHist(bitmap: Bitmap): Bitmap
 
-    fun equalizeHistHSV(bitmap: Bitmap): Bitmap
+    /**
+     * @param binsCount - Preferrable 128
+     */
+    fun equalizeHistHSV(bitmap: Bitmap, @IntRange(from = 2) binsCount: Int): Bitmap
+
+    /**
+     * @param binsCount - Preferrable 128
+     */
+    fun equalizeHistHSL(bitmap: Bitmap, @IntRange(from = 2) binsCount: Int): Bitmap
+
+    /**
+     * @param binsCount - Preferrable 128
+     */
+    fun equalizeHistLAB(bitmap: Bitmap, @IntRange(from = 2) binsCount: Int): Bitmap
+
+    /**
+     * @param binsCount - Preferrable 128
+     */
+    fun equalizeHistLUV(bitmap: Bitmap, @IntRange(from = 2) binsCount: Int): Bitmap
 
     /**
      * @throws Exception if horizontal grid or vertical <= 0
      */
-    fun equalizeHistSquares(bitmap: Bitmap, gridSizeHorizontal: Int = 8, gridSizeVertical: Int = 8): Bitmap
+    fun equalizeHistSquares(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int = 8,
+        gridSizeVertical: Int = 8
+    ): Bitmap
 
     /**
      * @throws Exception if horizontal grid or vertical <= 0
      */
-    fun equalizeHistAdaptive(bitmap: Bitmap, gridSizeHorizontal: Int = 3, gridSizeVertical: Int = 3): Bitmap
+    fun equalizeHistAdaptive(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int = 3,
+        gridSizeVertical: Int = 3
+    ): Bitmap
 
     /**
+     * @param binsCount - Preferable 128
      * @throws Exception if horizontal grid or vertical <= 0
      */
-    fun equalizeHistAdaptiveLUV(bitmap: Bitmap, gridSizeHorizontal: Int = 3, gridSizeVertical: Int = 3): Bitmap
+    fun equalizeHistAdaptiveLUV(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int = 3,
+        gridSizeVertical: Int = 3,
+        @IntRange(from = 2) binsCount: Int
+    ): Bitmap
 
     /**
-     * @param threshold - negative or positive reasonable values ~-10...+10
+     * @param binsCount - Preferable 128
      * @throws Exception if horizontal grid or vertical <= 0
      */
-    fun clahe(bitmap: Bitmap, threshold: Float = 0.5f, gridSizeHorizontal: Int = 8, gridSizeVertical: Int = 8): Bitmap
+    fun equalizeHistAdaptiveHSV(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int = 3,
+        gridSizeVertical: Int = 3,
+        @IntRange(from = 2) binsCount: Int
+    ): Bitmap
 
     /**
-     * @param threshold - negative or positive reasonable values ~-10...+10
+     * @param binsCount - Preferable 128
      * @throws Exception if horizontal grid or vertical <= 0
      */
-    fun claheLUV(bitmap: Bitmap, threshold: Float = 0.5f, gridSizeHorizontal: Int = 8, gridSizeVertical: Int = 8): Bitmap
+    fun equalizeHistAdaptiveHSL(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int = 3,
+        gridSizeVertical: Int = 3,
+        @IntRange(from = 2) binsCount: Int
+    ): Bitmap
 
     /**
-     * @param threshold - negative or positive reasonable values ~-10...+10
+     * @param threshold - negative or positive reasonable values ~-0...+10
      * @throws Exception if horizontal grid or vertical <= 0
      */
-    fun claheLAB(bitmap: Bitmap, threshold: Float = 0.5f, gridSizeHorizontal: Int = 8, gridSizeVertical: Int = 8): Bitmap
+    fun clahe(
+        bitmap: Bitmap,
+        @FloatRange(from = 0.01) threshold: Float = 0.5f,
+        gridSizeHorizontal: Int = 8,
+        gridSizeVertical: Int = 8
+    ): Bitmap
 
     /**
+     * @param binsCount - Preferable 128
+     * @param threshold - negative or positive reasonable values ~0...+10
      * @throws Exception if horizontal grid or vertical <= 0
      */
-    fun equalizeHistAdaptiveLAB(bitmap: Bitmap, gridSizeHorizontal: Int = 3, gridSizeVertical: Int = 3): Bitmap
+    fun claheLUV(
+        bitmap: Bitmap,
+        @FloatRange(from = 0.01) threshold: Float = 0.5f,
+        gridSizeHorizontal: Int = 8,
+        gridSizeVertical: Int = 8,
+        @IntRange(from = 2) binsCount: Int
+    ): Bitmap
+
+    /**
+     * @param binsCount - Preferable 128
+     * @param threshold - negative or positive reasonable values ~0...+10
+     * @throws Exception if horizontal grid or vertical <= 0
+     */
+    fun claheHSV(
+        bitmap: Bitmap,
+        @FloatRange(from = 0.01) threshold: Float = 0.5f,
+        gridSizeHorizontal: Int = 8,
+        gridSizeVertical: Int = 8,
+        @IntRange(from = 2) binsCount: Int
+    ): Bitmap
+
+    /**
+     * @param binsCount - Preferable 128
+     * @param threshold - negative or positive reasonable values ~0...+10
+     * @throws Exception if horizontal grid or vertical <= 0
+     */
+    fun claheHSL(
+        bitmap: Bitmap,
+        @FloatRange(from = 0.01) threshold: Float = 0.5f,
+        gridSizeHorizontal: Int = 8,
+        gridSizeVertical: Int = 8,
+        @IntRange(from = 2) binsCount: Int
+    ): Bitmap
+
+    /**
+     * @param binsCount - Preferable 128
+     * @param threshold - negative or positive reasonable values ~-0...+10
+     * @throws Exception if horizontal grid or vertical <= 0
+     */
+    fun claheLAB(
+        bitmap: Bitmap,
+        @FloatRange(from = 0.01) threshold: Float = 0.5f,
+        gridSizeHorizontal: Int = 8,
+        gridSizeVertical: Int = 8,
+        @IntRange(from = 2) binsCount: Int
+    ): Bitmap
+
+    /**
+     * @param binsCount - Preferable 128
+     * @throws Exception if horizontal grid or vertical <= 0
+     */
+    fun equalizeHistAdaptiveLAB(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int = 3,
+        gridSizeVertical: Int = 3,
+        @IntRange(from = 2) binsCount: Int
+    ): Bitmap
 
 }

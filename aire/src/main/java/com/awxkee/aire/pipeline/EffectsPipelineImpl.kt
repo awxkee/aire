@@ -50,19 +50,13 @@ class EffectsPipelineImpl : EffectsPipelines {
     }
 
     override fun marble(
-        bitmap: Bitmap,
-        intensity: Float,
-        turbulence: Float,
-        amplitude: Float
+        bitmap: Bitmap, intensity: Float, turbulence: Float, amplitude: Float
     ): Bitmap {
         return marbleImpl(bitmap, intensity, turbulence, amplitude)
     }
 
     override fun perlinDistortion(
-        bitmap: Bitmap,
-        intensity: Float,
-        turbulence: Float,
-        amplitude: Float
+        bitmap: Bitmap, intensity: Float, turbulence: Float, amplitude: Float
     ): Bitmap {
         return perlinDistortionImpl(bitmap, intensity, turbulence, amplitude)
     }
@@ -94,14 +88,32 @@ class EffectsPipelineImpl : EffectsPipelines {
         return equalizeHistImpl(bitmap)
     }
 
-    override fun equalizeHistHSV(bitmap: Bitmap): Bitmap {
-        return equalizeHistHSVImpl(bitmap)
+    override fun equalizeHistHSV(
+        bitmap: Bitmap, @IntRange(from = 2.toLong()) binsCount: Int
+    ): Bitmap {
+        return equalizeHistHSVImpl(bitmap, binsCount)
+    }
+
+    override fun equalizeHistHSL(
+        bitmap: Bitmap, @IntRange(from = 2.toLong()) binsCount: Int
+    ): Bitmap {
+        return equalizeHistHSLImpl(bitmap, binsCount)
+    }
+
+    override fun equalizeHistLAB(
+        bitmap: Bitmap, @IntRange(from = 2.toLong()) binsCount: Int
+    ): Bitmap {
+        return equalizeHistLABImpl(bitmap, binsCount)
+    }
+
+    override fun equalizeHistLUV(
+        bitmap: Bitmap, @IntRange(from = 2.toLong()) binsCount: Int
+    ): Bitmap {
+        return equalizeHistLUVImpl(bitmap, binsCount)
     }
 
     override fun equalizeHistAdaptive(
-        bitmap: Bitmap,
-        gridSizeHorizontal: Int,
-        gridSizeVertical: Int
+        bitmap: Bitmap, gridSizeHorizontal: Int, gridSizeVertical: Int
     ): Bitmap {
         return equalizeHistAdaptiveImpl(bitmap, gridSizeHorizontal, gridSizeVertical)
     }
@@ -109,32 +121,47 @@ class EffectsPipelineImpl : EffectsPipelines {
     override fun equalizeHistAdaptiveLAB(
         bitmap: Bitmap,
         gridSizeHorizontal: Int,
-        gridSizeVertical: Int
+        gridSizeVertical: Int,
+        @IntRange(from = 2.toLong()) binsCount: Int
     ): Bitmap {
-        return equalizeHistAdaptiveLABImpl(bitmap, gridSizeHorizontal, gridSizeVertical)
+        return equalizeHistAdaptiveLABImpl(bitmap, gridSizeHorizontal, gridSizeVertical, binsCount)
+    }
+
+    override fun equalizeHistAdaptiveHSV(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        @IntRange(from = 2.toLong()) binsCount: Int
+    ): Bitmap {
+        return equalizeHistAdaptiveHSVImpl(bitmap, gridSizeHorizontal, gridSizeVertical, binsCount)
+    }
+
+    override fun equalizeHistAdaptiveHSL(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        @IntRange(from = 2.toLong()) binsCount: Int
+    ): Bitmap {
+        return equalizeHistAdaptiveHSLImpl(bitmap, gridSizeHorizontal, gridSizeVertical, binsCount)
     }
 
     override fun equalizeHistAdaptiveLUV(
         bitmap: Bitmap,
         gridSizeHorizontal: Int,
-        gridSizeVertical: Int
+        gridSizeVertical: Int,
+        @IntRange(from = 2.toLong()) binsCount: Int
     ): Bitmap {
-        return equalizeHistAdaptiveLUVImpl(bitmap, gridSizeHorizontal, gridSizeVertical)
+        return equalizeHistAdaptiveLUVImpl(bitmap, gridSizeHorizontal, gridSizeVertical, binsCount)
     }
 
     override fun equalizeHistSquares(
-        bitmap: Bitmap,
-        gridSizeHorizontal: Int,
-        gridSizeVertical: Int
+        bitmap: Bitmap, gridSizeHorizontal: Int, gridSizeVertical: Int
     ): Bitmap {
         return equalizeHistSquaresImpl(bitmap, gridSizeHorizontal, gridSizeVertical)
     }
 
     override fun clahe(
-        bitmap: Bitmap,
-        threshold: Float,
-        gridSizeHorizontal: Int,
-        gridSizeVertical: Int
+        bitmap: Bitmap, threshold: Float, gridSizeHorizontal: Int, gridSizeVertical: Int
     ): Bitmap {
         return claheImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical)
     }
@@ -143,40 +170,54 @@ class EffectsPipelineImpl : EffectsPipelines {
         bitmap: Bitmap,
         threshold: Float,
         gridSizeHorizontal: Int,
-        gridSizeVertical: Int
+        gridSizeVertical: Int,
+        @IntRange(from = 2.toLong()) binsCount: Int
     ): Bitmap {
-        return claheLUVImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical)
+        return claheLUVImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical, binsCount)
+    }
+
+    override fun claheHSV(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        @IntRange(from = 2.toLong()) binsCount: Int
+    ): Bitmap {
+        return claheHSVImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical, binsCount)
+    }
+
+    override fun claheHSL(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        @IntRange(from = 2.toLong()) binsCount: Int
+    ): Bitmap {
+        return claheHSLImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical, binsCount)
     }
 
     override fun claheLAB(
         bitmap: Bitmap,
         threshold: Float,
         gridSizeHorizontal: Int,
-        gridSizeVertical: Int
+        gridSizeVertical: Int,
+        @IntRange(from = 2.toLong()) binsCount: Int
     ): Bitmap {
-        return claheLABImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical)
+        return claheLABImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical, binsCount)
     }
 
     private external fun convexImpl(bitmap: Bitmap, strength: Float): Bitmap
 
     private external fun bokehImpl(
-        bitmap: Bitmap,
-        kernelSize: Int,
-        sides: Int,
-        enhance: Boolean
+        bitmap: Bitmap, kernelSize: Int, sides: Int, enhance: Boolean
     ): Bitmap
 
     private external fun perlinDistortionImpl(
-        bitmap: Bitmap,
-        intensity: Float,
-        turbulence: Float,
-        amplitude: Float
+        bitmap: Bitmap, intensity: Float, turbulence: Float, amplitude: Float
     ): Bitmap
 
     private external fun fractalGlassImpl(
-        bitmap: Bitmap,
-        glassSize: Float,
-        amplitude: Float
+        bitmap: Bitmap, glassSize: Float, amplitude: Float
     ): Bitmap
 
     private external fun waterEffectImpl(
@@ -189,66 +230,97 @@ class EffectsPipelineImpl : EffectsPipelines {
     ): Bitmap
 
     private external fun marbleImpl(
-        bitmap: Bitmap,
-        intensity: Float = 0.5f,
-        turbulence: Float = 1f,
-        amplitude: Float = 1f
+        bitmap: Bitmap, intensity: Float = 0.5f, turbulence: Float = 1f, amplitude: Float = 1f
     ): Bitmap
 
     private external fun oilImpl(bitmap: Bitmap, radius: Int, levels: Float): Bitmap
 
     private external fun crystallizeImpl(
-        bitmap: Bitmap,
-        clustersCount: Int,
-        strokeColor: Int
+        bitmap: Bitmap, clustersCount: Int, strokeColor: Int
     ): Bitmap
 
     private external fun equalizeHistImpl(bitmap: Bitmap): Bitmap
 
-    private external fun equalizeHistHSVImpl(bitmap: Bitmap): Bitmap
+    private external fun equalizeHistHSVImpl(bitmap: Bitmap, binsCount: Int): Bitmap
 
-    private external fun equalizeHistAdaptiveImpl(
-        bitmap: Bitmap,
-        gridSizeHorizontal: Int,
-        gridSizeVertical: Int
-    ): Bitmap
+    private external fun equalizeHistHSLImpl(bitmap: Bitmap, binsCount: Int): Bitmap
+
+    private external fun equalizeHistLABImpl(bitmap: Bitmap, binsCount: Int): Bitmap
+
+    private external fun equalizeHistLUVImpl(bitmap: Bitmap, binsCount: Int): Bitmap
 
     private external fun equalizeHistSquaresImpl(
-        bitmap: Bitmap,
-        gridSizeHorizontal: Int,
-        gridSizeVertical: Int
+        bitmap: Bitmap, gridSizeHorizontal: Int, gridSizeVertical: Int
     ): Bitmap
 
     private external fun claheImpl(
+        bitmap: Bitmap, threshold: Float, gridSizeHorizontal: Int, gridSizeVertical: Int
+    ): Bitmap
+
+    private external fun claheHSVImpl(
         bitmap: Bitmap,
         threshold: Float,
         gridSizeHorizontal: Int,
-        gridSizeVertical: Int
+        gridSizeVertical: Int,
+        binsCount: Int,
+    ): Bitmap
+
+    private external fun claheHSLImpl(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        binsCount: Int,
     ): Bitmap
 
     private external fun claheLUVImpl(
         bitmap: Bitmap,
         threshold: Float,
         gridSizeHorizontal: Int,
-        gridSizeVertical: Int
+        gridSizeVertical: Int,
+        binsCount: Int,
     ): Bitmap
 
-    private external fun equalizeHistAdaptiveLABImpl(
-        bitmap: Bitmap,
-        gridSizeHorizontal: Int,
-        gridSizeVertical: Int
-    ): Bitmap
-
-    private external fun equalizeHistAdaptiveLUVImpl(
-        bitmap: Bitmap,
-        gridSizeHorizontal: Int,
-        gridSizeVertical: Int
-    ): Bitmap
 
     private external fun claheLABImpl(
         bitmap: Bitmap,
         threshold: Float,
         gridSizeHorizontal: Int,
-        gridSizeVertical: Int
+        gridSizeVertical: Int,
+        binsCount: Int,
     ): Bitmap
+
+    private external fun equalizeHistAdaptiveImpl(
+        bitmap: Bitmap, gridSizeHorizontal: Int, gridSizeVertical: Int
+    ): Bitmap
+
+
+    private external fun equalizeHistAdaptiveLABImpl(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        binsCount: Int,
+    ): Bitmap
+
+    private external fun equalizeHistAdaptiveLUVImpl(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        binsCount: Int,
+    ): Bitmap
+
+    private external fun equalizeHistAdaptiveHSLImpl(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        binsCount: Int,
+    ): Bitmap
+
+    private external fun equalizeHistAdaptiveHSVImpl(
+        bitmap: Bitmap,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        binsCount: Int,
+    ): Bitmap
+
 }

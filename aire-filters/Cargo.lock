@@ -6,8 +6,9 @@ version = 3
 name = "aire-filters"
 version = "0.1.0"
 dependencies = [
- "colorutils-rs",
+ "colorutils-rs 0.3.1",
  "half",
+ "histogram_equalization",
  "jni",
  "ndk",
  "ndk-sys",
@@ -51,6 +52,15 @@ name = "colorutils-rs"
 version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bfdfc58089ac71a9a0922e9509b62802ffce9f067351e35c58e3ceb9a1e76d3a"
+dependencies = [
+ "half",
+]
+
+[[package]]
+name = "colorutils-rs"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c9534cacefccbe8567637a47fc9a9a6d9135a981b453f4ce3e9f93691260f7ed"
 dependencies = [
  "half",
 ]
@@ -123,6 +133,17 @@ name = "hashbrown"
 version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
+
+[[package]]
+name = "histogram_equalization"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c82a44e5139752bac7aec732548edd3618ee095d28343483418168e20c72ffbf"
+dependencies = [
+ "colorutils-rs 0.3.1",
+ "num-traits",
+ "yuvutils-rs",
+]
 
 [[package]]
 name = "indexmap"
@@ -228,7 +249,7 @@ version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "522668a8aeba7c99d485fcb1a4c37dfab6d343e17ff2a38a378447c4ff6f3d53"
 dependencies = [
- "colorutils-rs",
+ "colorutils-rs 0.2.11",
  "num-traits",
  "rayon",
 ]
@@ -518,6 +539,6 @@ dependencies = [
 
 [[package]]
 name = "yuvutils-rs"
-version = "0.2.6"
+version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "612b4a6baf384f7536cc49d357b5f431a68df0badf2848b32686771662a33c3f"
+checksum = "c2f1b553efe1c2ee6965d3e0272e7a9fbcf36159b2190867d96755b334426a7d"

@@ -1,11 +1,9 @@
 use colorutils_rs::{Hsv, Rgb};
-use yuvutils_rs::{
-    rgb_to_yuv444, rgba_to_yuv444, yuv444_to_rgb, yuv444_to_rgba, YuvRange, YuvStandardMatrix,
-};
+use histogram_equalization::ClaheGridSize;
 
-use crate::clahe::ClaheGridSize;
-use crate::histogram::{make_histogram_1_channel, make_histogram_channel_3_region};
 use EqualizeHistogramChannels::{Channels3, Channels4};
+
+use crate::histogram::make_histogram_channel_3_region;
 
 #[repr(u8)]
 #[derive(Copy, Clone, PartialOrd, PartialEq)]
@@ -51,146 +49,6 @@ pub fn cdf(arr: &mut [u64]) {
     }
 }
 
-#[allow(dead_code)]
-pub fn equalize_histogram<const CHANNELS: u8>(
-    source: &[u8],
-    src_stride: u32,
-    dst: &mut [u8],
-    dst_stride: u32,
-    width: u32,
-    height: u32,
-) {
-    equalize_histogram_region_yuv::<CHANNELS>(source, src_stride, dst, dst_stride, width, height);
-}
-
-#[allow(dead_code)]
-fn equalize_histogram_region_yuv<const CHANNELS: u8>(
-    source: &[u8],
-    src_stride: u32,
-    dst: &mut [u8],
-    dst_stride: u32,
-    width: u32,
-    height: u32,
-) {
-    let h_channels: EqualizeHistogramChannels = CHANNELS.into();
-
-    let mut y_plane: Vec<u8> = Vec::new();
-    y_plane.resize(width as usize * height as usize, 0u8);
-
-    let mut u_plane: Vec<u8> = Vec::new();
-    u_plane.resize(width as usize * height as usize, 0u8);
-
-    let mut v_plane: Vec<u8> = Vec::new();
-    v_plane.resize(width as usize * height as usize, 0u8);
-
-    match h_channels {
-        Channels3 => {
-            rgb_to_yuv444(
-                &mut y_plane,
-                width,
-                &mut u_plane,
-                width,
-                &mut v_plane,
-                width,
-                source,
-                src_stride,
-                width,
-                height,
-                YuvRange::Full,
-                YuvStandardMatrix::Bt709,
-            );
-        }
-        Channels4 => {
-            rgba_to_yuv444(
-                &mut y_plane,
-                width,
-                &mut u_plane,
-                width,
-                &mut v_plane,
-                width,
-                source,
-                src_stride,
-                width,
-                height,
-                YuvRange::Full,
-                YuvStandardMatrix::Bt709,
-            );
-        }
-    }
-
-    let histogram = make_histogram_1_channel(&y_plane, width, width, height);
-    let mut bins = histogram.bins;
-
-    cdf(&mut bins);
-
-    let pixels_count = width * height;
-
-    let (min_bin, _) = minmax(&bins);
-
-    let distance_r = 1f64 / (pixels_count as f64 - min_bin as f64);
-
-    for i in 0..256usize {
-        if distance_r != 0f64 {
-            bins[i] = (255f64 * (bins[i] as f64 - min_bin as f64) * distance_r)
-                .round()
-                .min(255f64) as u64;
-        }
-    }
-
-    let mut y_shift = 0usize;
-    for _ in 0usize..height as usize {
-        for x in 0usize..width as usize {
-            unsafe {
-                *y_plane.get_unchecked_mut(y_shift + x) = bins[*y_plane.get_unchecked(y_shift + x) as usize] as u8;
-            }
-        }
-        y_shift += width as usize;
-    }
-
-    match h_channels {
-        Channels3 => {
-            yuv444_to_rgb(
-                &y_plane,
-                width,
-                &u_plane,
-                width,
-                &v_plane,
-                width,
-                dst,
-                dst_stride,
-                width,
-                height,
-                YuvRange::Full,
-                YuvStandardMatrix::Bt709,
-            );
-        }
-        Channels4 => {
-            yuv444_to_rgba(
-                &y_plane,
-                width,
-                &u_plane,
-                width,
-                &v_plane,
-                width,
-                dst,
-                dst_stride,
-                width,
-                height,
-                YuvRange::Full,
-                YuvStandardMatrix::Bt709,
-            );
-        }
-    }
-}
-
-#[allow(dead_code)]
-pub fn equalize_histogram_hsv(dst: &mut [u8], dst_stride: u32, width: u32, height: u32) {
-    equalize_histogram_region_hsv::<{ Channels4 as u8 }>(
-        dst, dst_stride, 0, width, 0, height, width, height,
-    );
-}
-
-#[allow(dead_code)]
 fn equalize_histogram_region_hsv<const CHANNELS: u8>(
     in_place: &mut [u8],
     stride: u32,
