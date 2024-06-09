@@ -47,10 +47,54 @@ class MainActivity : ComponentActivity() {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.default_test)
 //                                .copy(Bitmap.Config.ARGB_8888, true)
-////
+//////
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
+//
+//                        delay(2000L)
+//
+//                        var radius = 71
+//
+//                        var time = measureTimeMillis {
+//                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f)
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
+//
+//                        time = measureTimeMillis {
+//                            val image = Aire.stackBlur(bitmap, radius)
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        Log.d("AireMedian", "Blur timing stackBlur done in ${time}ms")
+//
+//                        time = measureTimeMillis {
+//                            val image = Aire.tentBlur(bitmap, radius)
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        Log.d("AireMedian", "Blur timing tentBlur done in ${time}ms")
+//
+//                        time = measureTimeMillis {
+//                            val image = Aire.fastGaussian2Degree(bitmap, radius)
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        Log.d("AireMedian", "Blur timing fastGaussian2Degree done in ${time}ms")
+//
+//                        time = measureTimeMillis {
+//                            val image = Aire.boxBlur(bitmap, radius)
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        Log.d("AireMedian", "Blur timing boxBlur done in ${time}ms")
 //
 
 //                        val entries = ResizeFunction.entries
