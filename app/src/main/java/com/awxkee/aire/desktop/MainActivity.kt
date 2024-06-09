@@ -27,6 +27,7 @@ import com.awxkee.aire.ResizeFunction
 import com.awxkee.aire.ScaleColorSpace
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -44,29 +45,13 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                            BitmapFactory.decodeResource(resources, R.drawable.default_test)
 //                                .copy(Bitmap.Config.ARGB_8888, true)
 ////
 //                        scope.launch {
 //                            imagesArray.add(bitmap)
 //                        }
 //
-//                        val srgb = Aire.scale(bitmap, 2000, 4000, ResizeFunction.EwaLanczosSoft, ScaleColorSpace.SRGB)
-//                        scope.launch {
-//                            imagesArray.add(srgb)
-//                        }
-//                        val linear = Aire.scale(bitmap, 2000, 4000, ResizeFunction.EwaLanczos4Sharpest, ScaleColorSpace.LINEAR)
-//                        scope.launch {
-//                            imagesArray.add(linear)
-//                        }
-//                        val lab = Aire.scale(bitmap, 2000, 4000, ResizeFunction.EwaGinseng, ScaleColorSpace.LAB)
-//                        scope.launch {
-//                            imagesArray.add(lab)
-//                        }
-//                        val luv = Aire.scale(bitmap, 2000, 4000, ResizeFunction.HaasnSoft, ScaleColorSpace.LUV)
-//                        scope.launch {
-//                            imagesArray.add(luv)
-//                        }
 
 //                        val entries = ResizeFunction.entries
 //                        for (entry in entries) {

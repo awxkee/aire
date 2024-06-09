@@ -35,6 +35,8 @@ import androidx.annotation.IntRange
 import com.awxkee.aire.BlurPipelines
 
 class BlurPipelinesImpl : BlurPipelines {
+
+
     override fun gaussianBlur(bitmap: Bitmap, kernelSize: Int, sigma: Float): Bitmap {
         if (kernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
@@ -42,7 +44,10 @@ class BlurPipelinesImpl : BlurPipelines {
         if (sigma < 0) {
             throw IllegalStateException("Sigma must be more than 0")
         }
-        return gaussianBlurPipeline(bitmap, kernelSize, sigma)
+        if (kernelSize % 2 == 0) {
+            throw IllegalStateException("Kernel size must be odd")
+        }
+        return gaussianBlurImpl(bitmap, kernelSize, sigma)
     }
 
     override fun bilateralBlur(
@@ -72,8 +77,9 @@ class BlurPipelinesImpl : BlurPipelines {
         if (kernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
-        return boxBlurPipeline(bitmap, kernelSize)
+        return boxBlurImpl(bitmap, kernelSize)
     }
+
 
     override fun poissonBlur(bitmap: Bitmap, kernelSize: Int): Bitmap {
         if (kernelSize < 1) {
@@ -93,22 +99,22 @@ class BlurPipelinesImpl : BlurPipelines {
         if (kernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
-        return medianBlurPipeline(bitmap, kernelSize)
+        return medianBlurImpl(bitmap, kernelSize)
     }
 
     override fun fastGaussian2Degree(bitmap: Bitmap, radius: Int): Bitmap {
-        return fastGaussian2DImpl(bitmap, radius)
+        return fastGaussianImpl(bitmap, radius)
     }
 
     override fun fastGaussian3Degree(bitmap: Bitmap, radius: Int): Bitmap {
-        return fastGaussian3DImpl(bitmap, radius)
+        return fastGaussianNextImpl(bitmap, radius)
     }
 
     override fun tentBlur(bitmap: Bitmap, kernelSize: Int): Bitmap {
         if (kernelSize < 3) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
-        return tentBlurPipeline(bitmap, kernelSize)
+        return tentBlurImpl(bitmap, kernelSize)
     }
 
     override fun fastGaussian4Degree(bitmap: Bitmap, radius: Int): Bitmap {
@@ -156,9 +162,9 @@ class BlurPipelinesImpl : BlurPipelines {
         angle: Float
     ): Bitmap
 
-    private external fun fastGaussian2DImpl(bitmap: Bitmap, radius: Int): Bitmap
+    private external fun fastGaussianImpl(bitmap: Bitmap, radius: Int): Bitmap
 
-    private external fun fastGaussian3DImpl(bitmap: Bitmap, radius: Int): Bitmap
+    private external fun fastGaussianNextImpl(bitmap: Bitmap, radius: Int): Bitmap
 
     private external fun fastGaussian4DImpl(bitmap: Bitmap, radius: Int): Bitmap
 
@@ -177,7 +183,7 @@ class BlurPipelinesImpl : BlurPipelines {
         spatialSigma: Float
     ): Bitmap
 
-    private external fun gaussianBlurPipeline(bitmap: Bitmap, radius: Int, sigma: Float): Bitmap
+    private external fun gaussianBlurImpl(bitmap: Bitmap, radius: Int, sigma: Float): Bitmap
 
     private external fun bilateralBlurPipeline(
         bitmap: Bitmap,
@@ -186,11 +192,11 @@ class BlurPipelinesImpl : BlurPipelines {
         spatialSigma: Float
     ): Bitmap
 
-    private external fun medianBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
+    private external fun medianBlurImpl(bitmap: Bitmap, radius: Int): Bitmap
 
     private external fun stackNativeBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
 
-    private external fun boxBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
+    private external fun boxBlurImpl(bitmap: Bitmap, radius: Int): Bitmap
 
-    private external fun tentBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
+    private external fun tentBlurImpl(bitmap: Bitmap, radius: Int): Bitmap
 }

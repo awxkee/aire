@@ -13,6 +13,8 @@ pub mod android_bitmap {
         AndroidBitmap_unlockPixels, ANDROID_BITMAP_FLAGS_IS_HARDWARE,
         ANDROID_BITMAP_RESULT_SUCCESS,
     };
+    #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+    use std::arch::aarch64::*;
     use std::os::raw::c_uint;
     use std::slice;
 
@@ -210,9 +212,45 @@ pub mod android_bitmap {
             let dst_ptr = unsafe { dst_slice.as_mut_ptr().add(y * dst_stride) };
             let src_ptr = unsafe { o_slice.as_ptr().add(y * src_stride) };
             let row_length = new_info.width as usize * 4usize * std::mem::size_of::<u8>();
-            unsafe {
-                std::ptr::copy_nonoverlapping(src_ptr, dst_ptr, row_length);
-            };
+            let mut cx = 0usize;
+            #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+            while cx + 64 < row_length {
+                let row = unsafe { vld1q_u8_x4(src_ptr.add(cx)) };
+                unsafe {
+                    vst1q_u8_x4(dst_ptr.add(cx), row);
+                }
+                cx += 64;
+            }
+            #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+            while cx + 32 < row_length {
+                let row = unsafe { vld1q_u8_x2(src_ptr.add(cx)) };
+                unsafe {
+                    vst1q_u8_x2(dst_ptr.add(cx), row);
+                }
+                cx += 32;
+            }
+            #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+            while cx + 16 < row_length {
+                let row = unsafe { vld1q_u8(src_ptr.add(cx)) };
+                unsafe {
+                    vst1q_u8(dst_ptr.add(cx), row);
+                }
+                cx += 16;
+            }
+            #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+            while cx + 8 < row_length {
+                let row = unsafe { vld1_u8(src_ptr.add(cx)) };
+                unsafe {
+                    vst1_u8(dst_ptr.add(cx), row);
+                }
+                cx += 8;
+            }
+            while cx < row_length {
+                unsafe {
+                    *dst_ptr.add(cx) = *src_ptr.add(cx);
+                }
+                cx += 1;
+            }
         }
 
         if unsafe { AndroidBitmap_unlockPixels(native_env, new_bitmap.as_raw()) }
