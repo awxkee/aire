@@ -5,7 +5,7 @@ pub mod android {
 
     use jni::sys::{jfloat, jint, jobject};
     use jni::JNIEnv;
-    use libblur::{FastBlurChannels, ThreadingPolicy};
+    use libblur::{EdgeMode, FastBlurChannels, ThreadingPolicy};
 
     use crate::bitmap_helper::android_bitmap;
 
@@ -205,6 +205,7 @@ pub mod android {
         bitmap: jobject,
         kernel_size: jint,
         sigma: jfloat,
+        kernel_mode: jint,
     ) -> jobject {
         if kernel_size <= 0 {
             let clazz = env
@@ -237,6 +238,7 @@ pub mod android {
         match bitmap_info {
             Ok(info) => {
                 let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
+                let edge_mode: EdgeMode = (kernel_mode as usize).into();
                 libblur::gaussian_blur(
                     &info.data,
                     info.stride,
@@ -247,6 +249,7 @@ pub mod android {
                     kernel_size as u32,
                     sigma,
                     FastBlurChannels::Channels4,
+                    edge_mode,
                     ThreadingPolicy::Adaptive,
                 );
 

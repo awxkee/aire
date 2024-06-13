@@ -33,11 +33,16 @@ package com.awxkee.aire.pipeline
 import android.graphics.Bitmap
 import androidx.annotation.IntRange
 import com.awxkee.aire.BlurPipelines
+import com.awxkee.aire.EdgeMode
 
 class BlurPipelinesImpl : BlurPipelines {
 
-
-    override fun gaussianBlur(bitmap: Bitmap, kernelSize: Int, sigma: Float): Bitmap {
+    override fun gaussianBlur(
+        bitmap: Bitmap,
+        kernelSize: Int,
+        sigma: Float,
+        edgeMode: EdgeMode
+    ): Bitmap {
         if (kernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
@@ -47,7 +52,7 @@ class BlurPipelinesImpl : BlurPipelines {
         if (kernelSize % 2 == 0) {
             throw IllegalStateException("Kernel size must be odd")
         }
-        return gaussianBlurImpl(bitmap, kernelSize, sigma)
+        return gaussianBlurImpl(bitmap, kernelSize, sigma, edgeMode.value)
     }
 
     override fun bilateralBlur(
@@ -183,7 +188,7 @@ class BlurPipelinesImpl : BlurPipelines {
         spatialSigma: Float
     ): Bitmap
 
-    private external fun gaussianBlurImpl(bitmap: Bitmap, radius: Int, sigma: Float): Bitmap
+    private external fun gaussianBlurImpl(bitmap: Bitmap, radius: Int, sigma: Float, kernelMode: Int): Bitmap
 
     private external fun bilateralBlurPipeline(
         bitmap: Bitmap,

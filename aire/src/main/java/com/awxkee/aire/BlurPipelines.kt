@@ -41,7 +41,7 @@ interface BlurPipelines {
         @IntRange(from = 3) sides: Int = 6,
     ): Bitmap
 
-    fun gaussianBlur(bitmap: Bitmap, kernelSize: Int, sigma: Float): Bitmap
+    fun gaussianBlur(bitmap: Bitmap, kernelSize: Int, sigma: Float, edgeMode: EdgeMode): Bitmap
 
     fun bilateralBlur(
         bitmap: Bitmap,
