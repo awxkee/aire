@@ -45,15 +45,15 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-                        val bitmap =
-                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-                                .copy(Bitmap.Config.ARGB_8888, true)
-////
-                        scope.launch {
-                            imagesArray.add(bitmap)
-                        }
-
-                        delay(2000L)
+//                        val bitmap =
+//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                                .copy(Bitmap.Config.ARGB_8888, true)
+//////
+//                        scope.launch {
+//                            imagesArray.add(bitmap)
+//                        }
+//
+//                        delay(2000L)
 
 //                        var radius = 75
 //
