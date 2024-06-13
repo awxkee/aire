@@ -45,17 +45,17 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-//                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                                .copy(Bitmap.Config.ARGB_8888, true)
-//////
-//                        scope.launch {
-//                            imagesArray.add(bitmap)
-//                        }
-//
-//                        delay(2000L)
-//
-//                        var radius = 215
+                        val bitmap =
+                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+                                .copy(Bitmap.Config.ARGB_8888, true)
+////
+                        scope.launch {
+                            imagesArray.add(bitmap)
+                        }
+
+                        delay(2000L)
+
+//                        var radius = 75
 //
 //                        var time = measureTimeMillis {
 //                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.CLAMP)
@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity() {
 //                        }
 //                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
 //                        time = measureTimeMillis {
-//                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.REFLECT)
+//                            val image = Aire.stackBlur(bitmap, radius)
 //                            scope.launch {
 //                                imagesArray.add(image)
 //                            }

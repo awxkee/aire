@@ -10,6 +10,66 @@ pub mod android {
     use crate::bitmap_helper::android_bitmap;
 
     #[no_mangle]
+    pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_stackBlurImpl(
+        mut env: JNIEnv,
+        _: jobject,
+        bitmap: jobject,
+        radius: jint,
+    ) -> jobject {
+        if radius <= 0 {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Radius must be more than 0")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
+        match bitmap_info {
+            Ok(mut info) => {
+                libblur::stack_blur(
+                    &mut info.data,
+                    info.stride,
+                    info.width,
+                    info.height,
+                    radius as u32,
+                    FastBlurChannels::Channels4,
+                    ThreadingPolicy::Adaptive,
+                );
+
+                let new_bitmap_r = android_bitmap::create_bitmap(
+                    &mut env,
+                    &info.data,
+                    info.stride,
+                    info.width,
+                    info.height,
+                );
+
+                return match new_bitmap_r {
+                    Ok(new_bitmap) => new_bitmap.as_raw(),
+                    Err(error_message) => {
+                        let clazz = env
+                            .find_class("java/lang/Exception")
+                            .expect("Found exception class");
+                        env.throw_new(clazz, error_message)
+                            .expect("Failed to access JNI");
+                        bitmap
+                    }
+                };
+            }
+            Err(error_message) => {
+                let clazz = env
+                    .find_class("java/lang/Exception")
+                    .expect("Found exception class");
+                env.throw_new(clazz, error_message)
+                    .expect("Failed to access JNI");
+                bitmap
+            }
+        }
+    }
+
+    #[no_mangle]
     pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_boxBlurImpl(
         mut env: JNIEnv,
         _: jobject,

@@ -47,37 +47,6 @@
 
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_stackNativeBlurPipeline(JNIEnv *env, jobject thiz,
-                                                                        jobject bitmap,
-                                                                        jint radius) {
-    try {
-        std::vector<AcquirePixelFormat> formats;
-        formats.insert(formats.begin(), APF_RGBA8888);
-        jobject newBitmap = AcquireBitmapPixels(env,
-                                                bitmap,
-                                                formats,
-                                                false,
-                                                [radius](std::vector<uint8_t> &input, int stride,
-                                                         int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
-                                                    aire::shgStackBlur(input.data(), width, height, radius);
-                                                    return {
-                                                            .data = input,
-                                                            .stride = stride,
-                                                            .width = width,
-                                                            .height = height,
-                                                            .pixelFormat = APF_RGBA8888
-                                                    };
-                                                });
-        return newBitmap;
-    } catch (AireError &err) {
-        std::string msg = err.what();
-        throwException(env, msg);
-        return nullptr;
-    }
-}
-
-extern "C"
-JNIEXPORT jobject JNICALL
 Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_boxBlurPipeline(JNIEnv *env, jobject thiz,
                                                                 jobject bitmap,
                                                                 jint radius) {
