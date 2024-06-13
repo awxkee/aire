@@ -45,46 +45,46 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-                        val bitmap =
-                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-                                .copy(Bitmap.Config.ARGB_8888, true)
-////
-                        scope.launch {
-                            imagesArray.add(bitmap)
-                        }
-
-                        delay(2000L)
-
-                        var radius = 215
-
-                        var time = measureTimeMillis {
-                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.CLAMP)
-                            scope.launch {
-                                imagesArray.add(image)
-                            }
-                        }
-                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
-                        time = measureTimeMillis {
-                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.KERNEL_CLIP)
-                            scope.launch {
-                                imagesArray.add(image)
-                            }
-                        }
-                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
-                        time = measureTimeMillis {
-                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.WRAP)
-                            scope.launch {
-                                imagesArray.add(image)
-                            }
-                        }
-                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
-                        time = measureTimeMillis {
-                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.REFLECT)
-                            scope.launch {
-                                imagesArray.add(image)
-                            }
-                        }
-                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
+//                        val bitmap =
+//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                                .copy(Bitmap.Config.ARGB_8888, true)
+//////
+//                        scope.launch {
+//                            imagesArray.add(bitmap)
+//                        }
+//
+//                        delay(2000L)
+//
+//                        var radius = 215
+//
+//                        var time = measureTimeMillis {
+//                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.CLAMP)
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
+//                        time = measureTimeMillis {
+//                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.KERNEL_CLIP)
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
+//                        time = measureTimeMillis {
+//                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.WRAP)
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
+//                        time = measureTimeMillis {
+//                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.REFLECT)
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
 //
 //                        time = measureTimeMillis {
 //                            val image = Aire.stackBlur(bitmap, radius)
