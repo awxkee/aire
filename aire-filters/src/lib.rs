@@ -7,23 +7,23 @@ pub use surface_type::aire_reformat_surface_u8_to_luva;
 
 mod android_bitmap;
 mod bitmap_helper;
+mod blur;
 mod equalize_hist;
 mod histogram;
-mod surface_type;
 mod hists;
-mod blur;
+mod surface_type;
 
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod android {
     extern crate jni;
 
-    use jni::JNIEnv;
     use jni::objects::JObject;
     use jni::sys::{jint, jobject};
+    use jni::JNIEnv;
     use pic_scale::{
         ImageSize, ImageStore, LabScaler, LinearScaler, LuvScaler, ResamplingFunction, Scaler,
-        Scaling, ThreadingPolicy,
+        Scaling, SigmoidalScaler, ThreadingPolicy,
     };
 
     use crate::android_bitmap::copy_image;
@@ -66,6 +66,7 @@ pub mod android {
             1 => Box::new(LabScaler::new(resampling)),
             2 => Box::new(LinearScaler::new(resampling)),
             3 => Box::new(LuvScaler::new(resampling)),
+            4 => Box::new(SigmoidalScaler::new(resampling)),
             _ => {
                 let clazz = env
                     .find_class("java/lang/Exception")

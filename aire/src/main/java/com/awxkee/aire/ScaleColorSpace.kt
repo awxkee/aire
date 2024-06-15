@@ -34,5 +34,6 @@ enum class ScaleColorSpace(internal val value: Int) {
     SRGB(0),
     LAB(1),
     LINEAR(2),
-    LUV(3)
+    LUV(3),
+    SIGMOIDAL(4),
 }

@@ -53,39 +53,51 @@ class MainActivity : ComponentActivity() {
 //                            imagesArray.add(bitmap)
 //                        }
 //
-//                        delay(2000L)
-
-//                        var radius = 75
+////                        delay(2000L)
 //
+////                        var radius = 75
+////
+////                        var time = measureTimeMillis {
+////                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.CLAMP)
+////                            scope.launch {
+////                                imagesArray.add(image)
+////                            }
+////                        }
+////                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
+////                        time = measureTimeMillis {
+////                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.KERNEL_CLIP)
+////                            scope.launch {
+////                                imagesArray.add(image)
+////                            }
+////                        }
+////                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
 //                        var time = measureTimeMillis {
-//                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.CLAMP)
+//                            val image = Aire.scale(
+//                                bitmap,
+//                                bitmap.width / 4,
+//                                bitmap.height / 4,
+//                                ResizeFunction.EwaRobidoux,
+//                                ScaleColorSpace.SIGMOIDAL
+//                            )
 //                            scope.launch {
 //                                imagesArray.add(image)
 //                            }
 //                        }
-//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
+//                        Log.d("AireMedian", "Blur timing SIGMOIDAL done in ${time}ms")
 //                        time = measureTimeMillis {
-//                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.KERNEL_CLIP)
+//                            val image = Aire.scale(
+//                                bitmap,
+//                                bitmap.width / 4,
+//                                bitmap.height / 4,
+//                                ResizeFunction.EwaRobidoux,
+//                                ScaleColorSpace.LUV
+//                            )
 //                            scope.launch {
 //                                imagesArray.add(image)
 //                            }
 //                        }
-//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
-//                        time = measureTimeMillis {
-//                            val image = Aire.gaussianBlur(bitmap, radius, radius.toFloat() / 6f, EdgeMode.WRAP)
-//                            scope.launch {
-//                                imagesArray.add(image)
-//                            }
-//                        }
-//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
-//                        time = measureTimeMillis {
-//                            val image = Aire.stackBlur(bitmap, radius)
-//                            scope.launch {
-//                                imagesArray.add(image)
-//                            }
-//                        }
-//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
-//
+//                        Log.d("AireMedian", "Blur timing LUV done in ${time}ms")
+////
 //                        time = measureTimeMillis {
 //                            val image = Aire.stackBlur(bitmap, radius)
 //                            scope.launch {

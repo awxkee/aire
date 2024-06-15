@@ -50,18 +50,18 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "colorutils-rs"
-version = "0.2.11"
+version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfdfc58089ac71a9a0922e9509b62802ffce9f067351e35c58e3ceb9a1e76d3a"
+checksum = "83f3edb13b1c70a20cb5bc77e1e3ceecc513eabb09fde143a08bfe7db71d434d"
 dependencies = [
  "half",
 ]
 
 [[package]]
 name = "colorutils-rs"
-version = "0.3.5"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83f3edb13b1c70a20cb5bc77e1e3ceecc513eabb09fde143a08bfe7db71d434d"
+checksum = "134b2dbb079c6b1dc1cccba9cf71b2d7a6d7ffb5db0ed1f50baf3aca4c3f530b"
 dependencies = [
  "half",
 ]
@@ -257,11 +257,11 @@ dependencies = [
 
 [[package]]
 name = "pic-scale"
-version = "0.1.8"
+version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c5ef77e683569f86fe108f478e887d7030c0f8c3f50085388556cff7b67618d"
+checksum = "e4b81066f08aba99900b115bfe67d9c95cb568cf0f183f632ec7ea99fdeddffd"
 dependencies = [
- "colorutils-rs 0.2.11",
+ "colorutils-rs 0.4.1",
  "num-traits",
  "rayon",
 ]
