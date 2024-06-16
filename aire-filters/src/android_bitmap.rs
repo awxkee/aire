@@ -1,8 +1,8 @@
-#[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
-use std::arch::aarch64::*;
 use colorutils_rs::{Rgb565, Rgba, Rgba1010102, ToRgba8};
 use half::f16;
 use num_traits::FromPrimitive;
+#[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+use std::arch::aarch64::*;
 
 #[allow(dead_code)]
 pub fn convert_rgbaf16_to_rgba8888(
@@ -122,10 +122,8 @@ pub fn copy_image<T: FromPrimitive + Copy>(
     components_count: u32,
 ) {
     for y in 0..height as usize {
-        let dst_ptr =
-            unsafe { (dst.as_mut_ptr() as *mut u8).add(y * dst_stride as usize) };
-        let src_ptr =
-            unsafe { (source.as_ptr() as *const u8).add(y * src_stride as usize) };
+        let dst_ptr = unsafe { (dst.as_mut_ptr() as *mut u8).add(y * dst_stride as usize) };
+        let src_ptr = unsafe { (source.as_ptr() as *const u8).add(y * src_stride as usize) };
         let row_length = width as usize * components_count as usize * std::mem::size_of::<T>();
         let mut cx = 0usize;
         #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]

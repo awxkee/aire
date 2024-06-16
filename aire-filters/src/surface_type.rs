@@ -1,7 +1,10 @@
 use std::mem::transmute;
 use std::slice;
 
-use colorutils_rs::{append_alpha, laba_to_srgb, linear_to_rgba, Luv, Rgb, Rgba, rgba_to_laba, rgba_to_linear, TransferFunction};
+use colorutils_rs::{
+    append_alpha, laba_to_srgb, linear_to_rgba, rgba_to_laba, rgba_to_linear, Luv, Rgb, Rgba,
+    TransferFunction,
+};
 
 pub fn reformat_surface_u8_to_linear(
     original: &[u8],
@@ -11,7 +14,15 @@ pub fn reformat_surface_u8_to_linear(
     width: u32,
     height: u32,
 ) {
-    rgba_to_linear(original, src_stride, destination, dst_stride, width, height, TransferFunction::Srgb);
+    rgba_to_linear(
+        original,
+        src_stride,
+        destination,
+        dst_stride,
+        width,
+        height,
+        TransferFunction::Srgb,
+    );
 }
 
 pub fn reformat_surface_linear_to_u8(
@@ -22,7 +33,15 @@ pub fn reformat_surface_linear_to_u8(
     width: u32,
     height: u32,
 ) {
-    linear_to_rgba(src, src_stride, dst, dst_stride, width, height, TransferFunction::Srgb);
+    linear_to_rgba(
+        src,
+        src_stride,
+        dst,
+        dst_stride,
+        width,
+        height,
+        TransferFunction::Srgb,
+    );
 }
 
 #[no_mangle]
@@ -36,8 +55,9 @@ pub extern "C-unwind" fn aire_reformat_surface_u8_to_linear(
     height: u32,
 ) {
     let src_slice = unsafe { slice::from_raw_parts(src, src_stride as usize * height as usize) };
-    let dst_slice =
-        unsafe { slice::from_raw_parts_mut(dst as *mut f32, dst_stride as usize * height as usize) };
+    let dst_slice = unsafe {
+        slice::from_raw_parts_mut(dst as *mut f32, dst_stride as usize * height as usize)
+    };
     reformat_surface_u8_to_linear(src_slice, src_stride, dst_slice, dst_stride, width, height);
 }
 
@@ -71,8 +91,26 @@ pub fn reformat_surface_u8_to_laba(
     let mut alpha_store: Vec<f32> = vec![];
     let alpha_stride = width as usize * std::mem::size_of::<f32>();
     alpha_store.resize(width as usize * height as usize, 0f32);
-    rgba_to_laba(original, src_stride, &mut store, store_stride as u32, &mut alpha_store, alpha_stride as u32, width, height);
-    append_alpha(destination, dst_stride, &store, store_stride as u32, &alpha_store, alpha_stride as u32, width, height);
+    rgba_to_laba(
+        original,
+        src_stride,
+        &mut store,
+        store_stride as u32,
+        &mut alpha_store,
+        alpha_stride as u32,
+        width,
+        height,
+    );
+    append_alpha(
+        destination,
+        dst_stride,
+        &store,
+        store_stride as u32,
+        &alpha_store,
+        alpha_stride as u32,
+        width,
+        height,
+    );
 }
 
 #[no_mangle]
@@ -88,7 +126,14 @@ pub extern "C-unwind" fn aire_reformat_surface_u8_to_laba(
     let src_slice = unsafe { slice::from_raw_parts(src, src_stride as usize * height as usize) };
     let dst_slice =
         unsafe { slice::from_raw_parts_mut(dst as *mut u8, dst_stride as usize * height as usize) };
-    reformat_surface_u8_to_laba(src_slice, src_stride, unsafe { transmute(dst_slice) }, dst_stride, width, height);
+    reformat_surface_u8_to_laba(
+        src_slice,
+        src_stride,
+        unsafe { transmute(dst_slice) },
+        dst_stride,
+        width,
+        height,
+    );
 }
 
 pub fn reformat_surface_laba_to_u8(
@@ -126,7 +171,16 @@ pub fn reformat_surface_laba_to_u8(
         lab_shift += width as usize * 3usize;
     }
 
-    laba_to_srgb(&lab_store, lab_stride as u32, &a_store, width * std::mem::size_of::<f32>() as u32, dst, dst_stride, width, height);
+    laba_to_srgb(
+        &lab_store,
+        lab_stride as u32,
+        &a_store,
+        width * std::mem::size_of::<f32>() as u32,
+        dst,
+        dst_stride,
+        width,
+        height,
+    );
 }
 
 #[no_mangle]
@@ -139,7 +193,8 @@ pub extern "C-unwind" fn aire_reformat_surface_laba_to_u8(
     width: u32,
     height: u32,
 ) {
-    let src_slice = unsafe { slice::from_raw_parts(src as *const u8, src_stride as usize * height as usize) };
+    let src_slice =
+        unsafe { slice::from_raw_parts(src as *const u8, src_stride as usize * height as usize) };
     let dst_slice =
         unsafe { slice::from_raw_parts_mut(dst as *mut u8, dst_stride as usize * height as usize) };
     reformat_surface_laba_to_u8(src_slice, src_stride, dst_slice, dst_stride, width, height);
@@ -163,19 +218,10 @@ pub fn reformat_surface_u8_to_luva(
 
         for x in 0..width as usize {
             let px = x * 4;
-            let src_pixel = Rgb::new(
-                src_slice[px],
-                src_slice[px + 1],
-                src_slice[px + 2],
-            );
+            let src_pixel = Rgb::new(src_slice[px], src_slice[px + 1], src_slice[px + 2]);
             let lab = src_pixel.to_luv();
             let a_f32 = src_slice[px + 3] as f32 / 255f32;
-            let laba_pixel = Rgba::<f32>::new(
-                lab.l,
-                lab.u,
-                lab.v,
-                a_f32,
-            );
+            let laba_pixel = Rgba::<f32>::new(lab.l, lab.u, lab.v, a_f32);
             dst_slice[px] = laba_pixel.r;
             dst_slice[px + 1] = laba_pixel.g;
             dst_slice[px + 2] = laba_pixel.b;
@@ -243,7 +289,8 @@ pub extern "C-unwind" fn aire_reformat_surface_luva_to_u8(
     width: u32,
     height: u32,
 ) {
-    let src_slice = unsafe { slice::from_raw_parts(src as *const u8, src_stride as usize * height as usize) };
+    let src_slice =
+        unsafe { slice::from_raw_parts(src as *const u8, src_stride as usize * height as usize) };
     let dst_slice =
         unsafe { slice::from_raw_parts_mut(dst as *mut u8, dst_stride as usize * height as usize) };
     reformat_surface_luva_to_u8(src_slice, src_stride, dst_slice, dst_stride, width, height);

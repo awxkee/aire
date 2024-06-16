@@ -75,4 +75,8 @@ enum class ResizeFunction(internal val value: Int) {
     EwaLanczos4Sharpest(41),
     EwaLanczosSoft(42),
     HaasnSoft(43),
+    Lagrange2(44),
+    Lagrange3(45),
+    Lanczos6(46),
+    Lanczos6Jinc(47),
 }
