@@ -12,13 +12,13 @@ ndk = "0.9.0"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-colorutils-rs = "0.3.1"
+colorutils-rs = "0.4.5"
 half = "2.4.1"
 histogram_equalization = "0.1.0"
-libblur = "0.10.3"
+libblur = "0.10.12"
 num-traits = "0.2.19"
-pic-scale = "0.1.0"
-yuvutils-rs = "0.2.1"
+pic-scale = "0.1.11"
+yuvutils-rs = "0.3.0"
 
 
 

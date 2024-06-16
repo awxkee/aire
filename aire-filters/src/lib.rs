@@ -18,6 +18,7 @@ mod surface_type;
 pub mod android {
     extern crate jni;
 
+    use colorutils_rs::TransferFunction;
     use jni::objects::JObject;
     use jni::sys::{jint, jobject};
     use jni::JNIEnv;
@@ -68,6 +69,10 @@ pub mod android {
             3 => Box::new(LuvScaler::new(resampling)),
             4 => Box::new(SigmoidalScaler::new(resampling)),
             5 => Box::new(XYZScaler::new(resampling)),
+            6 => Box::new(LinearScaler::new_with_transfer(resampling, TransferFunction::Srgb)),
+            7 => Box::new(LinearScaler::new_with_transfer(resampling, TransferFunction::Rec709)),
+            8 => Box::new(LinearScaler::new_with_transfer(resampling, TransferFunction::Gamma2p2)),
+            9 => Box::new(LinearScaler::new_with_transfer(resampling, TransferFunction::Gamma2p8)),
             _ => {
                 let clazz = env
                     .find_class("java/lang/Exception")

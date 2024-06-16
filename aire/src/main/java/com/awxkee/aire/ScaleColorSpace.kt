@@ -36,5 +36,30 @@ enum class ScaleColorSpace(internal val value: Int) {
     LINEAR(2),
     LUV(3),
     SIGMOIDAL(4),
+
+    /**
+     * XYZ uses sRGB transfer function and D65 observer point
+     */
     XYZ(5),
+
+    /**
+     * Scaling in f32 slower than 8-bit approximation.
+     * sRGB transfer function
+     */
+    LINEAR_F32_SRGB(6),
+    /**
+     * Scaling in f32 slower than 8-bit approximation.
+     * Rec.709 transfer function
+     */
+    LINEAR_F32_REC709(7),
+    /**
+     * Scaling in f32 slower than 8-bit approximation.
+     * Pure gamma 2.2 transfer function
+     */
+    LINEAR_F32_GAMMA_2_2(7),
+    /**
+     * Scaling in f32 slower than 8-bit approximation.
+     * Pure gamma 2.8 transfer function
+     */
+    LINEAR_F32_GAMMA_2_8(8)
 }
