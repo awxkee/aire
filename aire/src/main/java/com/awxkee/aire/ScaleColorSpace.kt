@@ -43,23 +43,28 @@ enum class ScaleColorSpace(internal val value: Int) {
     XYZ(5),
 
     /**
-     * Scaling in f32 slower than 8-bit approximation.
+     * Scaling in linear f32 slower than 8-bit approximation.
      * sRGB transfer function
      */
     LINEAR_F32_SRGB(6),
     /**
-     * Scaling in f32 slower than 8-bit approximation.
+     * Scaling in linear f32 slower than 8-bit approximation.
      * Rec.709 transfer function
      */
     LINEAR_F32_REC709(7),
     /**
-     * Scaling in f32 slower than 8-bit approximation.
+     * Scaling in linear f32 slower than 8-bit approximation.
      * Pure gamma 2.2 transfer function
      */
-    LINEAR_F32_GAMMA_2_2(7),
+    LINEAR_F32_GAMMA_2_2(8),
     /**
-     * Scaling in f32 slower than 8-bit approximation.
+     * Scaling in linear f32 slower than 8-bit approximation.
      * Pure gamma 2.8 transfer function
      */
-    LINEAR_F32_GAMMA_2_8(8)
+    LINEAR_F32_GAMMA_2_8(9),
+
+    /**
+     * CIE LCh color space, scaling in f32
+     */
+    LCH(10),
 }

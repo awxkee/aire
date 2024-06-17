@@ -6,7 +6,7 @@ version = 3
 name = "aire-filters"
 version = "0.1.0"
 dependencies = [
- "colorutils-rs 0.4.6",
+ "colorutils-rs 0.4.8",
  "half",
  "histogram_equalization",
  "jni",
@@ -59,9 +59,9 @@ dependencies = [
 
 [[package]]
 name = "colorutils-rs"
-version = "0.4.6"
+version = "0.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0aba8a8f9e67c261effb0a9654de50edbac52652df28d2c87605cfd5e3b257b7"
+checksum = "3261d108c421af6596bd4f5e28ffcc045c4e95340e6281e3aec0fab4cea161ff"
 dependencies = [
  "half",
 ]
@@ -257,11 +257,11 @@ dependencies = [
 
 [[package]]
 name = "pic-scale"
-version = "0.1.12"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9cf30801e1705edb907d826160e6a6925d28024852a31965166e3ea81602b9b9"
+checksum = "e393c9f2fd5aac4d60351b5a5fd5c89dacbe3add300a7fdef6bebff0a9e5334a"
 dependencies = [
- "colorutils-rs 0.4.6",
+ "colorutils-rs 0.4.8",
  "num-traits",
  "rayon",
 ]
