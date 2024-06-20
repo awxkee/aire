@@ -160,7 +160,9 @@ pub fn copy_image<T: FromPrimitive + Copy>(
         }
         while cx < row_length {
             unsafe {
-                *dst_ptr.add(cx) = *src_ptr.add(cx);
+                dst_ptr
+                    .add(cx)
+                    .write_unaligned(src_ptr.add(cx).read_unaligned());
             }
             cx += 1;
         }
