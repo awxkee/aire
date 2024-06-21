@@ -6,7 +6,7 @@ version = 3
 name = "aire-filters"
 version = "0.1.0"
 dependencies = [
- "colorutils-rs 0.4.8",
+ "colorutils-rs 0.4.9",
  "half",
  "histogram_equalization",
  "jni",
@@ -59,9 +59,9 @@ dependencies = [
 
 [[package]]
 name = "colorutils-rs"
-version = "0.4.8"
+version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3261d108c421af6596bd4f5e28ffcc045c4e95340e6281e3aec0fab4cea161ff"
+checksum = "c5eb3d3bdc06af95fe1e0d6966a99f2989351dbecedd5a32e6d6b43206c5d7ef"
 dependencies = [
  "half",
 ]
@@ -257,11 +257,11 @@ dependencies = [
 
 [[package]]
 name = "pic-scale"
-version = "0.1.15"
+version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ee3e22e9d40fe26cb6cab86b2868e96b812be8a3ce22b039e5c7a949f611f25"
+checksum = "5b06d4c25d27a36b475a88a8103d6231bb7a189be420f327e7eacb847bd7fb58"
 dependencies = [
- "colorutils-rs 0.4.8",
+ "colorutils-rs 0.4.9",
  "num-traits",
  "rayon",
 ]
@@ -277,9 +277,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.85"
+version = "1.0.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22244ce15aa966053a896d1accb3a6e68469b97c7f33f284b99f0d576879fc23"
+checksum = "5e719e8df665df0d1c8fbfd238015744736151d4445ec0836b8e628aae103b77"
 dependencies = [
  "unicode-ident",
 ]
@@ -330,9 +330,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.66"
+version = "2.0.67"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c42f3f41a2de00b01c0aaad383c5a45241efc8b2d1eda5661812fda5f3cdcff5"
+checksum = "ff8655ed1d86f3af4ee3fd3263786bc14245ad17c4c7e85ba7187fb3ae028c90"
 dependencies = [
  "proc-macro2",
  "quote",
