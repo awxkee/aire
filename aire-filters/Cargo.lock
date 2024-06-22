@@ -180,9 +180,9 @@ checksum = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
 
 [[package]]
 name = "libblur"
-version = "0.10.12"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1417d58760872d477d2dda4f75775ead01f4170ad27cf00ff78ea019394137d"
+checksum = "35c5dc1d557506397ca1184e4dd9cb1d9356fa55bd7797d819a96915926daade"
 dependencies = [
  "half",
  "num-traits",
