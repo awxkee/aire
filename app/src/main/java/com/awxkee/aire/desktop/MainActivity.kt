@@ -59,31 +59,6 @@ class MainActivity : ComponentActivity() {
 //                        var radius = 75
 ////
 //                        var time = measureTimeMillis {
-//                            val image = Aire.gaussianBlur(
-//                                bitmap,
-//                                radius * 2 + 1,
-//                                radius.toFloat() * 2 / 6f,
-//                                EdgeMode.CLAMP
-//                            )
-//                            scope.launch {
-//                                imagesArray.add(image)
-//                            }
-//                        }
-//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
-//                        time = measureTimeMillis {
-//                            val image = Aire.linearGaussianBlur(
-//                                bitmap,
-//                                radius * 2 + 1,
-//                                radius.toFloat() * 2 / 6f,
-//                                EdgeMode.KERNEL_CLIP,
-//                                TransferFunction.SRGB
-//                            )
-//                            scope.launch {
-//                                imagesArray.add(image)
-//                            }
-//                        }
-//                        Log.d("AireMedian", "Blur timing linearGaussianBlur done in ${time}ms")
-//                        time = measureTimeMillis {
 //                            val image = Aire.gaussianBoxBlur(
 //                                bitmap,
 //                                radius,
@@ -92,9 +67,31 @@ class MainActivity : ComponentActivity() {
 //                                imagesArray.add(image)
 //                            }
 //                        }
+//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
+//                        time = measureTimeMillis {
+//                            val image = Aire.linearBoxBlur(
+//                                bitmap,
+//                                radius,
+//                                TransferFunction.SRGB,
+//                            )
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        Log.d("AireMedian", "Blur timing linearGaussianBlur done in ${time}ms")
+//                        time = measureTimeMillis {
+//                            val image = Aire.linearTentBlur(
+//                                bitmap,
+//                                radius,
+//                                TransferFunction.SRGB,
+//                            )
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
 //                        Log.d("AireMedian", "Blur timing gaussianBoxBlur done in ${time}ms")
 //                        time = measureTimeMillis {
-//                            val image = Aire.linearStackBlur(
+//                            val image = Aire.linearGaussianBoxBlur(
 //                                bitmap,
 //                                radius,
 //                                TransferFunction.SRGB,

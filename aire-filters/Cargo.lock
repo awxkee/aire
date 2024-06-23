@@ -181,9 +181,9 @@ checksum = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
 
 [[package]]
 name = "libblur"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14c37cc6b7d8cbb6af0f08e9ee28ce3fd9f91d58da7b50c121bfee2516860e6e"
+checksum = "efa880519979b0e1a4e9971afba448e7cb627362fbe5f498dcce2c3f1e0ff9e3"
 dependencies = [
  "colorutils-rs 0.4.10",
  "half",

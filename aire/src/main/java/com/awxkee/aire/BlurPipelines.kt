@@ -186,6 +186,42 @@ interface BlurPipelines {
     ): Bitmap
 
     /**
+     * Box blur averages all pixels to make a blur.
+     * Produces box filter with very noticeable ringing.
+     * Convergence of this function is high so strong box effect appears very fast.
+     * Made in *linear* colorspace.
+     * O(1) complexity, slow.
+     *
+     * @param radius - radius of blurring kernel, almost any size is supported
+     * @param transferFunction - transfer function in linear and its inverse
+     */
+    fun linearBoxBlur(bitmap: Bitmap, radius: Int, transferFunction: TransferFunction): Bitmap
+
+    /**
+     * Tent blur just make 2 passes of box blur as per [Central limit theorem](https://en.wikipedia.org/wiki/Central_limit_theorem).
+     * Produces tent filter with noticeable ringing.
+     * Convergence of this function is high so strong box effect appears very fast.
+     * Made in *linear* colorspace.
+     * O(1) complexity, slow.
+     *
+     * @param radius - radius of blurring kernel, almost any size is supported
+     * @param transferFunction - transfer function in linear and its inverse
+     */
+    fun linearTentBlur(bitmap: Bitmap, radius: Int, transferFunction: TransferFunction): Bitmap
+
+    /**
+     * Gaussian blur just make 3 passes of box blur as per [Central limit theorem](https://en.wikipedia.org/wiki/Central_limit_theorem).
+     * Produces ideal gaussian as stated in [Central limit theorem](https://en.wikipedia.org/wiki/Central_limit_theorem)
+     * Convergence of this function is high so strong box effect appears very fast.
+     * Made in *linear* colorspace.
+     * O(1) complexity, slow.
+     *
+     * @param radius - radius of blurring kernel, almost any size is supported
+     * @param transferFunction - transfer function in linear and its inverse
+     */
+    fun linearGaussianBoxBlur(bitmap: Bitmap, radius: Int, transferFunction: TransferFunction): Bitmap
+
+    /**
      * Tent blur just make 2 passes of box blur as per [Central limit theorem](https://en.wikipedia.org/wiki/Central_limit_theorem).
      * Produces tent filter with noticeable ringing.
      * Convergence of this function is high so strong tent effect appears very fast

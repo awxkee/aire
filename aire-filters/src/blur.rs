@@ -11,6 +11,237 @@ pub mod android {
     use crate::transfer_resolve::param_into_transfer;
 
     #[no_mangle]
+    pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_gaussianBoxBlurLinearImpl(
+        mut env: JNIEnv,
+        _: jobject,
+        bitmap: jobject,
+        radius: jint,
+        transfer: jint,
+    ) -> jobject {
+        if radius <= 0 {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Radius must be more than 0")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        let transfer = match param_into_transfer(transfer) {
+            Ok(transfer) => transfer,
+            Err(err) => {
+                let clazz = env
+                    .find_class("java/lang/Exception")
+                    .expect("Found exception class");
+                env.throw_new(clazz, err.to_string())
+                    .expect("Failed to access JNI");
+                return bitmap;
+            }
+        };
+
+        let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
+        match bitmap_info {
+            Ok(info) => {
+                let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
+                libblur::gaussian_box_blur_in_linear(
+                    &info.data,
+                    info.stride,
+                    &mut dst_vec,
+                    info.stride,
+                    info.width,
+                    info.height,
+                    radius as u32,
+                    FastBlurChannels::Channels4,
+                    ThreadingPolicy::Adaptive,
+                    transfer,
+                );
+
+                let new_bitmap_r = android_bitmap::create_bitmap(
+                    &mut env,
+                    &dst_vec,
+                    info.stride,
+                    info.width,
+                    info.height,
+                );
+
+                return match new_bitmap_r {
+                    Ok(new_bitmap) => new_bitmap.as_raw(),
+                    Err(error_message) => {
+                        let clazz = env
+                            .find_class("java/lang/Exception")
+                            .expect("Found exception class");
+                        env.throw_new(clazz, error_message)
+                            .expect("Failed to access JNI");
+                        bitmap
+                    }
+                };
+            }
+            Err(error_message) => {
+                let clazz = env
+                    .find_class("java/lang/Exception")
+                    .expect("Found exception class");
+                env.throw_new(clazz, error_message)
+                    .expect("Failed to access JNI");
+                bitmap
+            }
+        }
+    }
+
+    #[no_mangle]
+    pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_tentBlurLinearImpl(
+        mut env: JNIEnv,
+        _: jobject,
+        bitmap: jobject,
+        radius: jint,
+        transfer: jint,
+    ) -> jobject {
+        if radius <= 0 {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Radius must be more than 0")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        let transfer = match param_into_transfer(transfer) {
+            Ok(transfer) => transfer,
+            Err(err) => {
+                let clazz = env
+                    .find_class("java/lang/Exception")
+                    .expect("Found exception class");
+                env.throw_new(clazz, err.to_string())
+                    .expect("Failed to access JNI");
+                return bitmap;
+            }
+        };
+
+        let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
+        match bitmap_info {
+            Ok(info) => {
+                let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
+                libblur::tent_blur_in_linear(
+                    &info.data,
+                    info.stride,
+                    &mut dst_vec,
+                    info.stride,
+                    info.width,
+                    info.height,
+                    radius as u32,
+                    FastBlurChannels::Channels4,
+                    ThreadingPolicy::Adaptive,
+                    transfer,
+                );
+
+                let new_bitmap_r = android_bitmap::create_bitmap(
+                    &mut env,
+                    &dst_vec,
+                    info.stride,
+                    info.width,
+                    info.height,
+                );
+
+                return match new_bitmap_r {
+                    Ok(new_bitmap) => new_bitmap.as_raw(),
+                    Err(error_message) => {
+                        let clazz = env
+                            .find_class("java/lang/Exception")
+                            .expect("Found exception class");
+                        env.throw_new(clazz, error_message)
+                            .expect("Failed to access JNI");
+                        bitmap
+                    }
+                };
+            }
+            Err(error_message) => {
+                let clazz = env
+                    .find_class("java/lang/Exception")
+                    .expect("Found exception class");
+                env.throw_new(clazz, error_message)
+                    .expect("Failed to access JNI");
+                bitmap
+            }
+        }
+    }
+
+    #[no_mangle]
+    pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_boxBlurLinearImpl(
+        mut env: JNIEnv,
+        _: jobject,
+        bitmap: jobject,
+        radius: jint,
+        transfer: jint,
+    ) -> jobject {
+        if radius <= 0 {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Radius must be more than 0")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        let transfer = match param_into_transfer(transfer) {
+            Ok(transfer) => transfer,
+            Err(err) => {
+                let clazz = env
+                    .find_class("java/lang/Exception")
+                    .expect("Found exception class");
+                env.throw_new(clazz, err.to_string())
+                    .expect("Failed to access JNI");
+                return bitmap;
+            }
+        };
+
+        let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
+        match bitmap_info {
+            Ok(info) => {
+                let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
+                libblur::box_blur_in_linear(
+                    &info.data,
+                    info.stride,
+                    &mut dst_vec,
+                    info.stride,
+                    info.width,
+                    info.height,
+                    radius as u32,
+                    FastBlurChannels::Channels4,
+                    ThreadingPolicy::Adaptive,
+                    transfer,
+                );
+
+                let new_bitmap_r = android_bitmap::create_bitmap(
+                    &mut env,
+                    &dst_vec,
+                    info.stride,
+                    info.width,
+                    info.height,
+                );
+
+                return match new_bitmap_r {
+                    Ok(new_bitmap) => new_bitmap.as_raw(),
+                    Err(error_message) => {
+                        let clazz = env
+                            .find_class("java/lang/Exception")
+                            .expect("Found exception class");
+                        env.throw_new(clazz, error_message)
+                            .expect("Failed to access JNI");
+                        bitmap
+                    }
+                };
+            }
+            Err(error_message) => {
+                let clazz = env
+                    .find_class("java/lang/Exception")
+                    .expect("Found exception class");
+                env.throw_new(clazz, error_message)
+                    .expect("Failed to access JNI");
+                bitmap
+            }
+        }
+    }
+
+    #[no_mangle]
     pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_gaussianBoxBlurImpl(
         mut env: JNIEnv,
         _: jobject,

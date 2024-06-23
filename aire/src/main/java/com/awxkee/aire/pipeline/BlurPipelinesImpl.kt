@@ -38,6 +38,30 @@ import com.awxkee.aire.TransferFunction
 
 class BlurPipelinesImpl : BlurPipelines {
 
+    override fun linearBoxBlur(
+        bitmap: Bitmap,
+        radius: Int,
+        transferFunction: TransferFunction
+    ): Bitmap {
+        return boxBlurLinearImpl(bitmap, radius, transferFunction.value)
+    }
+
+    override fun linearTentBlur(
+        bitmap: Bitmap,
+        radius: Int,
+        transferFunction: TransferFunction
+    ): Bitmap {
+        return tentBlurLinearImpl(bitmap, radius, transferFunction.value)
+    }
+
+    override fun linearGaussianBoxBlur(
+        bitmap: Bitmap,
+        radius: Int,
+        transferFunction: TransferFunction
+    ): Bitmap {
+        return gaussianBoxBlurLinearImpl(bitmap, radius, transferFunction.value)
+    }
+
     override fun gaussianBoxBlur(bitmap: Bitmap, radius: Int): Bitmap {
         return gaussianBoxBlurImpl(bitmap, radius)
     }
@@ -283,4 +307,14 @@ class BlurPipelinesImpl : BlurPipelines {
     private external fun tentBlurImpl(bitmap: Bitmap, radius: Int): Bitmap
 
     private external fun gaussianBoxBlurImpl(bitmap: Bitmap, radius: Int): Bitmap
+
+    private external fun boxBlurLinearImpl(bitmap: Bitmap, radius: Int, transfer: Int): Bitmap
+
+    private external fun tentBlurLinearImpl(bitmap: Bitmap, radius: Int, transfer: Int): Bitmap
+
+    private external fun gaussianBoxBlurLinearImpl(
+        bitmap: Bitmap,
+        radius: Int,
+        transfer: Int
+    ): Bitmap
 }
