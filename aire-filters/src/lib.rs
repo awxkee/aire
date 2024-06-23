@@ -12,6 +12,7 @@ mod equalize_hist;
 mod histogram;
 mod hists;
 mod surface_type;
+mod transfer_resolve;
 
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]

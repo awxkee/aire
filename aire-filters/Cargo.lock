@@ -6,7 +6,7 @@ version = 3
 name = "aire-filters"
 version = "0.1.0"
 dependencies = [
- "colorutils-rs 0.4.9",
+ "colorutils-rs 0.4.10",
  "half",
  "histogram_equalization",
  "jni",
@@ -59,9 +59,9 @@ dependencies = [
 
 [[package]]
 name = "colorutils-rs"
-version = "0.4.9"
+version = "0.4.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5eb3d3bdc06af95fe1e0d6966a99f2989351dbecedd5a32e6d6b43206c5d7ef"
+checksum = "54f52323799eb46a7b83e1b527066896511cf7345f0165efb0a3d4c1f1507427"
 dependencies = [
  "half",
 ]
@@ -127,6 +127,7 @@ checksum = "6dd08c532ae367adf81c312a4580bc67f1d0fe8bc9c460520283f4c0ff277888"
 dependencies = [
  "cfg-if",
  "crunchy",
+ "num-traits",
 ]
 
 [[package]]
@@ -180,14 +181,21 @@ checksum = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
 
 [[package]]
 name = "libblur"
-version = "0.11.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35c5dc1d557506397ca1184e4dd9cb1d9356fa55bd7797d819a96915926daade"
+checksum = "14c37cc6b7d8cbb6af0f08e9ee28ce3fd9f91d58da7b50c121bfee2516860e6e"
 dependencies = [
+ "colorutils-rs 0.4.10",
  "half",
  "num-traits",
  "rayon",
 ]
+
+[[package]]
+name = "libm"
+version = "0.2.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4ec2a862134d2a7d32d7983ddcdd1c4923530833c9f2ea1a44fc5fa473989058"
 
 [[package]]
 name = "log"
@@ -232,6 +240,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
 dependencies = [
  "autocfg",
+ "libm",
 ]
 
 [[package]]
@@ -261,7 +270,7 @@ version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b06d4c25d27a36b475a88a8103d6231bb7a189be420f327e7eacb847bd7fb58"
 dependencies = [
- "colorutils-rs 0.4.9",
+ "colorutils-rs 0.4.10",
  "num-traits",
  "rayon",
 ]
