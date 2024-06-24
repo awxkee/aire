@@ -6,7 +6,7 @@ version = 3
 name = "aire-filters"
 version = "0.1.0"
 dependencies = [
- "colorutils-rs 0.4.10",
+ "colorutils-rs",
  "half",
  "histogram_equalization",
  "jni",
@@ -15,7 +15,7 @@ dependencies = [
  "ndk-sys",
  "num-traits",
  "pic-scale",
- "yuvutils-rs 0.3.0",
+ "yuvutils-rs",
 ]
 
 [[package]]
@@ -47,15 +47,6 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
-
-[[package]]
-name = "colorutils-rs"
-version = "0.3.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83f3edb13b1c70a20cb5bc77e1e3ceecc513eabb09fde143a08bfe7db71d434d"
-dependencies = [
- "half",
-]
 
 [[package]]
 name = "colorutils-rs"
@@ -138,13 +129,13 @@ checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
 
 [[package]]
 name = "histogram_equalization"
-version = "0.1.4"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a704b192cb4722e20b6aae84d3526911c64b908e9efbf330bdae1b1affbb68e"
+checksum = "183a83655e896d1bd7dbb412a4ce08b9f73a4d6414095b02a076cb1e0116ed70"
 dependencies = [
- "colorutils-rs 0.3.5",
+ "colorutils-rs",
  "num-traits",
- "yuvutils-rs 0.2.7",
+ "yuvutils-rs",
 ]
 
 [[package]]
@@ -181,11 +172,11 @@ checksum = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
 
 [[package]]
 name = "libblur"
-version = "0.2.1"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "efa880519979b0e1a4e9971afba448e7cb627362fbe5f498dcce2c3f1e0ff9e3"
+checksum = "1b927f08adc375f71c6ad12db38113aca079e3f1247b274f7bb18ff29a29ee82"
 dependencies = [
- "colorutils-rs 0.4.10",
+ "colorutils-rs",
  "half",
  "num-traits",
  "rayon",
@@ -270,7 +261,7 @@ version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b06d4c25d27a36b475a88a8103d6231bb7a189be420f327e7eacb847bd7fb58"
 dependencies = [
- "colorutils-rs 0.4.10",
+ "colorutils-rs",
  "num-traits",
  "rayon",
 ]
@@ -339,9 +330,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.67"
+version = "2.0.68"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ff8655ed1d86f3af4ee3fd3263786bc14245ad17c4c7e85ba7187fb3ae028c90"
+checksum = "901fa70d88b9d6c98022e23b4136f9f3e54e4662c3bc1bd1d84a42a9a0f0c1e9"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -557,12 +548,6 @@ checksum = "f593a95398737aeed53e489c785df13f3618e41dbcd6718c6addbf1395aa6876"
 dependencies = [
  "memchr",
 ]
-
-[[package]]
-name = "yuvutils-rs"
-version = "0.2.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2f1b553efe1c2ee6965d3e0272e7a9fbcf36159b2190867d96755b334426a7d"
 
 [[package]]
 name = "yuvutils-rs"

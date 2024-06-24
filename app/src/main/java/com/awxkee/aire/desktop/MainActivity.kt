@@ -59,9 +59,10 @@ class MainActivity : ComponentActivity() {
 //                        var radius = 75
 ////
 //                        var time = measureTimeMillis {
-//                            val image = Aire.gaussianBoxBlur(
+//                            val image = Aire.fastGaussian2Degree(
 //                                bitmap,
 //                                radius,
+//                                EdgeMode.REFLECT,
 //                            )
 //                            scope.launch {
 //                                imagesArray.add(image)
@@ -69,10 +70,11 @@ class MainActivity : ComponentActivity() {
 //                        }
 //                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
 //                        time = measureTimeMillis {
-//                            val image = Aire.linearBoxBlur(
+//                            val image = Aire.linearFastGaussianNext(
 //                                bitmap,
 //                                radius,
 //                                TransferFunction.SRGB,
+//                                EdgeMode.REFLECT,
 //                            )
 //                            scope.launch {
 //                                imagesArray.add(image)

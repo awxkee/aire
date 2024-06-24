@@ -37,8 +37,9 @@ enum class EdgeMode(internal val value: Int) {
     CLAMP(0),
 
     /**
-     *  If kernel goes out of bounds it will be clipped, this is a slightly faster than clamp, however have different visual effects at the edge
-     */
+     **  If kernel goes out of bounds it will be clipped, this is a slightly faster than clamp, however have different visual effects at the edge
+     **  *Only gaussian blur and linear gaussian supporting kernel clip!*
+     **/
     KERNEL_CLIP(1),
 
     /**

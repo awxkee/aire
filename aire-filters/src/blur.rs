@@ -311,12 +311,23 @@ pub mod android {
         bitmap: jobject,
         radius: jint,
         transfer: jint,
+        edge_mode: jint,
     ) -> jobject {
         if radius <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
             env.throw_new(clazz, "Radius must be more than 0")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        let edge_mode: EdgeMode = (edge_mode as usize).into();
+        if edge_mode == EdgeMode::KernelClip {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Kernel clip is not supported in this blur")
                 .expect("Failed to access JNI");
             return bitmap;
         }
@@ -345,6 +356,7 @@ pub mod android {
                     FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
                     transfer,
+                    edge_mode,
                 );
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
@@ -385,12 +397,23 @@ pub mod android {
         bitmap: jobject,
         radius: jint,
         transfer: jint,
+        edge_mode: jint,
     ) -> jobject {
         if radius <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
             env.throw_new(clazz, "Radius must be more than 0")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        let edge_mode: EdgeMode = (edge_mode as usize).into();
+        if edge_mode == EdgeMode::KernelClip {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Kernel clip is not supported in this blur")
                 .expect("Failed to access JNI");
             return bitmap;
         }
@@ -419,6 +442,7 @@ pub mod android {
                     FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
                     transfer,
+                    edge_mode,
                 );
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
@@ -967,12 +991,23 @@ pub mod android {
         _: jobject,
         bitmap: jobject,
         radius: jint,
+        edge_mode: jint,
     ) -> jobject {
         if radius <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
             env.throw_new(clazz, "Radius must be more than 0")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        let edge_mode: EdgeMode = (edge_mode as usize).into();
+        if edge_mode == EdgeMode::KernelClip {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Kernel clip is not supported in this blur")
                 .expect("Failed to access JNI");
             return bitmap;
         }
@@ -988,6 +1023,7 @@ pub mod android {
                     radius as u32,
                     FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
+                    edge_mode,
                 );
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
@@ -1027,12 +1063,23 @@ pub mod android {
         _: jobject,
         bitmap: jobject,
         radius: jint,
+        edge_mode: jint,
     ) -> jobject {
         if radius <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
             env.throw_new(clazz, "Radius must be more than 0")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        let edge_mode: EdgeMode = (edge_mode as usize).into();
+        if edge_mode == EdgeMode::KernelClip {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Kernel clip is not supported in this blur")
                 .expect("Failed to access JNI");
             return bitmap;
         }
@@ -1048,6 +1095,7 @@ pub mod android {
                     radius as u32,
                     FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
+                    edge_mode,
                 );
 
                 let new_bitmap_r = android_bitmap::create_bitmap(

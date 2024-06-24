@@ -132,8 +132,14 @@ interface BlurPipelines {
      *
      * @param radius - blurring radius, blurring radius almost unlimited since transformation is in f32
      * @param transferFunction - transfer function in linear and its inverse
+     * @param edgeMode - Edge handling mode, *Kernel clip* is not supported here!
      */
-    fun linearFastGaussian(bitmap: Bitmap, radius: Int, transferFunction: TransferFunction): Bitmap
+    fun linearFastGaussian(
+        bitmap: Bitmap,
+        radius: Int,
+        transferFunction: TransferFunction,
+        edgeMode: EdgeMode
+    ): Bitmap
 
     /**
      *  Extended Binomial Filter of the Gaussian Blur 3 degree, extended box level, very fast compare to gaussian.
@@ -145,11 +151,13 @@ interface BlurPipelines {
      *
      * @param radius - blurring radius, blurring radius almost unlimited since transformation is in f32
      * @param transferFunction - transfer function in linear and its inverse
+     * @param edgeMode - Edge handling mode, *Kernel clip* is not supported here!
      */
     fun linearFastGaussianNext(
         bitmap: Bitmap,
         radius: Int,
-        transferFunction: TransferFunction
+        transferFunction: TransferFunction,
+        edgeMode: EdgeMode,
     ): Bitmap
 
     /**
@@ -159,8 +167,9 @@ interface BlurPipelines {
      *  O(log(R)) complexity, fast.
      *
      * @param radius - blurring radius, radius ~[1, 319]
+     * @param edgeMode - Edge handling mode, *Kernel clip* is not supported here!
      */
-    fun fastGaussian2Degree(bitmap: Bitmap, radius: Int): Bitmap
+    fun fastGaussian2Degree(bitmap: Bitmap, radius: Int, edgeMode: EdgeMode): Bitmap
 
     /**
      *  Extended Binomial Filter of the Gaussian Blur 3 degree, very fast compare to gaussian.
@@ -169,8 +178,9 @@ interface BlurPipelines {
      *  O(log(R)) complexity, fast.
      *
      * @param radius - blurring radius, radius ~[1, 280]
+     * @param edgeMode - Edge handling mode, *Kernel clip* is not supported here!
      */
-    fun fastGaussian3Degree(bitmap: Bitmap, radius: Int): Bitmap
+    fun fastGaussian3Degree(bitmap: Bitmap, radius: Int, edgeMode: EdgeMode): Bitmap
 
     /**
      *  Extended Binomial Filter of the Gaussian Blur 4 degree, very close level to gaussian,
@@ -219,7 +229,11 @@ interface BlurPipelines {
      * @param radius - radius of blurring kernel, almost any size is supported
      * @param transferFunction - transfer function in linear and its inverse
      */
-    fun linearGaussianBoxBlur(bitmap: Bitmap, radius: Int, transferFunction: TransferFunction): Bitmap
+    fun linearGaussianBoxBlur(
+        bitmap: Bitmap,
+        radius: Int,
+        transferFunction: TransferFunction
+    ): Bitmap
 
     /**
      * Tent blur just make 2 passes of box blur as per [Central limit theorem](https://en.wikipedia.org/wiki/Central_limit_theorem).

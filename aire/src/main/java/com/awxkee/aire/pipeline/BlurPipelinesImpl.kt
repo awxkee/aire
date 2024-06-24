@@ -69,17 +69,19 @@ class BlurPipelinesImpl : BlurPipelines {
     override fun linearFastGaussianNext(
         bitmap: Bitmap,
         radius: Int,
-        transferFunction: TransferFunction
+        transferFunction: TransferFunction,
+        edgeMode: EdgeMode,
     ): Bitmap {
-        return fastGaussianNextLinearImpl(bitmap, radius, transferFunction.value)
+        return fastGaussianNextLinearImpl(bitmap, radius, transferFunction.value, edgeMode.value)
     }
 
     override fun linearFastGaussian(
         bitmap: Bitmap,
         radius: Int,
-        transferFunction: TransferFunction
+        transferFunction: TransferFunction,
+        edgeMode: EdgeMode
     ): Bitmap {
-        return fastGaussianLinearImpl(bitmap, radius, transferFunction.value)
+        return fastGaussianLinearImpl(bitmap, radius, transferFunction.value, edgeMode.value)
     }
 
     override fun linearGaussianBlur(
@@ -185,12 +187,12 @@ class BlurPipelinesImpl : BlurPipelines {
         return medianBlurImpl(bitmap, kernelSize)
     }
 
-    override fun fastGaussian2Degree(bitmap: Bitmap, radius: Int): Bitmap {
-        return fastGaussianImpl(bitmap, radius)
+    override fun fastGaussian2Degree(bitmap: Bitmap, radius: Int, edgeMode: EdgeMode): Bitmap {
+        return fastGaussianImpl(bitmap, radius, edgeMode.value)
     }
 
-    override fun fastGaussian3Degree(bitmap: Bitmap, radius: Int): Bitmap {
-        return fastGaussianNextImpl(bitmap, radius)
+    override fun fastGaussian3Degree(bitmap: Bitmap, radius: Int, edgeMode: EdgeMode): Bitmap {
+        return fastGaussianNextImpl(bitmap, radius, edgeMode.value)
     }
 
     override fun tentBlur(bitmap: Bitmap, radius: Int): Bitmap {
@@ -245,16 +247,21 @@ class BlurPipelinesImpl : BlurPipelines {
         angle: Float
     ): Bitmap
 
-    private external fun fastGaussianImpl(bitmap: Bitmap, radius: Int): Bitmap
+    private external fun fastGaussianImpl(bitmap: Bitmap, radius: Int, edgeMode: Int): Bitmap
 
-    private external fun fastGaussianLinearImpl(bitmap: Bitmap, radius: Int, transfer: Int): Bitmap
+    private external fun fastGaussianLinearImpl(
+        bitmap: Bitmap,
+        radius: Int,
+        transfer: Int,
+        edgeMode: Int
+    ): Bitmap
 
-    private external fun fastGaussianNextImpl(bitmap: Bitmap, radius: Int): Bitmap
+    private external fun fastGaussianNextImpl(bitmap: Bitmap, radius: Int, edgeMode: Int): Bitmap
 
     private external fun fastGaussianNextLinearImpl(
         bitmap: Bitmap,
         radius: Int,
-        transfer: Int
+        transfer: Int, edgeMode: Int
     ): Bitmap
 
     private external fun fastGaussian4DImpl(bitmap: Bitmap, radius: Int): Bitmap
