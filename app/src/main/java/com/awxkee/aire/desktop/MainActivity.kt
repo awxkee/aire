@@ -24,18 +24,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import com.awxkee.aire.Aire
 import com.awxkee.aire.EdgeMode
-import com.awxkee.aire.ResizeFunction
-import com.awxkee.aire.ScaleColorSpace
 import com.awxkee.aire.TransferFunction
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
 import java.util.concurrent.Executors
 import kotlin.system.measureTimeMillis
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -56,19 +54,18 @@ class MainActivity : ComponentActivity() {
 //
 ////                        delay(2000L)
 //
-//                        var radius = 75
+//                        var radius = 77
 ////
 //                        var time = measureTimeMillis {
-//                            val image = Aire.fastGaussian2Degree(
+//                            val image = Aire.stackBlur(
 //                                bitmap,
 //                                radius,
-//                                EdgeMode.REFLECT,
 //                            )
 //                            scope.launch {
 //                                imagesArray.add(image)
 //                            }
 //                        }
-//                        Log.d("AireMedian", "Blur timing gaussianBlur done in ${time}ms")
+//                        Log.d("AireMedian", "Fast blur in ${time}ms")
 //                        time = measureTimeMillis {
 //                            val image = Aire.linearFastGaussianNext(
 //                                bitmap,
