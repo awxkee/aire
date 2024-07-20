@@ -24,6 +24,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import com.awxkee.aire.Aire
 import com.awxkee.aire.EdgeMode
+import com.awxkee.aire.ResizeFunction
+import com.awxkee.aire.ScaleColorSpace
 import com.awxkee.aire.TransferFunction
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -57,9 +59,12 @@ class MainActivity : ComponentActivity() {
 //                        var radius = 77
 ////
 //                        var time = measureTimeMillis {
-//                            val image = Aire.stackBlur(
+//                            val image = Aire.scale(
 //                                bitmap,
-//                                radius,
+//                                bitmap.width / 2,
+//                                bitmap.height / 2,
+//                                ResizeFunction.Lanczos3,
+//                                ScaleColorSpace.OKLAB_GAMMA_2_8,
 //                            )
 //                            scope.launch {
 //                                imagesArray.add(image)

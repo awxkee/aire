@@ -32,6 +32,10 @@ package com.awxkee.aire
 
 enum class ScaleColorSpace(internal val value: Int) {
     SRGB(0),
+
+    /**
+     * CIELAB
+     */
     LAB(1),
     LINEAR(2),
     LUV(3),
@@ -47,16 +51,19 @@ enum class ScaleColorSpace(internal val value: Int) {
      * sRGB transfer function
      */
     LINEAR_F32_SRGB(6),
+
     /**
      * Scaling in linear f32 slower than 8-bit approximation.
      * Rec.709 transfer function
      */
     LINEAR_F32_REC709(7),
+
     /**
      * Scaling in linear f32 slower than 8-bit approximation.
      * Pure gamma 2.2 transfer function
      */
     LINEAR_F32_GAMMA_2_2(8),
+
     /**
      * Scaling in linear f32 slower than 8-bit approximation.
      * Pure gamma 2.8 transfer function
@@ -67,4 +74,28 @@ enum class ScaleColorSpace(internal val value: Int) {
      * CIE LCh color space, scaling in f32
      */
     LCH(10),
+
+    /**
+     * Oklab
+     * sRGB transfer function
+     */
+    OKLAB_SRGB(11),
+
+    /**
+     * Oklab
+     * Rec.709 transfer function
+     */
+    OKLAB_REC709(12),
+
+    /**
+     * Oklab
+     * Pure gamma 2.2 transfer function
+     */
+    OKLAB_GAMMA_2_2(13),
+
+    /**
+     * Oklab
+     * Pure gamma 2.8 transfer function
+     */
+    OKLAB_GAMMA_2_8(14),
 }

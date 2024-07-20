@@ -161,11 +161,14 @@ pub fn reformat_surface_laba_to_u8(
         for x in 0..width as usize {
             let px = x * 4;
             let lx = x * 3;
-            lab_store[lab_shift + lx] = src_slice[px];
-            lab_store[lab_shift + lx + 1] = src_slice[px + 1];
-            lab_store[lab_shift + lx + 2] = src_slice[px + 2];
-            a_store[a_shift + x] = 1f32;
+            unsafe {
+                *lab_store.get_unchecked_mut(lab_shift + lx) = *src_slice.get_unchecked(px);
+                *lab_store.get_unchecked_mut(lab_shift + lx + 1) = *src_slice.get_unchecked(px + 1);
+                *lab_store.get_unchecked_mut(lab_shift + lx + 2) = *src_slice.get_unchecked(px + 2);
+                *a_store.get_unchecked_mut(a_shift + x) = 1f32;
+            }
         }
+
         src_shift += src_stride as usize;
         a_shift += width as usize;
         lab_shift += width as usize * 3usize;
@@ -222,10 +225,12 @@ pub fn reformat_surface_u8_to_luva(
             let lab = src_pixel.to_luv();
             let a_f32 = src_slice[px + 3] as f32 / 255f32;
             let laba_pixel = Rgba::<f32>::new(lab.l, lab.u, lab.v, a_f32);
-            dst_slice[px] = laba_pixel.r;
-            dst_slice[px + 1] = laba_pixel.g;
-            dst_slice[px + 2] = laba_pixel.b;
-            dst_slice[px + 3] = laba_pixel.a;
+            unsafe {
+                *dst_slice.get_unchecked_mut(px) = laba_pixel.r;
+                *dst_slice.get_unchecked_mut(px + 1) = laba_pixel.g;
+                *dst_slice.get_unchecked_mut(px + 2) = laba_pixel.b;
+                *dst_slice.get_unchecked_mut(px + 3) = laba_pixel.a;
+            }
         }
         dst_shift += dst_stride as usize;
         src_shift += src_stride as usize;
@@ -266,13 +271,21 @@ pub fn reformat_surface_luva_to_u8(
 
         for x in 0..width as usize {
             let px = x * 4;
-            let lab = Luv::new(src_slice[px], src_slice[px + 1], src_slice[px + 2]);
-            let rgb_pixel = lab.to_rgb();
-            let alpha = (src_slice[px + 3] * 255f32).min(255f32).max(0f32) as u8;
-            dst_slice[px] = rgb_pixel.r;
-            dst_slice[px + 1] = rgb_pixel.g;
-            dst_slice[px + 2] = rgb_pixel.b;
-            dst_slice[px + 3] = alpha;
+            unsafe {
+                let lab = Luv::new(
+                    *src_slice.get_unchecked(px),
+                    *src_slice.get_unchecked(px + 1),
+                    *src_slice.get_unchecked(px + 2),
+                );
+                let rgb_pixel = lab.to_rgb();
+                let alpha = ((*src_slice.get_unchecked(px + 3)) * 255f32)
+                    .min(255f32)
+                    .max(0f32) as u8;
+                *dst_slice.get_unchecked_mut(px) = rgb_pixel.r;
+                *dst_slice.get_unchecked_mut(px + 1) = rgb_pixel.g;
+                *dst_slice.get_unchecked_mut(px + 2) = rgb_pixel.b;
+                *dst_slice.get_unchecked_mut(px + 3) = alpha;
+            }
         }
         dst_shift += dst_stride as usize;
         src_shift += src_stride as usize;
