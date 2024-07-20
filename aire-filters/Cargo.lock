@@ -50,9 +50,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "colorutils-rs"
-version = "0.4.15"
+version = "0.4.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "24dd0b9389fd1728eda8ce2b3d91c47f6ba9df86acf04136d4f418a5d5cf6851"
+checksum = "b201df8a925ac8519d5b41e38535b2d465ea0f3a9ff535f3c4e2b74039bc7a63"
 dependencies = [
  "erydanos",
  "half",
