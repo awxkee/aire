@@ -24,8 +24,9 @@ pub mod android {
     use jni::sys::{jint, jobject};
     use jni::JNIEnv;
     use pic_scale::{
-        ImageSize, ImageStore, LChScaler, LabScaler, LinearScaler, LuvScaler, OklabScaler,
-        ResamplingFunction, Scaler, Scaling, SigmoidalScaler, ThreadingPolicy, XYZScaler,
+        ImageSize, ImageStore, JzazbzScaler, LChScaler, LabScaler, LinearScaler, LuvScaler,
+        OklabScaler, ResamplingFunction, Scaler, Scaling, SigmoidalScaler, ThreadingPolicy,
+        XYZScaler,
     };
 
     use crate::android_bitmap::copy_image;
@@ -91,6 +92,22 @@ pub mod android {
             12 => Box::new(OklabScaler::new(resampling, TransferFunction::Rec709)),
             13 => Box::new(OklabScaler::new(resampling, TransferFunction::Gamma2p2)),
             14 => Box::new(OklabScaler::new(resampling, TransferFunction::Gamma2p8)),
+            15 => Box::new(JzazbzScaler::new(resampling, 200., TransferFunction::Srgb)),
+            16 => Box::new(JzazbzScaler::new(
+                resampling,
+                200.,
+                TransferFunction::Rec709,
+            )),
+            17 => Box::new(JzazbzScaler::new(
+                resampling,
+                200.,
+                TransferFunction::Gamma2p2,
+            )),
+            18 => Box::new(JzazbzScaler::new(
+                resampling,
+                200.,
+                TransferFunction::Gamma2p8,
+            )),
             _ => {
                 let clazz = env
                     .find_class("java/lang/Exception")

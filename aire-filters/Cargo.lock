@@ -50,9 +50,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "colorutils-rs"
-version = "0.4.16"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b201df8a925ac8519d5b41e38535b2d465ea0f3a9ff535f3c4e2b74039bc7a63"
+checksum = "cab673f9f878bd331eb0e14a8d7bdf780ac086391b0a8fe9582ca52140f1834f"
 dependencies = [
  "erydanos",
  "half",
@@ -139,9 +139,9 @@ checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
 
 [[package]]
 name = "histogram_equalization"
-version = "0.1.5"
+version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "183a83655e896d1bd7dbb412a4ce08b9f73a4d6414095b02a076cb1e0116ed70"
+checksum = "47c3c8d5994ab1ca91f31b13d7552262503bf12fcaa55f1a8d73e2a973f079fd"
 dependencies = [
  "colorutils-rs",
  "num-traits",
@@ -182,9 +182,9 @@ checksum = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
 
 [[package]]
 name = "libblur"
-version = "0.13.0"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd7a1259c3d5d5ae69a81513f8eab2249915eb86c046a3ca6b14bcf987758eec"
+checksum = "52bbe9d0148ef82c28d5e244a3264e4ddf572a021828dd3577dcb4161152f06f"
 dependencies = [
  "colorutils-rs",
  "erydanos",
@@ -268,9 +268,9 @@ dependencies = [
 
 [[package]]
 name = "pic-scale"
-version = "0.1.21"
+version = "0.1.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e13fd80c09bc3b66c35b64c202117899191ee659f6ba5f112c98899b50e770c"
+checksum = "fc0eabb1859d3054e4a8122aedb3f81c9e68d32bab0fd4f2560d1cb4093b5360"
 dependencies = [
  "colorutils-rs",
  "num-traits",
@@ -341,9 +341,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.71"
+version = "2.0.72"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b146dcf730474b4bcd16c311627b31ede9ab149045db4d6088b3becaea046462"
+checksum = "dc4b9b9bf2add8093d3f2c0204471e951b2285580335de42f9d2534f3ae7a8af"
 dependencies = [
  "proc-macro2",
  "quote",

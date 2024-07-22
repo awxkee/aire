@@ -206,6 +206,26 @@ class EffectsPipelineImpl : EffectsPipelines {
         return claheLABImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical, binsCount)
     }
 
+    override fun claheOklab(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        @IntRange(from = 2.toLong()) binsCount: Int
+    ): Bitmap {
+        return claheOKLABImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical, binsCount)
+    }
+
+    override fun claheJzazbz(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        @IntRange(from = 2.toLong()) binsCount: Int
+    ): Bitmap {
+        return claheJZAZBZImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical, binsCount)
+    }
+
     private external fun convexImpl(bitmap: Bitmap, strength: Float): Bitmap
 
     private external fun bokehImpl(
@@ -283,6 +303,22 @@ class EffectsPipelineImpl : EffectsPipelines {
 
 
     private external fun claheLABImpl(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        binsCount: Int,
+    ): Bitmap
+
+    private external fun claheOKLABImpl(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        binsCount: Int,
+    ): Bitmap
+
+    private external fun claheJZAZBZImpl(
         bitmap: Bitmap,
         threshold: Float,
         gridSizeHorizontal: Int,

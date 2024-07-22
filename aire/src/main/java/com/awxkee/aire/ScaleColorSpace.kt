@@ -98,4 +98,28 @@ enum class ScaleColorSpace(internal val value: Int) {
      * Pure gamma 2.8 transfer function
      */
     OKLAB_GAMMA_2_8(14),
+
+    /**
+     * Jzazbz
+     * sRGB transfer function
+     */
+    JZAZBZ_SRGB(15),
+
+    /**
+     * Jzazbz
+     * Rec.709 transfer function
+     */
+    JZAZBZ_REC709(16),
+
+    /**
+     * Jzazbz
+     * Pure gamma 2.2 transfer function
+     */
+    JZAZBZ_GAMMA_2_2(17),
+
+    /**
+     * Jzazbz
+     * Pure gamma 2.8 transfer function
+     */
+    JZAZBZ_GAMMA_2_8(18),
 }

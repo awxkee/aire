@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
 //                                bitmap.width / 2,
 //                                bitmap.height / 2,
 //                                ResizeFunction.Lanczos3,
-//                                ScaleColorSpace.OKLAB_GAMMA_2_8,
+//                                ScaleColorSpace.JZAZBZ_GAMMA_2_8,
 //                            )
 //                            scope.launch {
 //                                imagesArray.add(image)
@@ -72,11 +72,19 @@ class MainActivity : ComponentActivity() {
 //                        }
 //                        Log.d("AireMedian", "Fast blur in ${time}ms")
 //                        time = measureTimeMillis {
-//                            val image = Aire.linearFastGaussianNext(
+//                            val image = Aire.claheOklab(
 //                                bitmap,
-//                                radius,
-//                                TransferFunction.SRGB,
-//                                EdgeMode.REFLECT,
+//                                binsCount = 128
+//                            )
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        time = measureTimeMillis {
+//                            val image = Aire.claheJzazbz(
+//                                bitmap,
+//                                threshold = 0.2f,
+//                                binsCount = 128
 //                            )
 //                            scope.launch {
 //                                imagesArray.add(image)
