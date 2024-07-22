@@ -216,6 +216,16 @@ class EffectsPipelineImpl : EffectsPipelines {
         return claheOKLABImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical, binsCount)
     }
 
+    override fun claheOklch(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        binsCount: Int
+    ): Bitmap {
+        return claheOKLCHImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical, binsCount)
+    }
+
     override fun claheJzazbz(
         bitmap: Bitmap,
         threshold: Float,
@@ -311,6 +321,14 @@ class EffectsPipelineImpl : EffectsPipelines {
     ): Bitmap
 
     private external fun claheOKLABImpl(
+        bitmap: Bitmap,
+        threshold: Float,
+        gridSizeHorizontal: Int,
+        gridSizeVertical: Int,
+        binsCount: Int,
+    ): Bitmap
+
+    private external fun claheOKLCHImpl(
         bitmap: Bitmap,
         threshold: Float,
         gridSizeHorizontal: Int,

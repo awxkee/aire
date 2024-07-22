@@ -50,9 +50,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "colorutils-rs"
-version = "0.5.2"
+version = "0.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cab673f9f878bd331eb0e14a8d7bdf780ac086391b0a8fe9582ca52140f1834f"
+checksum = "317c9284435188cc49bc19e48fb291c3c4be4c3c14746aaff399c0484ae09f69"
 dependencies = [
  "erydanos",
  "half",
@@ -139,9 +139,9 @@ checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
 
 [[package]]
 name = "histogram_equalization"
-version = "0.1.6"
+version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47c3c8d5994ab1ca91f31b13d7552262503bf12fcaa55f1a8d73e2a973f079fd"
+checksum = "b3711224aef570a372e92fe5d1fc3ecbafd94529d30f8bcc406c2b1f53487de0"
 dependencies = [
  "colorutils-rs",
  "num-traits",

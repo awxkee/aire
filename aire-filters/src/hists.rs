@@ -848,6 +848,72 @@ pub mod android {
     }
 
     #[no_mangle]
+    pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_claheOKLCHImpl(
+        mut env: JNIEnv,
+        _: jobject,
+        bitmap: jobject,
+        threshold: jfloat,
+        grid_size_w: jint,
+        grid_size_h: jint,
+        bins_count: jint,
+    ) -> jobject {
+        if grid_size_w <= 0 || grid_size_h <= 0 {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Grid Size zeros or negative is not supported")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
+        match bitmap_info {
+            Ok(info) => {
+                let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
+                clahe_oklch_rgba(
+                    &info.data,
+                    info.stride,
+                    &mut dst_vec,
+                    info.stride,
+                    info.width,
+                    info.height,
+                    threshold,
+                    ClaheGridSize::new(grid_size_w as u32, grid_size_h as u32),
+                    bins_count as usize,
+                );
+
+                let new_bitmap_r = android_bitmap::create_bitmap(
+                    &mut env,
+                    &dst_vec,
+                    info.stride,
+                    info.width,
+                    info.height,
+                );
+
+                return match new_bitmap_r {
+                    Ok(new_bitmap) => new_bitmap.as_raw(),
+                    Err(error_message) => {
+                        let clazz = env
+                            .find_class("java/lang/Exception")
+                            .expect("Found exception class");
+                        env.throw_new(clazz, error_message)
+                            .expect("Failed to access JNI");
+                        bitmap
+                    }
+                };
+            }
+            Err(error_message) => {
+                let clazz = env
+                    .find_class("java/lang/Exception")
+                    .expect("Found exception class");
+                env.throw_new(clazz, error_message)
+                    .expect("Failed to access JNI");
+                bitmap
+            }
+        }
+    }
+
+    #[no_mangle]
     pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_claheJZAZBZImpl(
         mut env: JNIEnv,
         _: jobject,

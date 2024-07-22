@@ -232,6 +232,20 @@ interface EffectsPipelines {
      * @param threshold - negative or positive reasonable values ~-0...+10
      * @throws Exception if horizontal grid or vertical <= 0
      */
+    fun claheOklch(
+        bitmap: Bitmap,
+        @FloatRange(from = 0.01) threshold: Float = 0.5f,
+        gridSizeHorizontal: Int = 8,
+        gridSizeVertical: Int = 8,
+        @IntRange(from = 2) binsCount: Int
+    ): Bitmap
+
+    /**
+     * Clahe for oklab
+     * @param binsCount - Preferable 128
+     * @param threshold - negative or positive reasonable values ~-0...+10
+     * @throws Exception if horizontal grid or vertical <= 0
+     */
     fun claheJzazbz(
         bitmap: Bitmap,
         @FloatRange(from = 0.01) threshold: Float = 0.5f,
