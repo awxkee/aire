@@ -139,9 +139,9 @@ checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
 
 [[package]]
 name = "histogram_equalization"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b3711224aef570a372e92fe5d1fc3ecbafd94529d30f8bcc406c2b1f53487de0"
+checksum = "2920708932cbf56369bba09b68a0812ae5fb66f4e784adde24a7debf26765f48"
 dependencies = [
  "colorutils-rs",
  "num-traits",
@@ -268,9 +268,9 @@ dependencies = [
 
 [[package]]
 name = "pic-scale"
-version = "0.1.22"
+version = "0.1.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc0eabb1859d3054e4a8122aedb3f81c9e68d32bab0fd4f2560d1cb4093b5360"
+checksum = "a693b25404bf7480bbc8cc64290ac39b60afc3e71d2706368a4a03c9c46f5ab1"
 dependencies = [
  "colorutils-rs",
  "num-traits",
