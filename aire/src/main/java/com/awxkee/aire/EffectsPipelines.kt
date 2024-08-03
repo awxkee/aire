@@ -265,4 +265,17 @@ interface EffectsPipelines {
         @IntRange(from = 2) binsCount: Int
     ): Bitmap
 
+    /**
+     * Copies palette from one image to another using statistical method
+     * lαβ best in common other LAB, OKLAB and LUV
+     * @param source - source bitmap
+     * @param destination - destination bitmap
+     * @param colorspace - copying colorspace
+     */
+    fun copyPalette(
+        source: Bitmap,
+        destination: Bitmap,
+        colorSpace: PaletteTransferColorspace
+    ): Bitmap
+
 }

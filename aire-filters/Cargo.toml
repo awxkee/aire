@@ -17,5 +17,6 @@ half = { version = "2.4.1", default-features = true, features = ["std", "alloc",
 histogram_equalization = "0.1.0"
 libblur = "0.13.1"
 num-traits = "0.2.19"
-pic-scale = "0.1.21"
+palette-transfer = "0.1.1"
+pic-scale = "0.2.1"
 yuvutils-rs = "0.3.0"

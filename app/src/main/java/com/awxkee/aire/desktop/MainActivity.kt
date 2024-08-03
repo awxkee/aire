@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import com.awxkee.aire.Aire
 import com.awxkee.aire.EdgeMode
+import com.awxkee.aire.PaletteTransferColorspace
 import com.awxkee.aire.ResizeFunction
 import com.awxkee.aire.ScaleColorSpace
 import com.awxkee.aire.TransferFunction
@@ -48,6 +49,12 @@ class MainActivity : ComponentActivity() {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
+//                                .scaleWith(0.7f)
+//                                .copy(Bitmap.Config.ARGB_8888, true)
+//
+//                        val bitmap1 =
+//                            BitmapFactory.decodeResource(resources, R.drawable.haze)
+//                                .scaleWith(0.6f)
 //                                .copy(Bitmap.Config.ARGB_8888, true)
 ////////
 ////                        scope.launch {
@@ -59,12 +66,40 @@ class MainActivity : ComponentActivity() {
 //                        var radius = 77
 ////
 //                        var time = measureTimeMillis {
-//                            val image = Aire.scale(
+//                            val image = Aire.copyPalette(
 //                                bitmap,
-//                                bitmap.width / 2,
-//                                bitmap.height / 2,
-//                                ResizeFunction.Lanczos3,
-//                                ScaleColorSpace.JZAZBZ_GAMMA_2_8,
+//                                bitmap1,
+//                                PaletteTransferColorspace.LALPHABETA,
+//                            )
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        var time2 = measureTimeMillis {
+//                            val image = Aire.copyPalette(
+//                                bitmap,
+//                                bitmap1,
+//                                PaletteTransferColorspace.LAB,
+//                            )
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        var time3 = measureTimeMillis {
+//                            val image = Aire.copyPalette(
+//                                bitmap,
+//                                bitmap1,
+//                                PaletteTransferColorspace.OKLAB,
+//                            )
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
+//                        var time1 = measureTimeMillis {
+//                            val image = Aire.copyPalette(
+//                                bitmap,
+//                                bitmap1,
+//                                PaletteTransferColorspace.LUV,
 //                            )
 //                            scope.launch {
 //                                imagesArray.add(image)

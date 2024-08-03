@@ -33,6 +33,7 @@ package com.awxkee.aire.pipeline
 import android.graphics.Bitmap
 import androidx.annotation.IntRange
 import com.awxkee.aire.EffectsPipelines
+import com.awxkee.aire.PaletteTransferColorspace
 
 class EffectsPipelineImpl : EffectsPipelines {
 
@@ -236,6 +237,14 @@ class EffectsPipelineImpl : EffectsPipelines {
         return claheJZAZBZImpl(bitmap, threshold, gridSizeHorizontal, gridSizeVertical, binsCount)
     }
 
+    override fun copyPalette(
+        source: Bitmap,
+        destination: Bitmap,
+        colorSpace: PaletteTransferColorspace
+    ): Bitmap {
+        return copyPaletteImpl(source, destination, colorSpace.value)
+    }
+
     private external fun convexImpl(bitmap: Bitmap, strength: Float): Bitmap
 
     private external fun bokehImpl(
@@ -375,6 +384,12 @@ class EffectsPipelineImpl : EffectsPipelines {
         gridSizeHorizontal: Int,
         gridSizeVertical: Int,
         binsCount: Int,
+    ): Bitmap
+
+    private external fun copyPaletteImpl(
+        source: Bitmap,
+        dest: Bitmap,
+        transfer: Int
     ): Bitmap
 
 }

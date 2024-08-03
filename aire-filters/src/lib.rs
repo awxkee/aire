@@ -11,6 +11,7 @@ mod blur;
 mod equalize_hist;
 mod histogram;
 mod hists;
+mod palette;
 mod surface_type;
 mod transfer_resolve;
 
@@ -140,7 +141,8 @@ pub mod android {
             source_buffer,
             bitmap_info.width as usize,
             bitmap_info.height as usize,
-        );
+        )
+        .unwrap();
         let new_size = ImageSize::new(new_width as usize, new_height as usize);
         let new_image_store = scaler.resize_rgba(new_size, source_store, true);
         let bytes = new_image_store.as_bytes();
