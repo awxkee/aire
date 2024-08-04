@@ -269,9 +269,9 @@ dependencies = [
 
 [[package]]
 name = "palette-transfer"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "347ec3c36f40fa6418b3c9f6053e49af4e4b60e24fd8b03c7ee5f73f985c8162"
+checksum = "1524d9a12b3dd33461be79c6fe85202a007b5ee903fc9a0eb6867e39c133902a"
 dependencies = [
  "colorutils-rs",
 ]

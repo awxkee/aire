@@ -69,6 +69,7 @@ class MainActivity : ComponentActivity() {
 //                            val image = Aire.copyPalette(
 //                                bitmap,
 //                                bitmap1,
+//                                1.0f,
 //                                PaletteTransferColorspace.LALPHABETA,
 //                            )
 //                            scope.launch {
@@ -79,6 +80,7 @@ class MainActivity : ComponentActivity() {
 //                            val image = Aire.copyPalette(
 //                                bitmap,
 //                                bitmap1,
+//                                1.0f,
 //                                PaletteTransferColorspace.LAB,
 //                            )
 //                            scope.launch {

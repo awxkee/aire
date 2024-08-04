@@ -240,9 +240,10 @@ class EffectsPipelineImpl : EffectsPipelines {
     override fun copyPalette(
         source: Bitmap,
         destination: Bitmap,
-        colorSpace: PaletteTransferColorspace
+        intensity: Float,
+        colorSpace: PaletteTransferColorspace,
     ): Bitmap {
-        return copyPaletteImpl(source, destination, colorSpace.value)
+        return copyPaletteImpl(source, destination, intensity, colorSpace.value)
     }
 
     private external fun convexImpl(bitmap: Bitmap, strength: Float): Bitmap
@@ -389,7 +390,8 @@ class EffectsPipelineImpl : EffectsPipelines {
     private external fun copyPaletteImpl(
         source: Bitmap,
         dest: Bitmap,
-        transfer: Int
+        intensity: Float,
+        transfer: Int,
     ): Bitmap
 
 }

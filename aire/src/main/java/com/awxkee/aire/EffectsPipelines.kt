@@ -267,7 +267,7 @@ interface EffectsPipelines {
 
     /**
      * Copies palette from one image to another using statistical method
-     * lαβ best in common other LAB, OKLAB and LUV
+     * lαβ best in common over LAB, OKLAB and LUV
      * @param source - source bitmap
      * @param destination - destination bitmap
      * @param colorspace - copying colorspace
@@ -275,7 +275,8 @@ interface EffectsPipelines {
     fun copyPalette(
         source: Bitmap,
         destination: Bitmap,
-        colorSpace: PaletteTransferColorspace
+        intensity: Float,
+        colorSpace: PaletteTransferColorspace,
     ): Bitmap
 
 }

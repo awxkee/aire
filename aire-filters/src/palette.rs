@@ -4,7 +4,7 @@ pub mod android {
     extern crate jni;
 
     use jni::objects::JObject;
-    use jni::sys::{jint, jobject};
+    use jni::sys::{jfloat, jint, jobject};
     use jni::JNIEnv;
     use palette_transfer::{copy_palette_rgba, TransferColorspace};
 
@@ -17,6 +17,7 @@ pub mod android {
         _: jobject,
         source: jobject,
         destination: jobject,
+        intensity: jfloat,
         colorspace: jint,
     ) -> jobject {
         let transfer = match colorspace {
@@ -98,6 +99,7 @@ pub mod android {
             &mut dest_bitmap,
             destination_bitmap_info.width,
             destination_bitmap_info.height,
+            intensity,
             transfer,
         ) {
             let clazz = env
