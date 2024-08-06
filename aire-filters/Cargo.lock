@@ -51,9 +51,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "colorutils-rs"
-version = "0.5.8"
+version = "0.5.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b97f018df38195b9d3649a3e59484252a7fce93c6f2df298cfaca72a9a8bb593"
+checksum = "1e748b823f7a786157bc11a361fd7e36d5182b6139ee44e4499ea0c4fd5e2c15"
 dependencies = [
  "erydanos",
  "half",
@@ -183,9 +183,9 @@ checksum = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
 
 [[package]]
 name = "libblur"
-version = "0.13.1"
+version = "0.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52bbe9d0148ef82c28d5e244a3264e4ddf572a021828dd3577dcb4161152f06f"
+checksum = "cb8b339c73e9c4c775c2ea3328d7106a48e8f7d42113f5c9ee1d21d341946249"
 dependencies = [
  "colorutils-rs",
  "erydanos",
@@ -278,9 +278,9 @@ dependencies = [
 
 [[package]]
 name = "pic-scale"
-version = "0.2.1"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f7141ca27f6e59c21d58195c086b7aa50260fbbc710abe34ab1ca1856eaa923"
+checksum = "86bd18713b0770e4585d8b0d8eaa90633422dd750c0d5407663cae21a71aea14"
 dependencies = [
  "colorutils-rs",
  "num-traits",
