@@ -34,6 +34,7 @@ import android.graphics.Bitmap
 import androidx.annotation.IntRange
 import com.awxkee.aire.BlurPipelines
 import com.awxkee.aire.EdgeMode
+import com.awxkee.aire.GaussianPreciseLevel
 import com.awxkee.aire.TransferFunction
 
 class BlurPipelinesImpl : BlurPipelines {
@@ -121,18 +122,25 @@ class BlurPipelinesImpl : BlurPipelines {
         bitmap: Bitmap,
         kernelSize: Int,
         sigma: Float,
-        edgeMode: EdgeMode
+        edgeMode: EdgeMode,
+        gaussianPreciseLevel: GaussianPreciseLevel
     ): Bitmap {
         if (kernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
         if (sigma < 0) {
-            throw IllegalStateException("Sigma must be more than 0")
+            throw IllegalStateException("Sigma must be more than or equal to 0")
         }
         if (kernelSize % 2 == 0) {
             throw IllegalStateException("Kernel size must be odd")
         }
-        return gaussianBlurImpl(bitmap, kernelSize, sigma, edgeMode.value)
+        return gaussianBlurImpl(
+            bitmap,
+            kernelSize,
+            sigma,
+            edgeMode.value,
+            gaussianPreciseLevel.value
+        )
     }
 
     override fun bilateralBlur(
@@ -285,7 +293,8 @@ class BlurPipelinesImpl : BlurPipelines {
         bitmap: Bitmap,
         radius: Int,
         sigma: Float,
-        kernelMode: Int
+        kernelMode: Int,
+        preciseLevel: Int,
     ): Bitmap
 
     private external fun gaussianBlurLinearImpl(

@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import com.awxkee.aire.Aire
 import com.awxkee.aire.EdgeMode
+import com.awxkee.aire.GaussianPreciseLevel
 import com.awxkee.aire.PaletteTransferColorspace
 import com.awxkee.aire.ResizeFunction
 import com.awxkee.aire.ScaleColorSpace
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
 //                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
 //                                .scaleWith(0.7f)
 //                                .copy(Bitmap.Config.ARGB_8888, true)
-//
+
 //                        val bitmap1 =
 //                            BitmapFactory.decodeResource(resources, R.drawable.haze)
 //                                .scaleWith(0.6f)
@@ -66,11 +67,12 @@ class MainActivity : ComponentActivity() {
 //                        var radius = 77
 ////
 //                        var time = measureTimeMillis {
-//                            val image = Aire.copyPalette(
+//                            val image = Aire.gaussianBlur(
 //                                bitmap,
-//                                bitmap1,
-//                                1.0f,
-//                                PaletteTransferColorspace.LALPHABETA,
+//                                75,
+//                                0f,
+//                                EdgeMode.CLAMP,
+//                                GaussianPreciseLevel.INTEGRAL,
 //                            )
 //                            scope.launch {
 //                                imagesArray.add(image)

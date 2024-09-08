@@ -151,11 +151,6 @@ class BasePipelinesImpl : BasePipelines {
         return toJPEGImpl(bitmap, quality)
     }
 
-    override fun jpegli(bitmap: Bitmap, quality: Int): ByteArray {
-        return compressJpegli(bitmap, quality)
-    }
-
-    private external fun compressJpegli(bitmap: Bitmap, quality: Int): ByteArray
 
     private external fun toJPEGImpl(bitmap: Bitmap, quality: Int): ByteArray
 

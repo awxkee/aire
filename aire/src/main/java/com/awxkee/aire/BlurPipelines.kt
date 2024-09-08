@@ -46,10 +46,16 @@ interface BlurPipelines {
      * O(R) complexity, very slow.
      *
      * @param kernelSize - size of blurring kernel, must be odd, kernel may be almost any reasonable size
-     * @param sigma - controlling kernel flattening level, default (kernelSize / 6), higher sigma creates more flat kernel
+     * @param sigma - controlling kernel flattening level, default 0 ( will compute preferred automatically ), higher sigma creates more flat kernel
      * @param edgeMode - edge controlling mode
      */
-    fun gaussianBlur(bitmap: Bitmap, kernelSize: Int, sigma: Float, edgeMode: EdgeMode): Bitmap
+    fun gaussianBlur(
+        bitmap: Bitmap,
+        kernelSize: Int,
+        sigma: Float = 0f,
+        edgeMode: EdgeMode,
+        gaussianPreciseLevel: GaussianPreciseLevel
+    ): Bitmap
 
     /**
      * Default gaussian blur, [see more](https://en.wikipedia.org/wiki/Gaussian_filter).

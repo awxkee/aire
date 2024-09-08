@@ -103,11 +103,6 @@ interface BasePipelines {
      */
     fun mozjpeg(bitmap: Bitmap, quality: Int = 76): ByteArray
 
-    /**
-     * Jpegli jpeg compression
-     */
-    fun jpegli(bitmap: Bitmap, quality: Int = 76): ByteArray
-
     fun getStructuringKernel(kernelSize: Int): FloatArray {
         val kern = FloatArray(kernelSize * kernelSize) {
             1f

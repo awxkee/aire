@@ -5,7 +5,7 @@
  *  * Copyright (c) 2024 Radzivon Bartoshyk
  *  * aire [https://github.com/awxkee/aire]
  *  *
- *  * Created by Radzivon Bartoshyk on 10/03/24, 6:13 PM
+ *  * Created by Radzivon Bartoshyk on 9/8/24, 6:09 PM
  *  *
  *  * Permission is hereby granted, free of charge, to any person obtaining a copy
  *  * of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,9 @@
  *
  */
 
-#pragma once
+package com.awxkee.aire
 
-namespace aire {
-
+enum class GaussianPreciseLevel(val value: Int) {
+    EXACT(0),
+    INTEGRAL(1),
 }

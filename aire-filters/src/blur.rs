@@ -5,7 +5,7 @@ pub mod android {
 
     use jni::sys::{jfloat, jint, jobject};
     use jni::JNIEnv;
-    use libblur::{EdgeMode, FastBlurChannels, ThreadingPolicy};
+    use libblur::{EdgeMode, FastBlurChannels, GaussianPreciseLevel, ThreadingPolicy};
 
     use crate::bitmap_helper::android_bitmap;
     use crate::transfer_resolve::param_into_transfer;
@@ -813,7 +813,7 @@ pub mod android {
                     info.height,
                 );
 
-                return match new_bitmap_r {
+                match new_bitmap_r {
                     Ok(new_bitmap) => new_bitmap.as_raw(),
                     Err(error_message) => {
                         let clazz = env
@@ -823,7 +823,7 @@ pub mod android {
                             .expect("Failed to access JNI");
                         bitmap
                     }
-                };
+                }
             }
             Err(error_message) => {
                 let clazz = env
@@ -876,7 +876,7 @@ pub mod android {
                     info.height,
                 );
 
-                return match new_bitmap_r {
+                match new_bitmap_r {
                     Ok(new_bitmap) => new_bitmap.as_raw(),
                     Err(error_message) => {
                         let clazz = env
@@ -886,7 +886,7 @@ pub mod android {
                             .expect("Failed to access JNI");
                         bitmap
                     }
-                };
+                }
             }
             Err(error_message) => {
                 let clazz = env
@@ -907,6 +907,7 @@ pub mod android {
         kernel_size: jint,
         sigma: jfloat,
         kernel_mode: jint,
+        precise_level: jint,
     ) -> jobject {
         if kernel_size <= 0 {
             let clazz = env
@@ -926,14 +927,17 @@ pub mod android {
             return bitmap;
         }
 
-        if sigma <= 0f32 {
+        let precise_level = match precise_level {
+            0 => GaussianPreciseLevel::EXACT,
+            1 => GaussianPreciseLevel::INTEGRAL,
+            _ => {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
-            env.throw_new(clazz, "Sigma must be more than 0")
+            env.throw_new(clazz, format!("Unknown approximation level {} was requested", precise_level))
                 .expect("Failed to access JNI");
             return bitmap;
-        }
+        } };
 
         let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
         match bitmap_info {
@@ -952,6 +956,7 @@ pub mod android {
                     FastBlurChannels::Channels4,
                     edge_mode,
                     ThreadingPolicy::Adaptive,
+                    precise_level,
                 );
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
@@ -962,7 +967,7 @@ pub mod android {
                     info.height,
                 );
 
-                return match new_bitmap_r {
+                match new_bitmap_r {
                     Ok(new_bitmap) => new_bitmap.as_raw(),
                     Err(error_message) => {
                         let clazz = env
@@ -972,7 +977,7 @@ pub mod android {
                             .expect("Failed to access JNI");
                         bitmap
                     }
-                };
+                }
             }
             Err(error_message) => {
                 let clazz = env
