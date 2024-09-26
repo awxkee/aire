@@ -51,4 +51,10 @@ enum class EdgeMode(internal val value: Int) {
      *  If filter goes out of bounds image will be replicated with rule fedcba|abcdefgh|hgfedcb
      */
     REFLECT(3),
+
+    /**
+     *  If filter goes out of bounds image will be replicated with rule fedcba|abcdefgh|hgfedcb
+     */
+    REFLECT_101(4),
+
 }

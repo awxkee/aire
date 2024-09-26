@@ -36,8 +36,36 @@ import com.awxkee.aire.AireColorMapper
 import com.awxkee.aire.AirePaletteDithering
 import com.awxkee.aire.AireQuantize
 import com.awxkee.aire.BasePipelines
+import com.awxkee.aire.EdgeMode
+import com.awxkee.aire.MorphOp
+import com.awxkee.aire.MorphOpMode
 
 class BasePipelinesImpl : BasePipelines {
+
+    override fun getBokehKernel(kernelSize: Int, sides: Int): IntArray {
+        return getBokehKernelImpl(kernelSize, sides)
+    }
+
+    override fun morphology(
+        bitmap: Bitmap,
+        morphOp: MorphOp,
+        morphOpMode: MorphOpMode,
+        borderMode: EdgeMode,
+        kernel: IntArray,
+        kernelWidth: Int,
+        kernelHeight: Int
+    ): Bitmap {
+        return morphologyImpl(
+            bitmap,
+            morphOp.value,
+            morphOpMode.value,
+            borderMode.value,
+            kernel,
+            kernelWidth,
+            kernelHeight
+        )
+    }
+
     override fun grayscale(
         bitmap: Bitmap,
         rPrimary: Float,
@@ -45,14 +73,6 @@ class BasePipelinesImpl : BasePipelines {
         bPrimary: Float
     ): Bitmap {
         return grayscalePipeline(bitmap, rPrimary, gPrimary, bPrimary)
-    }
-
-    override fun erode(bitmap: Bitmap, kernelSize: Int): Bitmap {
-        return erodePipeline(bitmap, kernelSize)
-    }
-
-    override fun dilate(bitmap: Bitmap, kernel: FloatArray): Bitmap {
-        return dilatePipeline(bitmap, kernel)
     }
 
     override fun threshold(bitmap: Bitmap, level: Int): Bitmap {
@@ -191,6 +211,8 @@ class BasePipelinesImpl : BasePipelines {
         compressionLevel: Int,
     ): ByteArray
 
+    private external fun getBokehKernelImpl(size: Int, sides: Int): IntArray
+
     private external fun gammaImpl(bitmap: Bitmap, gamma: Float): Bitmap
 
     private external fun unsharpImpl(bitmap: Bitmap, intensity: Float = 1f): Bitmap
@@ -217,9 +239,15 @@ class BasePipelinesImpl : BasePipelines {
 
     private external fun vibrancePipeline(bitmap: Bitmap, vibrance: Float): Bitmap
 
-    private external fun erodePipeline(bitmap: Bitmap, kernelSize: Int): Bitmap
-
-    private external fun dilatePipeline(bitmap: Bitmap, kernel: FloatArray): Bitmap
-
     private external fun thresholdPipeline(bitmap: Bitmap, level: Int): Bitmap
+
+    private external fun morphologyImpl(
+        bitmap: Bitmap,
+        morphOp: Int,
+        morphOpMode: Int,
+        borderMode: Int,
+        kernel: IntArray,
+        kernelWidth: Int,
+        kernelHeight: Int
+    ): Bitmap
 }

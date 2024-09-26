@@ -117,7 +117,7 @@ pub mod android {
             destination_bitmap_info.height,
         );
 
-        return match new_bitmap_r {
+        match new_bitmap_r {
             Ok(new_bitmap) => new_bitmap.as_raw(),
             Err(error_message) => {
                 let clazz = env
@@ -127,6 +127,6 @@ pub mod android {
                     .expect("Failed to access JNI");
                 JObject::null().as_raw()
             }
-        };
+        }
     }
 }

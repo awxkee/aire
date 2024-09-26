@@ -14,6 +14,7 @@ mod hists;
 mod palette;
 mod surface_type;
 mod transfer_resolve;
+mod morph;
 
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]

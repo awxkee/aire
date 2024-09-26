@@ -23,8 +23,12 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import com.awxkee.aire.Aire
+import com.awxkee.aire.AireQuantize
+import com.awxkee.aire.ConvolveKernels
 import com.awxkee.aire.EdgeMode
 import com.awxkee.aire.GaussianPreciseLevel
+import com.awxkee.aire.MorphOp
+import com.awxkee.aire.MorphOpMode
 import com.awxkee.aire.PaletteTransferColorspace
 import com.awxkee.aire.ResizeFunction
 import com.awxkee.aire.ScaleColorSpace
@@ -49,8 +53,7 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.beach_horizon)
-//                                .scaleWith(0.7f)
+//                            BitmapFactory.decodeResource(resources, R.drawable.test_augea)
 //                                .copy(Bitmap.Config.ARGB_8888, true)
 
 //                        val bitmap1 =
@@ -67,12 +70,14 @@ class MainActivity : ComponentActivity() {
 //                        var radius = 77
 ////
 //                        var time = measureTimeMillis {
-//                            val image = Aire.gaussianBlur(
+//                            val kern = Aire.getBokehKernel(35, 9)
+//                            val image = Aire.morphology(
 //                                bitmap,
-//                                75,
-//                                0f,
-//                                EdgeMode.CLAMP,
-//                                GaussianPreciseLevel.INTEGRAL,
+//                                MorphOp.GRADIENT,
+//                                MorphOpMode.RGB,
+//                                EdgeMode.REFLECT,
+//                                kern.map { (it) }.toIntArray(),
+//                                35, 35
 //                            )
 //                            scope.launch {
 //                                imagesArray.add(image)

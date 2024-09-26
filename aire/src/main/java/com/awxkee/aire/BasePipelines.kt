@@ -34,16 +34,36 @@ import android.graphics.Bitmap
 import androidx.annotation.IntRange
 
 interface BasePipelines {
+
+    /**
+     *  Performs morphology on the image
+     *
+     * @param morphOp - See [MorphOp] for more info
+     * @param morphOpMode - See [MorphOpMode] for more info
+     * @param borderMode - Edge handling mode, *Kernel clip* is not supported here!
+     * @param kernel - kernel is arbitrary shaped
+     */
+    fun morphology(
+        bitmap: Bitmap,
+        morphOp: MorphOp,
+        morphOpMode: MorphOpMode,
+        borderMode: EdgeMode,
+        kernel: IntArray,
+        kernelWidth: Int,
+        kernelHeight: Int
+    ): Bitmap
+
+    fun getBokehKernel(
+        @IntRange(from = 3) kernelSize: Int,
+        @IntRange(from = 3) sides: Int = 6,
+    ): IntArray
+
     fun grayscale(
         bitmap: Bitmap,
         rPrimary: Float = 0.299f,
         gPrimary: Float = 0.587f,
         bPrimary: Float = 0.114f
     ): Bitmap
-
-    fun erode(bitmap: Bitmap, kernelSize: Int): Bitmap
-
-    fun dilate(bitmap: Bitmap, kernel: FloatArray): Bitmap
 
     fun threshold(bitmap: Bitmap, @IntRange(from = 0, to = 255) level: Int): Bitmap
 
