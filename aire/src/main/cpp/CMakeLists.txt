@@ -36,9 +36,6 @@ set_target_properties(aire libzlibng PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE
 add_library(libturbojpeg STATIC IMPORTED)
 set_target_properties(${CMAKE_PROJECT_NAME} libturbojpeg PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libturbojpeg.a)
 
-add_library(libfftw STATIC IMPORTED)
-set_target_properties(${CMAKE_PROJECT_NAME} libfftw PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/${ANDROID_ABI}/libfftw3f.a)
-
 add_definitions(-DHWY_COMPILE_ONLY_STATIC -DJC_VORONOI_IMPLEMENTATION)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -64,5 +61,4 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         log
         libzlibng
         libturbojpeg
-        libfftw
         -ljnigraphics)
