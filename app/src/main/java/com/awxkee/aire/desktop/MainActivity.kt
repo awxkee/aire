@@ -55,9 +55,9 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-                        val bitmap =
-                            BitmapFactory.decodeResource(resources, R.drawable.test_augea)
-                                .copy(Bitmap.Config.ARGB_8888, true)
+//                        val bitmap =
+//                            BitmapFactory.decodeResource(resources, R.drawable.test_augea)
+//                                .copy(Bitmap.Config.ARGB_8888, true)
 
 //                        val bitmap1 =
 //                            BitmapFactory.decodeResource(resources, R.drawable.haze)
@@ -72,14 +72,14 @@ class MainActivity : ComponentActivity() {
 //
 //                        var radius = 77
 ////
-                        var time = measureTimeMillis {
-                            val size = 225
-                            val kern = Aire.getBokehConvolutionKernel(size, 7)
-                            val image = Aire.laplacian(bitmap, EdgeMode.CLAMP, Scalar.ZEROS)
-                            scope.launch {
-                                imagesArray.add(image)
-                            }
-                        }
+//                        var time = measureTimeMillis {
+//                            val size = 225
+//                            val kern = Aire.getBokehConvolutionKernel(size, 7)
+//                            val image = Aire.laplacian(bitmap, EdgeMode.CLAMP, Scalar.ZEROS)
+//                            scope.launch {
+//                                imagesArray.add(image)
+//                            }
+//                        }
 //                        var time2 = measureTimeMillis {
 //                            val image = Aire.copyPalette(
 //                                bitmap,
