@@ -32,9 +32,13 @@ package com.awxkee.aire.pipeline
 
 import android.graphics.Bitmap
 import androidx.annotation.IntRange
+import com.awxkee.aire.Aire
 import com.awxkee.aire.BlurPipelines
 import com.awxkee.aire.EdgeMode
 import com.awxkee.aire.GaussianPreciseLevel
+import com.awxkee.aire.KernelShape
+import com.awxkee.aire.MorphOpMode
+import com.awxkee.aire.Scalar
 import com.awxkee.aire.TransferFunction
 
 class BlurPipelinesImpl : BlurPipelines {
@@ -160,10 +164,11 @@ class BlurPipelinesImpl : BlurPipelines {
 
     override fun fastBilateralBlur(
         bitmap: Bitmap,
+        kernelSize: Int,
+        spatialSigma: Float,
         rangeSigma: Float,
-        spatialSigma: Float
     ): Bitmap {
-        return fastBilateralPipeline(bitmap, rangeSigma, spatialSigma)
+        return fastBilateralBlurImpl(bitmap, kernelSize, spatialSigma, rangeSigma)
     }
 
     override fun boxBlur(bitmap: Bitmap, radius: Int): Bitmap {
@@ -235,15 +240,34 @@ class BlurPipelinesImpl : BlurPipelines {
         return zoomBlurImpl(bitmap, kernelSize, sigma, centerX, centerY, strength, angle)
     }
 
-    override fun bokehBlur(
+    override fun motionBlur(
         bitmap: Bitmap,
-        @IntRange(from = 3.toLong()) kernelSize: Int,
-        @IntRange(from = 3.toLong()) sides: Int
+        kernelSize: Int,
+        angle: Float,
+        borderMode: EdgeMode,
+        borderScalar: Scalar
     ): Bitmap {
-        return bokehBlurImpl(bitmap, kernelSize, sides)
+        return motionBlurImpl(bitmap, kernelSize, angle, borderMode.value, borderScalar)
     }
 
-    private external fun bokehBlurImpl(bitmap: Bitmap, kernelSize: Int, sides: Int): Bitmap
+    override fun bokehBlur(
+        bitmap: Bitmap,
+        @IntRange(from = 3) kernelSize: Int,
+        @IntRange(from = 3) sides: Int,
+        edgeMode: EdgeMode,
+        scalar: Scalar,
+        mode: MorphOpMode
+    ): Bitmap {
+        return Aire.convolve2D(bitmap, Aire.getBokehConvolutionKernel(kernelSize, sides), KernelShape(kernelSize, kernelSize), edgeMode, scalar, mode)
+    }
+
+    private external fun motionBlurImpl(
+        bitmap: Bitmap,
+        kernelSize: Int,
+        angle: Float,
+        borderMode: Int,
+        borderScalar: Scalar
+    ): Bitmap
 
     private external fun zoomBlurImpl(
         bitmap: Bitmap,
@@ -283,8 +307,9 @@ class BlurPipelinesImpl : BlurPipelines {
 
     private external fun poissonBlurPipeline(bitmap: Bitmap, radius: Int): Bitmap
 
-    private external fun fastBilateralPipeline(
+    private external fun fastBilateralBlurImpl(
         bitmap: Bitmap,
+        kernelSize: Int,
         radiusSigma: Float,
         spatialSigma: Float
     ): Bitmap

@@ -35,7 +35,6 @@
 #include "MathUtils.hpp"
 #include "base/Convolve1D.h"
 #include "base/Convolve1Db16.h"
-#include "base/Convolve2D.h"
 #include "Eigen/Eigen"
 #include "flat_hash_map.hpp"
 #include "concurrency.hpp"

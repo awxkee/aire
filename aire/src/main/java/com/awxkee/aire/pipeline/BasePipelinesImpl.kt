@@ -32,13 +32,16 @@ package com.awxkee.aire.pipeline
 
 import android.graphics.Bitmap
 import androidx.annotation.IntRange
+import com.awxkee.aire.Aire
 import com.awxkee.aire.AireColorMapper
 import com.awxkee.aire.AirePaletteDithering
 import com.awxkee.aire.AireQuantize
 import com.awxkee.aire.BasePipelines
 import com.awxkee.aire.EdgeMode
+import com.awxkee.aire.KernelShape
 import com.awxkee.aire.MorphOp
 import com.awxkee.aire.MorphOpMode
+import com.awxkee.aire.Scalar
 
 class BasePipelinesImpl : BasePipelines {
 
@@ -51,6 +54,7 @@ class BasePipelinesImpl : BasePipelines {
         morphOp: MorphOp,
         morphOpMode: MorphOpMode,
         borderMode: EdgeMode,
+        borderScalar: Scalar,
         kernel: IntArray,
         kernelWidth: Int,
         kernelHeight: Int
@@ -60,6 +64,7 @@ class BasePipelinesImpl : BasePipelines {
             morphOp.value,
             morphOpMode.value,
             borderMode.value,
+            borderScalar,
             kernel,
             kernelWidth,
             kernelHeight
@@ -100,7 +105,19 @@ class BasePipelinesImpl : BasePipelines {
     }
 
     override fun emboss(bitmap: Bitmap, intensity: Float): Bitmap {
-        return embossImpl(bitmap, intensity)
+        val matrix = floatArrayOf(
+            intensity * -2, -intensity, 0.0f,
+            -intensity, 1.0f, intensity,
+            0.0f, intensity, intensity * 2
+        )
+        return Aire.convolve2D(
+            bitmap,
+            matrix,
+            KernelShape(3, 3),
+            EdgeMode.REFLECT_101,
+            Scalar.ZEROS,
+            MorphOpMode.RGB,
+        )
     }
 
     override fun grain(bitmap: Bitmap, intensity: Float): Bitmap {
@@ -108,7 +125,22 @@ class BasePipelinesImpl : BasePipelines {
     }
 
     override fun sharpness(bitmap: Bitmap, intensity: Float): Bitmap {
-        return sharpnessImpl(bitmap, intensity)
+        var matrix = floatArrayOf(
+            0.0f, -1f, 0f, -1f, 5f, -1f, 0f, -1f, 0f
+        )
+        val sum = matrix.sum()
+        if (sum != 0f) {
+            matrix = matrix.map { it / sum }.toFloatArray()
+        }
+        val sharpened = Aire.convolve2D(
+            bitmap,
+            matrix,
+            KernelShape(3, 3),
+            EdgeMode.REFLECT_101,
+            Scalar.ZEROS,
+            MorphOpMode.RGB,
+        )
+        return sharpnessImpl(sharpened, intensity)
     }
 
     override fun unsharp(bitmap: Bitmap, intensity: Float): Bitmap {
@@ -171,6 +203,9 @@ class BasePipelinesImpl : BasePipelines {
         return toJPEGImpl(bitmap, quality)
     }
 
+    override fun getBokehConvolutionKernel(kernelSize: Int, sides: Int): FloatArray {
+        return getBokehConvolutionKernelImpl(kernelSize, sides)
+    }
 
     private external fun toJPEGImpl(bitmap: Bitmap, quality: Int): ByteArray
 
@@ -213,6 +248,8 @@ class BasePipelinesImpl : BasePipelines {
 
     private external fun getBokehKernelImpl(size: Int, sides: Int): IntArray
 
+    private external fun getBokehConvolutionKernelImpl(size: Int, sides: Int): FloatArray
+
     private external fun gammaImpl(bitmap: Bitmap, gamma: Float): Bitmap
 
     private external fun unsharpImpl(bitmap: Bitmap, intensity: Float = 1f): Bitmap
@@ -220,8 +257,6 @@ class BasePipelinesImpl : BasePipelines {
     private external fun sharpnessImpl(bitmap: Bitmap, intensity: Float = 1f): Bitmap
 
     private external fun grainImpl(bitmap: Bitmap, intensity: Float): Bitmap
-
-    private external fun embossImpl(bitmap: Bitmap, intensity: Float): Bitmap
 
     private external fun colorMatrixImpl(bitmap: Bitmap, colorMatrix: FloatArray): Bitmap
 
@@ -246,6 +281,7 @@ class BasePipelinesImpl : BasePipelines {
         morphOp: Int,
         morphOpMode: Int,
         borderMode: Int,
+        borderScalar: Scalar,
         kernel: IntArray,
         kernelWidth: Int,
         kernelHeight: Int

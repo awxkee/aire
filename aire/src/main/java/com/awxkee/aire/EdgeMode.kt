@@ -37,24 +37,22 @@ enum class EdgeMode(internal val value: Int) {
     CLAMP(0),
 
     /**
-     **  If kernel goes out of bounds it will be clipped, this is a slightly faster than clamp, however have different visual effects at the edge
-     **  *Only gaussian blur and linear gaussian supporting kernel clip!*
-     **/
-    KERNEL_CLIP(1),
-
-    /**
      *  If kernel goes out of bounds it will be clipped, this is a slightly faster than clamp, however have different visual effects at the edge
      */
-    WRAP(2),
+    WRAP(1),
 
     /**
      *  If filter goes out of bounds image will be replicated with rule fedcba|abcdefgh|hgfedcb
      */
-    REFLECT(3),
+    REFLECT(2),
 
     /**
      *  If filter goes out of bounds image will be replicated with rule fedcba|abcdefgh|hgfedcb
      */
-    REFLECT_101(4),
+    REFLECT_101(3),
+    /**
+     *  If filter goes out of bounds image will be replicated with provided constant value, this filter is not everywhere supported
+     */
+    CONSTANT(4),
 
 }

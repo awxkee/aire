@@ -32,9 +32,13 @@ package com.awxkee.aire.pipeline
 
 import android.graphics.Bitmap
 import androidx.annotation.IntRange
+import com.awxkee.aire.EdgeMode
+import com.awxkee.aire.KernelShape
+import com.awxkee.aire.MorphOpMode
 import com.awxkee.aire.ProcessingPipelines
+import com.awxkee.aire.Scalar
 
-class ProcessingPipelinesImpl: ProcessingPipelines {
+class ProcessingPipelinesImpl : ProcessingPipelines {
     override fun removeShadows(
         bitmap: Bitmap,
         @IntRange(from = 3.toLong(), to = 9.toLong()) kernelSize: Int
@@ -46,13 +50,52 @@ class ProcessingPipelinesImpl: ProcessingPipelines {
         return dehazeImpl(bitmap, radius, omega)
     }
 
-    override fun convolve2D(bitmap: Bitmap, kernel: FloatArray): Bitmap {
-        return convolve2DImpl(bitmap, kernel)
+    override fun convolve2D(
+        bitmap: Bitmap,
+        kernel: FloatArray,
+        kernelShape: KernelShape,
+        edgeMode: EdgeMode,
+        scalar: Scalar,
+        mode: MorphOpMode
+    ): Bitmap {
+        return convolve2DImpl(
+            bitmap,
+            kernel,
+            kernelShape.width,
+            kernelShape.height,
+            edgeMode.value,
+            scalar,
+            mode.value
+        )
     }
 
-    private external fun convolve2DImpl(bitmap: Bitmap, kernel: FloatArray): Bitmap
+    override fun sobel(
+        bitmap: Bitmap,
+        edgeMode: EdgeMode,
+        scalar: Scalar,
+    ): Bitmap {
+        return sobelImpl(bitmap, edgeMode.value, scalar)
+    }
 
-    private external fun removeShadowsPipelines(bitmap: Bitmap,  kernelSize: Int): Bitmap
+    override fun laplacian(bitmap: Bitmap, edgeMode: EdgeMode, scalar: Scalar): Bitmap {
+        return laplacianImpl(bitmap, edgeMode.value, scalar)
+    }
+
+    private external fun convolve2DImpl(
+        bitmap: Bitmap,
+        kernel: FloatArray,
+        kernelWidth: Int,
+        kernelHeight: Int,
+        edgeMode: Int,
+        scalar: Scalar,
+        mode: Int,
+    ): Bitmap
+
+    private external fun removeShadowsPipelines(bitmap: Bitmap, kernelSize: Int): Bitmap
 
     private external fun dehazeImpl(bitmap: Bitmap, radius: Int, omega: Float): Bitmap
+
+    private external fun sobelImpl(bitmap: Bitmap, edgeMode: Int, scalar: Scalar): Bitmap
+
+    private external fun laplacianImpl(bitmap: Bitmap, edgeMode: Int, scalar: Scalar): Bitmap
 }

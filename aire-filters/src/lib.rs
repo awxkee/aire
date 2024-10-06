@@ -11,10 +11,11 @@ mod blur;
 mod equalize_hist;
 mod histogram;
 mod hists;
+mod morph;
 mod palette;
 mod surface_type;
 mod transfer_resolve;
-mod morph;
+mod scalar;
 
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]

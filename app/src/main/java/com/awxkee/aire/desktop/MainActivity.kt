@@ -27,10 +27,13 @@ import com.awxkee.aire.AireQuantize
 import com.awxkee.aire.ConvolveKernels
 import com.awxkee.aire.EdgeMode
 import com.awxkee.aire.GaussianPreciseLevel
+import com.awxkee.aire.KernelShape
+import com.awxkee.aire.MorphKernels
 import com.awxkee.aire.MorphOp
 import com.awxkee.aire.MorphOpMode
 import com.awxkee.aire.PaletteTransferColorspace
 import com.awxkee.aire.ResizeFunction
+import com.awxkee.aire.Scalar
 import com.awxkee.aire.ScaleColorSpace
 import com.awxkee.aire.TransferFunction
 import com.awxkee.aire.desktop.ui.theme.AireDesktopTheme
@@ -52,9 +55,9 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-//                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.test_augea)
-//                                .copy(Bitmap.Config.ARGB_8888, true)
+                        val bitmap =
+                            BitmapFactory.decodeResource(resources, R.drawable.test_augea)
+                                .copy(Bitmap.Config.ARGB_8888, true)
 
 //                        val bitmap1 =
 //                            BitmapFactory.decodeResource(resources, R.drawable.haze)
@@ -69,20 +72,14 @@ class MainActivity : ComponentActivity() {
 //
 //                        var radius = 77
 ////
-//                        var time = measureTimeMillis {
-//                            val kern = Aire.getBokehKernel(35, 9)
-//                            val image = Aire.morphology(
-//                                bitmap,
-//                                MorphOp.GRADIENT,
-//                                MorphOpMode.RGB,
-//                                EdgeMode.REFLECT,
-//                                kern.map { (it) }.toIntArray(),
-//                                35, 35
-//                            )
-//                            scope.launch {
-//                                imagesArray.add(image)
-//                            }
-//                        }
+                        var time = measureTimeMillis {
+                            val size = 225
+                            val kern = Aire.getBokehConvolutionKernel(size, 7)
+                            val image = Aire.laplacian(bitmap, EdgeMode.CLAMP, Scalar.ZEROS)
+                            scope.launch {
+                                imagesArray.add(image)
+                            }
+                        }
 //                        var time2 = measureTimeMillis {
 //                            val image = Aire.copyPalette(
 //                                bitmap,

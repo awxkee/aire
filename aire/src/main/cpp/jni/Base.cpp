@@ -37,10 +37,8 @@
 #include "base/Threshold.h"
 #include "base/Erosion.h"
 #include "base/Vibrance.h"
-#include "base/Convolve2D.h"
 #include "base/Grain.h"
 #include "base/Sharpness.h"
-#include "base/Convolve2D.h"
 #include "base/LUT8.h"
 #include "algo/MedianCut.h"
 #include "blur/GaussBlur.h"
@@ -430,45 +428,6 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_colorMatrixImpl(JNIEnv *env, job
 
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_awxkee_aire_pipeline_BasePipelinesImpl_embossImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat intensity) {
-  Eigen::Matrix3f colorMatrix;
-  colorMatrix << intensity * -2, -intensity, 0, -intensity, 1, intensity, 0, intensity, intensity * 2;
-  std::vector<AcquirePixelFormat> formats;
-  try {
-    formats.insert(formats.begin(), APF_RGBA8888);
-    jobject newBitmap = AcquireBitmapPixels(env,
-                                            bitmap,
-                                            formats,
-                                            true,
-                                            [colorMatrix, intensity](
-                                                std::vector<uint8_t> &input, int stride,
-                                                int width, int height,
-                                                AcquirePixelFormat fmt) -> BuiltImagePresentation {
-                                              if (fmt == APF_RGBA8888) {
-                                                aire::Convolve2D convolve2D(colorMatrix);
-                                                convolve2D.convolve(input.data(),
-                                                                    stride,
-                                                                    width,
-                                                                    height);
-                                              }
-                                              return {
-                                                  .data = input,
-                                                  .stride = stride,
-                                                  .width = width,
-                                                  .height = height,
-                                                  .pixelFormat = fmt
-                                              };
-                                            });
-    return newBitmap;
-  } catch (AireError &err) {
-    std::string msg = err.what();
-    throwException(env, msg);
-    return nullptr;
-  }
-}
-
-extern "C"
-JNIEXPORT jobject JNICALL
 Java_com_awxkee_aire_pipeline_BasePipelinesImpl_grainImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat intensity) {
   try {
     std::vector<AcquirePixelFormat> formats;
@@ -521,12 +480,6 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_sharpnessImpl(JNIEnv *env, jobje
                                               if (fmt == APF_RGBA8888) {
                                                 std::vector<uint8_t> sharpen(stride * height);
                                                 std::copy(input.begin(), input.end(), sharpen.begin());
-                                                auto kernel = aire::generateSharpenKernel();
-                                                aire::Convolve2D convolve2D(kernel);
-                                                convolve2D.convolve(sharpen.data(),
-                                                                    stride,
-                                                                    width,
-                                                                    height);
                                                 aire::applySharp(input.data(), sharpen.data(), stride, width, height, intensity);
                                               }
                                               return {
@@ -724,6 +677,55 @@ Java_com_awxkee_aire_pipeline_BasePipelinesImpl_getBokehKernelImpl(JNIEnv *env, 
       return nullptr;
     }
     env->SetIntArrayRegion(result, 0, static_cast<jsize >(passingBy.size()), passingBy.data());
+    return result;
+  } catch (std::bad_alloc &err) {
+    std::string exception = "Not enough memory to create this kernel";
+    throwException(env, exception);
+    return nullptr;
+  }
+}
+
+extern "C"
+JNIEXPORT jfloatArray JNICALL
+Java_com_awxkee_aire_pipeline_BasePipelinesImpl_getBokehConvolutionKernelImpl(JNIEnv *env, jobject thiz, jint size, jint sides) {
+  try {
+    if (size < 3) {
+      std::string msg("Kernel size must be >= 3, but received " + std::to_string(size));
+      throwException(env, msg);
+      return nullptr;
+    }
+    if (sides < 3) {
+      std::string msg("Sides must be >= 3, but received " + std::to_string(sides));
+      throwException(env, msg);
+      return nullptr;
+    }
+
+    auto krn = getBokehEffect(size, sides);
+    auto bokehKernel = krn.cast<float>().eval();
+    auto sigma = std::max(static_cast<float>(bokehKernel.cols()), static_cast<float>(bokehKernel.rows()));
+    const auto center = std::max(static_cast<float>(bokehKernel.cols()), static_cast<float>(bokehKernel.rows())) / 2;
+    for (int i = 0; i < bokehKernel.rows(); ++i) {
+      for (int j = 0; j < bokehKernel.cols(); ++j) {
+        if (bokehKernel(i, j) == 1.f) {
+          const float scale = 1.f / (std::sqrtf(2 * M_PI) * sigma);
+          float distance = (i - center) * (i - center) + (j - center) * (j - center);
+          float value = std::expf(-(distance * distance) / (2.f * sigma * sigma)) * scale;
+          bokehKernel(i, j) = value;
+        }
+      }
+    }
+    float sum = bokehKernel.sum();
+    if (sum != 0.f) {
+      bokehKernel /= sum;
+    }
+
+    jfloatArray result = env->NewFloatArray(static_cast<jsize>(bokehKernel.size()));
+    if (result == nullptr) {
+      std::string memError = "Can't create jint array";
+      throwException(env, memError);
+      return nullptr;
+    }
+    env->SetFloatArrayRegion(result, 0, static_cast<jsize >(bokehKernel.size()), bokehKernel.data());
     return result;
   } catch (std::bad_alloc &err) {
     std::string exception = "Not enough memory to create this kernel";

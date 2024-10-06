@@ -38,8 +38,20 @@ interface ProcessingPipelines {
 
     fun dehaze(bitmap: Bitmap, radius: Int = 17, omega: Float = 0.45f): Bitmap
 
-    /***
-        2D Convolution, only square kernel is supported, Some examples in [ConvolveKernels]
-     ****/
-    fun convolve2D(bitmap: Bitmap, kernel: FloatArray): Bitmap
+    /**
+     * 2D Convolution, only square kernel is supported, Some examples in [ConvolveKernels]
+     * @param mode - Use RGB where if there is no alpha, it is faster
+     **/
+    fun convolve2D(
+        bitmap: Bitmap,
+        kernel: FloatArray,
+        kernelShape: KernelShape,
+        edgeMode: EdgeMode,
+        scalar: Scalar,
+        mode: MorphOpMode
+    ): Bitmap
+
+    fun sobel(bitmap: Bitmap, edgeMode: EdgeMode, scalar: Scalar): Bitmap
+
+    fun laplacian(bitmap: Bitmap, edgeMode: EdgeMode, scalar: Scalar): Bitmap
 }

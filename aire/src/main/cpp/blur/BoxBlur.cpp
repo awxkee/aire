@@ -32,7 +32,6 @@
 #include "hwy/highway.h"
 #include "algo/support-inl.h"
 #include "base/Convolve1Db16.h"
-#include "base/Convolve2D.h"
 #include "base/Convolve1D.h"
 #include "BoxBlur.h"
 #include "Eigen/Eigen"

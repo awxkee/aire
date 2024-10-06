@@ -40,7 +40,8 @@ interface BasePipelines {
      *
      * @param morphOp - See [MorphOp] for more info
      * @param morphOpMode - See [MorphOpMode] for more info
-     * @param borderMode - Edge handling mode, *Kernel clip* is not supported here!
+     * @param borderMode - Edge handling mode
+     * @param borderScalar - If [EdgeMode.CONSTANT] selected then this scalar value be used
      * @param kernel - kernel is arbitrary shaped
      */
     fun morphology(
@@ -48,6 +49,7 @@ interface BasePipelines {
         morphOp: MorphOp,
         morphOpMode: MorphOpMode,
         borderMode: EdgeMode,
+        borderScalar: Scalar,
         kernel: IntArray,
         kernelWidth: Int,
         kernelHeight: Int
@@ -57,6 +59,11 @@ interface BasePipelines {
         @IntRange(from = 3) kernelSize: Int,
         @IntRange(from = 3) sides: Int = 6,
     ): IntArray
+
+    fun getBokehConvolutionKernel(
+        @IntRange(from = 3) kernelSize: Int,
+        @IntRange(from = 3) sides: Int = 6,
+    ): FloatArray
 
     fun grayscale(
         bitmap: Bitmap,

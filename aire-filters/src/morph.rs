@@ -1,7 +1,4 @@
-use fast_morphology::{
-    morphology_rgb, morphology_rgba, BorderMode, ImageSize, KernelShape, MorphExOp,
-    MorphologyThreadingPolicy,
-};
+use fast_morphology::{morphology_rgb, morphology_rgba, BorderMode, ImageSize, KernelShape, MorphExOp, MorphScalar, MorphologyThreadingPolicy};
 
 #[repr(C)]
 #[derive(Copy, Clone, PartialOrd, Eq, PartialEq, Hash, Debug)]
@@ -24,9 +21,10 @@ pub fn morph_op_mode_from_java(value: i32) -> Result<MorphOpMode, String> {
 pub fn border_mode_from_java(value: i32) -> Result<BorderMode, String> {
     match value {
         0 => Ok(BorderMode::Clamp),
-        2 => Ok(BorderMode::Wrap),
-        3 => Ok(BorderMode::Reflect),
-        4 => Ok(BorderMode::Reflect101),
+        1 => Ok(BorderMode::Wrap),
+        2 => Ok(BorderMode::Reflect),
+        3 => Ok(BorderMode::Reflect101),
+        4 => Ok(BorderMode::Constant),
         _ => Err(format!(
             "Value {} is not supported for border mode in morphology",
             value
@@ -60,6 +58,7 @@ pub fn perform_morph(
     se: &[u8],
     se_width: i32,
     se_height: i32,
+    scalar: MorphScalar,
 ) -> Result<Vec<u8>, String> {
     let border_mode = border_mode_from_java(border_mode)?;
     let morph_op_mode = morph_op_mode_from_java(color_mode)?;
@@ -92,6 +91,7 @@ pub fn perform_morph(
                 se,
                 kernel_shape,
                 border_mode,
+                scalar,
                 MorphologyThreadingPolicy::default(),
             )?;
             rgb_image.resize(0, 0);
@@ -117,6 +117,7 @@ pub fn perform_morph(
                 se,
                 kernel_shape,
                 border_mode,
+                scalar,
                 MorphologyThreadingPolicy::default(),
             )?;
             Ok(dst_image)
@@ -129,12 +130,14 @@ pub fn perform_morph(
 pub mod android {
     extern crate jni;
 
+    use fast_morphology::MorphScalar;
     use crate::android_bitmap::copy_image;
     use crate::bitmap_helper::android_bitmap;
     use crate::morph::perform_morph;
     use jni::objects::{JIntArray, JObject};
     use jni::sys::{jint, jintArray, jobject};
     use jni::JNIEnv;
+    use crate::scalar::android::get_scalar_from_java;
 
     #[no_mangle]
     pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_BasePipelinesImpl_morphologyImpl(
@@ -144,6 +147,7 @@ pub mod android {
         morph_op: jint,
         morph_op_mode: jint,
         border_mode: jint,
+        border_constant: jobject,
         kernel: jintArray,
         kernel_width: jint,
         kernel_height: jint,
@@ -197,6 +201,8 @@ pub mod android {
         );
         bitmap_info.data.resize(0, 0);
 
+        let border_scalar = get_scalar_from_java(&mut env, border_constant);
+
         let morph_applied_image = match perform_morph(
             &new_bitmap,
             morph_op,
@@ -207,6 +213,7 @@ pub mod android {
             &reworked_se,
             kernel_width,
             kernel_height,
+            MorphScalar::new(border_scalar.v0, border_scalar.v1, border_scalar.v2, border_scalar.v3),
         ) {
             Ok(img) => img,
             Err(err) => {

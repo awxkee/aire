@@ -28,6 +28,7 @@
  *
  */
 
+#include "Eigen/Eigen"
 #include "BilateralBlur.h"
 #include <vector>
 #include "MathUtils.hpp"

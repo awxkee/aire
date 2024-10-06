@@ -31,7 +31,6 @@
 #include "PoissonBlur.h"
 #include "base/Convolve1D.h"
 #include "base/Convolve1Db16.h"
-#include "base/Convolve2D.h"
 #include "Eigen/Eigen"
 #include <vector>
 #include <random>

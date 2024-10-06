@@ -39,6 +39,9 @@ interface BlurPipelines {
         bitmap: Bitmap,
         @IntRange(from = 3) kernelSize: Int,
         @IntRange(from = 3) sides: Int = 6,
+        edgeMode: EdgeMode,
+        scalar: Scalar,
+        mode: MorphOpMode,
     ): Bitmap
 
     /**
@@ -80,7 +83,17 @@ interface BlurPipelines {
         spatialSigma: Float
     ): Bitmap
 
-    fun fastBilateralBlur(bitmap: Bitmap, rangeSigma: Float, spatialSigma: Float): Bitmap
+    fun fastBilateralBlur(bitmap: Bitmap, kernelSize: Int, spatialSigma: Float, rangeSigma: Float): Bitmap
+
+    /***
+     * Performs motion blur on the image
+     *
+     * @param kernelSize - Kernel size, must be odd!
+     * @param angle - Angle in *degrees*
+     * @param borderMode - See [EdgeMode]
+     * @param borderScalar - See [Scalar]
+     */
+    fun motionBlur(bitmap: Bitmap, kernelSize: Int, angle: Float, borderMode: EdgeMode, borderScalar: Scalar): Bitmap
 
     /**
      * Box blur averages all pixels to make a blur in perceptual colorspace.
