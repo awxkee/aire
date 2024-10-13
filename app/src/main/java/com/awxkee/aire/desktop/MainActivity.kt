@@ -58,12 +58,12 @@ class MainActivity : ComponentActivity() {
 //                        val bitmap =
 //                            BitmapFactory.decodeResource(resources, R.drawable.test_augea)
 //                                .copy(Bitmap.Config.ARGB_8888, true)
-
+//
 //                        val bitmap1 =
 //                            BitmapFactory.decodeResource(resources, R.drawable.haze)
 //                                .scaleWith(0.6f)
 //                                .copy(Bitmap.Config.ARGB_8888, true)
-////////
+//////
 ////                        scope.launch {
 ////                            imagesArray.add(bitmap)
 ////                        }
@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
 //                                bitmap,
 //                                bitmap1,
 //                                1.0f,
-//                                PaletteTransferColorspace.LAB,
+//                                PaletteTransferColorspace.OKLAB,
 //                            )
 //                            scope.launch {
 //                                imagesArray.add(image)

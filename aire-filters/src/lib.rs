@@ -120,7 +120,7 @@ pub mod android {
                 return JObject::default().as_raw();
             }
         };
-        scaler.set_threading_policy(ThreadingPolicy::Single);
+        scaler.set_threading_policy(ThreadingPolicy::Adaptive);
 
         let mut source_buffer = vec![
             0u8;
