@@ -52,9 +52,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "colorutils-rs"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dfb035b553bcc8c0e62c0aa74cde7fa65113de0a3ffa10744d1b198ebc9c1ad3"
+checksum = "77a76c2858e054024f6550841a233633186a7515c95291ff8920c20a5a4ac481"
 dependencies = [
  "erydanos",
  "half",
@@ -117,18 +117,18 @@ checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
 name = "erydanos"
-version = "0.2.15"
+version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d60718e8a3b1adb22e0789c1ff070dfc68ab53a37a1202348ef252d9c836635d"
+checksum = "a47baa8d6403c503aada20928019931ed367ed226ec0916f27c6a0d3af86c559"
 dependencies = [
  "num-traits",
 ]
 
 [[package]]
 name = "fast_morphology"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e1499535fd127107c537d7d56f468b8b65ee6f65a29d870b626a4756295bc01"
+checksum = "dd8da5ab30b76567579a33bf86d35dc13078978997b54e1c007983fbce64716c"
 dependencies = [
  "num-traits",
  "rayon",
@@ -319,9 +319,9 @@ dependencies = [
 
 [[package]]
 name = "pic-scale"
-version = "0.2.11"
+version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0e02a03e0ecf1698281ad9f3deb9e124ddd3c6234e4295907e024d4c75b5338"
+checksum = "a6ace5fa081f247605124163c052214b7656c9737756ce1a9c2901d672594afa"
 dependencies = [
  "colorutils-rs",
  "libc",
@@ -349,9 +349,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.86"
+version = "1.0.87"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e719e8df665df0d1c8fbfd238015744736151d4445ec0836b8e628aae103b77"
+checksum = "b3e4daa0dcf6feba26f985457cdf104d4b4256fc5a09547140f3631bb076b19a"
 dependencies = [
  "unicode-ident",
 ]
@@ -660,6 +660,6 @@ dependencies = [
 
 [[package]]
 name = "yuvutils-rs"
-version = "0.4.7"
+version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97b0c026d402c14683f21eae52b33dd76ba47c548273a7eb526eed5ce2f46b65"
+checksum = "0d2fe648c571cb93ae8db3bdc0274e5c4e76fbbc6a73496967716a4bb3aae8dc"

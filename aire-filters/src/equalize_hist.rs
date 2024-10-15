@@ -14,11 +14,11 @@ pub enum EqualizeHistogramChannels {
 
 impl From<u8> for EqualizeHistogramChannels {
     fn from(value: u8) -> Self {
-        return match value {
+        match value {
             0 => Channels3,
             1 => Channels4,
             _ => panic!("Not implemented"),
-        };
+        }
     }
 }
 
@@ -38,7 +38,7 @@ pub fn minmax(slice: &[u64]) -> (u64, u64) {
         }
         i += 1;
     }
-    return (min_value, max_value);
+    (min_value, max_value)
 }
 
 pub fn cdf(arr: &mut [u64]) {
