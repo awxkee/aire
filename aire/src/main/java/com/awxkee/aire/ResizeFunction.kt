@@ -79,4 +79,5 @@ enum class ResizeFunction(internal val value: Int) {
     Lagrange3(45),
     Lanczos6(46),
     Lanczos6Jinc(47),
+    Area(48),
 }

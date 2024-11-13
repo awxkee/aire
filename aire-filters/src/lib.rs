@@ -13,9 +13,10 @@ mod histogram;
 mod hists;
 mod morph;
 mod palette;
+mod scalar;
 mod surface_type;
 mod transfer_resolve;
-mod scalar;
+mod tonemap;
 
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
@@ -146,9 +147,9 @@ pub mod android {
         )
         .unwrap();
         let new_size = ImageSize::new(new_width as usize, new_height as usize);
-        let new_image_store = scaler.resize_rgba(new_size, source_store, true);
+        let new_image_store = scaler.resize_rgba(new_size, source_store, false).unwrap();
         let bytes = new_image_store.as_bytes();
-        return match android_bitmap::create_bitmap(
+        match android_bitmap::create_bitmap(
             &mut env,
             &bytes,
             new_size.width as u32 * 4,
@@ -161,8 +162,8 @@ pub mod android {
                     .find_class("java/lang/Exception")
                     .expect("Found exception class");
                 env.throw_new(clazz, error).expect("Failed to access JNI");
-                return JObject::default().as_raw();
+                JObject::default().as_raw()
             }
-        };
+        }
     }
 }

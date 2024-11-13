@@ -88,8 +88,8 @@ class BasePipelinesImpl : BasePipelines {
         return vibrancePipeline(bitmap, vibrance)
     }
 
-    override fun saturation(bitmap: Bitmap, saturation: Float): Bitmap {
-        return saturationImpl(bitmap, saturation)
+    override fun saturation(bitmap: Bitmap, saturation: Float, tonemap: Boolean): Bitmap {
+        return saturationImpl(bitmap, saturation, tonemap)
     }
 
     override fun contrast(bitmap: Bitmap, gain: Float): Bitmap {
@@ -270,7 +270,7 @@ class BasePipelinesImpl : BasePipelines {
         bPrimary: Float
     ): Bitmap
 
-    private external fun saturationImpl(bitmap: Bitmap, saturation: Float): Bitmap
+    private external fun saturationImpl(bitmap: Bitmap, saturation: Float, tonemap: Boolean): Bitmap
 
     private external fun vibrancePipeline(bitmap: Bitmap, vibrance: Float): Bitmap
 

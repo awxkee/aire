@@ -332,41 +332,6 @@ Java_com_awxkee_aire_pipeline_TonePipelinesImpl_whiteBalanceImpl(JNIEnv *env, jo
 
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_awxkee_aire_pipeline_BasePipelinesImpl_saturationImpl(JNIEnv *env, jobject thiz, jobject bitmap, jfloat saturation) {
-    try {
-        std::vector<AcquirePixelFormat> formats;
-        formats.insert(formats.begin(), APF_RGBA8888);
-        jobject newBitmap = AcquireBitmapPixels(env,
-                                                bitmap,
-                                                formats,
-                                                true,
-                                                [saturation](
-                                                        std::vector<uint8_t> &input, int stride,
-                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
-                                                    if (fmt == APF_RGBA8888) {
-                                                        aire::saturation(input.data(),
-                                                                           stride, width,
-                                                                           height,
-                                                                           saturation);
-                                                    }
-                                                    return {
-                                                            .data = input,
-                                                            .stride = stride,
-                                                            .width = width,
-                                                            .height = height,
-                                                            .pixelFormat = fmt
-                                                    };
-                                                });
-        return newBitmap;
-    } catch (AireError &err) {
-        std::string msg = err.what();
-        throwException(env, msg);
-        return nullptr;
-    }
-}
-
-extern "C"
-JNIEXPORT jobject JNICALL
 Java_com_awxkee_aire_pipeline_TonePipelinesImpl_mobiusImpl(JNIEnv *env, jobject thiz,
                                                            jobject bitmap,
                                                            jfloat exposure,

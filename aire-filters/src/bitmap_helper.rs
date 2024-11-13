@@ -131,7 +131,7 @@ pub mod android_bitmap {
             return Err("Can't unlock bitmap pixels".parse().unwrap());
         }
 
-        return Ok(bitmap_info);
+        Ok(bitmap_info)
     }
 
     pub fn create_bitmap<'a>(

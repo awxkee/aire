@@ -31,6 +31,7 @@
 package com.awxkee.aire
 
 import android.graphics.Bitmap
+import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 
 interface BasePipelines {
@@ -76,7 +77,19 @@ interface BasePipelines {
 
     fun vibrance(bitmap: Bitmap, vibrance: Float): Bitmap
 
-    fun saturation(bitmap: Bitmap, saturation: Float = 1f): Bitmap
+    /**
+     *  Performs saturation on the image
+     *
+     *  Turn on tone mapping on big values positive, or negative to compress colors in visible range
+     */
+    fun saturation(
+        bitmap: Bitmap,
+        @FloatRange(
+            from = Double.NEGATIVE_INFINITY,
+            to = Double.POSITIVE_INFINITY
+        ) saturation: Float = 1f,
+        tonemap: Boolean,
+    ): Bitmap
 
     fun contrast(bitmap: Bitmap, gain: Float = 1.0f): Bitmap
 
