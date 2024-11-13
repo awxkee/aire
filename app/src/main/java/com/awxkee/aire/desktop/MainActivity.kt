@@ -53,9 +53,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val bitmap0 =
-            BitmapFactory.decodeResource(resources, R.drawable.test_augea)
-                .copy(Bitmap.Config.ARGB_8888, true)
+//        val bitmap0 =
+//            BitmapFactory.decodeResource(resources, R.drawable.test_augea)
+//                .copy(Bitmap.Config.ARGB_8888, true)
         setContent {
             AireDesktopTheme {
                 val scope = rememberCoroutineScope()
