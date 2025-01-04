@@ -15,8 +15,8 @@ mod morph;
 mod palette;
 mod scalar;
 mod surface_type;
-mod transfer_resolve;
 mod tonemap;
+mod transfer_resolve;
 
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
@@ -28,9 +28,9 @@ pub mod android {
     use jni::sys::{jint, jobject};
     use jni::JNIEnv;
     use pic_scale::{
-        ImageSize, ImageStore, JzazbzScaler, LChScaler, LabScaler, LinearScaler, LuvScaler,
-        OklabScaler, ResamplingFunction, Scaler, Scaling, SigmoidalScaler, ThreadingPolicy,
-        XYZScaler,
+        ImageSize, ImageStore, ImageStoreMut, JzazbzScaler, LChScaler, LabScaler, LinearScaler,
+        LuvScaler, OklabScaler, ResamplingFunction, Scaler, Scaling, SigmoidalScaler,
+        ThreadingPolicy, XYZScaler,
     };
 
     use crate::android_bitmap::copy_image;
@@ -147,8 +147,11 @@ pub mod android {
         )
         .unwrap();
         let new_size = ImageSize::new(new_width as usize, new_height as usize);
-        let new_image_store = scaler.resize_rgba(new_size, source_store, false).unwrap();
-        let bytes = new_image_store.as_bytes();
+        let mut new_store = ImageStoreMut::<u8, 4>::alloc(new_size.width, new_size.height);
+        scaler
+            .resize_rgba(&source_store, &mut new_store, false)
+            .unwrap();
+        let bytes = new_store.as_bytes();
         match android_bitmap::create_bitmap(
             &mut env,
             &bytes,

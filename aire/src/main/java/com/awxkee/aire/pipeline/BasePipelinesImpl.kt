@@ -124,23 +124,31 @@ class BasePipelinesImpl : BasePipelines {
         return grainImpl(bitmap, intensity)
     }
 
-    override fun sharpness(bitmap: Bitmap, intensity: Float): Bitmap {
-        var matrix = floatArrayOf(
-            0.0f, -1f, 0f, -1f, 5f, -1f, 0f, -1f, 0f
-        )
+    override fun sharpness(bitmap: Bitmap, kernelSize: Int): Bitmap {
+        fun generateSharpeningKernel(size: Int): FloatArray {
+            require(size % 2 == 1) { "Kernel size must be odd." } // Ensure size is odd
+
+            val kernel = FloatArray(size * size) { -1.0f } // Fill with -1.0
+            val centerIndex = (size * size) / 2
+            kernel[centerIndex] = (2 * size - 1).toFloat() // Set center value
+
+            return kernel
+        }
+
+        var matrix = generateSharpeningKernel(kernelSize)
         val sum = matrix.sum()
         if (sum != 0f) {
-            matrix = matrix.map { it / sum }.toFloatArray()
+            val recpec = 1f / sum
+            matrix = matrix.map { it * recpec }.toFloatArray()
         }
-        val sharpened = Aire.convolve2D(
+        return Aire.convolve2D(
             bitmap,
             matrix,
-            KernelShape(3, 3),
+            KernelShape(kernelSize, kernelSize),
             EdgeMode.REFLECT_101,
             Scalar.ZEROS,
             MorphOpMode.RGB,
         )
-        return sharpnessImpl(sharpened, intensity)
     }
 
     override fun unsharp(bitmap: Bitmap, intensity: Float): Bitmap {

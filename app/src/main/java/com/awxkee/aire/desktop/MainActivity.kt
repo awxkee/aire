@@ -65,8 +65,9 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
 //                        val bitmap =
-//                            BitmapFactory.decodeResource(resources, R.drawable.test_augea)
+//                            BitmapFactory.decodeResource(resources, R.drawable.haze)
 //                                .copy(Bitmap.Config.ARGB_8888, true)
+//                                .scaleWith(0.4f)
 //
 ////                        val bitmap1 =
 ////                            BitmapFactory.decodeResource(resources, R.drawable.haze)
@@ -82,35 +83,36 @@ class MainActivity : ComponentActivity() {
 ////                        var radius = 77
 //////
 //                        var time = measureTimeMillis {
-//                            val image = Aire.saturation(bitmap, 1.1f, true)
+//                            val image = Aire.scale(bitmap, 500, 500, ResizeFunction.Lanczos3, ScaleColorSpace.SRGB)
 //                            scope.launch {
 //                                imagesArray.add(image)
 //                            }
 //                        }
+//                        Log.d("MainActivity", "Exec time $time")
                     }
                 })
 //                var sliderValue by remember { mutableFloatStateOf(100f) }  // Initial value of the slider
 //
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
-//                ) {
-//                    Column(modifier = Modifier.fillMaxWidth()) {
-//                        LazyColumn(
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                        ) {
-//                            items(imagesArray.count(), key = {
-//                                return@items UUID.randomUUID().toString()
-//                            }) {
-//                                Image(
-//                                    bitmap = imagesArray[it].asImageBitmap(),
-//                                    modifier = Modifier.fillMaxWidth(),
-//                                    contentScale = ContentScale.FillWidth,
-//                                    contentDescription = "ok"
-//                                )
-//                            }
-//                        }
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            items(imagesArray.count(), key = {
+                                return@items UUID.randomUUID().toString()
+                            }) {
+                                Image(
+                                    bitmap = imagesArray[it].asImageBitmap(),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentScale = ContentScale.FillWidth,
+                                    contentDescription = "ok"
+                                )
+                            }
+                        }
 //
 //                        Slider(
 //                            value = sliderValue,
@@ -126,8 +128,8 @@ class MainActivity : ComponentActivity() {
 //                            },
 //                            valueRange = 0f..1000f  // Defines the min and max range of the slider
 //                        )
-//                    }
-//                }
+                    }
+                }
             }
         }
     }

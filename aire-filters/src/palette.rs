@@ -7,12 +7,11 @@ pub mod android {
     use jni::objects::JObject;
     use jni::sys::{jfloat, jint, jobject};
     use jni::JNIEnv;
-    use num_traits::Float;
     use palette_transfer::{copy_palette_rgba, TransferColorspace};
 
     use crate::android_bitmap::copy_image;
     use crate::bitmap_helper::android_bitmap;
-    use crate::tonemap::{aces_hill, uncharted2_filmic};
+    use crate::tonemap::aces_hill;
 
     #[no_mangle]
     pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_EffectsPipelineImpl_copyPaletteImpl(

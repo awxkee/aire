@@ -1423,7 +1423,7 @@ pub mod android {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
-            env.throw_new(clazz, "Kernel dimensions do not matches provided kernel")
+            env.throw_new(clazz, "Kernel dimensions does not match provided kernel")
                 .expect("Failed to access JNI");
             return bitmap;
         }

@@ -99,7 +99,7 @@ interface BasePipelines {
 
     fun grain(bitmap: Bitmap, intensity: Float = 0.75f): Bitmap
 
-    fun sharpness(bitmap: Bitmap, intensity: Float = 1f): Bitmap
+    fun sharpness(bitmap: Bitmap, kernelSize: Int): Bitmap
 
     fun unsharp(bitmap: Bitmap, intensity: Float = 1f): Bitmap
 
