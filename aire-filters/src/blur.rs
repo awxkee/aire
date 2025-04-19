@@ -11,17 +11,18 @@ pub mod android {
     use jni::sys::{jfloat, jfloatArray, jint, jobject};
     use jni::JNIEnv;
     use libblur::{
-        EdgeMode, FastBlurChannels, GaussianPreciseLevel, ImageSize, KernelShape, ThreadingPolicy,
+        BlurImage, BlurImageMut, BufferStore, ConvolutionMode, EdgeMode, FastBlurChannels,
+        ImageSize, KernelShape, ThreadingPolicy,
     };
     #[no_mangle]
     pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_gaussianBoxBlurLinearImpl(
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        radius: jint,
+        sigma: jfloat,
         transfer: jint,
     ) -> jobject {
-        if radius <= 0 {
+        if sigma <= 0. {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -46,18 +47,31 @@ pub mod android {
         match bitmap_info {
             Ok(info) => {
                 let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
+
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::gaussian_box_blur_in_linear(
-                    &info.data,
-                    info.stride,
-                    &mut dst_vec,
-                    info.stride,
-                    info.width,
-                    info.height,
-                    radius as u32,
-                    FastBlurChannels::Channels4,
+                    &src_image,
+                    &mut dst_image,
+                    sigma,
                     ThreadingPolicy::Adaptive,
                     transfer,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -95,10 +109,10 @@ pub mod android {
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        radius: jint,
+        sigma: jfloat,
         transfer: jint,
     ) -> jobject {
-        if radius <= 0 {
+        if sigma <= 0. {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -123,18 +137,28 @@ pub mod android {
         match bitmap_info {
             Ok(info) => {
                 let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
                 libblur::tent_blur_in_linear(
-                    &info.data,
-                    info.stride,
-                    &mut dst_vec,
-                    info.stride,
-                    info.width,
-                    info.height,
-                    radius as u32,
-                    FastBlurChannels::Channels4,
+                    &src_image,
+                    &mut dst_image,
+                    sigma,
                     ThreadingPolicy::Adaptive,
                     transfer,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -200,18 +224,31 @@ pub mod android {
         match bitmap_info {
             Ok(info) => {
                 let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
+
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::box_blur_in_linear(
-                    &info.data,
-                    info.stride,
-                    &mut dst_vec,
-                    info.stride,
-                    info.width,
-                    info.height,
+                    &src_image,
+                    &mut dst_image,
                     radius as u32,
-                    FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
                     transfer,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -249,9 +286,9 @@ pub mod android {
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        radius: jint,
+        sigma: jfloat,
     ) -> jobject {
-        if radius <= 0 {
+        if sigma <= 0. {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -264,17 +301,30 @@ pub mod android {
         match bitmap_info {
             Ok(info) => {
                 let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
+
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::gaussian_box_blur(
-                    &info.data,
-                    info.stride,
-                    &mut dst_vec,
-                    info.stride,
-                    info.width,
-                    info.height,
-                    radius as u32,
-                    FastBlurChannels::Channels4,
+                    &src_image,
+                    &mut dst_image,
+                    sigma,
                     ThreadingPolicy::Adaptive,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -350,17 +400,22 @@ pub mod android {
         let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
         match bitmap_info {
             Ok(mut info) => {
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::fast_gaussian_next_in_linear(
-                    &mut info.data,
-                    info.stride,
-                    info.width,
-                    info.height,
+                    &mut dst_image,
                     radius as u32,
-                    FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
                     transfer,
                     edge_mode,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -436,17 +491,22 @@ pub mod android {
         let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
         match bitmap_info {
             Ok(mut info) => {
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::fast_gaussian_in_linear(
-                    &mut info.data,
-                    info.stride,
-                    info.width,
-                    info.height,
+                    &mut dst_image,
                     radius as u32,
-                    FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
                     transfer,
                     edge_mode,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -533,20 +593,33 @@ pub mod android {
             Ok(info) => {
                 let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
                 let edge_mode: EdgeMode = (kernel_mode as usize).into();
+
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::gaussian_blur_in_linear(
-                    &info.data,
-                    info.stride,
-                    &mut dst_vec,
-                    info.stride,
-                    info.width,
-                    info.height,
+                    &src_image,
+                    &mut dst_image,
                     kernel_size as u32,
                     sigma,
-                    FastBlurChannels::Channels4,
                     edge_mode,
                     ThreadingPolicy::Adaptive,
                     transfer,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -611,16 +684,21 @@ pub mod android {
         let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
         match bitmap_info {
             Ok(mut info) => {
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::stack_blur_in_linear(
-                    &mut info.data,
-                    info.stride,
-                    info.width,
-                    info.height,
+                    &mut dst_image,
                     radius as u32,
-                    FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
                     transfer,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -672,15 +750,16 @@ pub mod android {
         let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
         match bitmap_info {
             Ok(mut info) => {
-                libblur::stack_blur(
-                    &mut info.data,
-                    info.stride,
-                    info.width,
-                    info.height,
-                    radius as u32,
-                    FastBlurChannels::Channels4,
-                    ThreadingPolicy::Adaptive,
-                );
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                libblur::stack_blur(&mut dst_image, radius as u32, ThreadingPolicy::Adaptive)
+                    .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -733,17 +812,30 @@ pub mod android {
         match bitmap_info {
             Ok(info) => {
                 let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
+
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::box_blur(
-                    &info.data,
-                    info.stride,
-                    &mut dst_vec,
-                    info.stride,
-                    info.width,
-                    info.height,
+                    &src_image,
+                    &mut dst_image,
                     kernel_size as u32,
-                    FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -781,9 +873,9 @@ pub mod android {
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        radius: jint,
+        sigma: jfloat,
     ) -> jobject {
-        if radius <= 0 {
+        if sigma <= 0. {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -796,17 +888,25 @@ pub mod android {
         match bitmap_info {
             Ok(info) => {
                 let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
-                libblur::tent_blur(
-                    &info.data,
-                    info.stride,
-                    &mut dst_vec,
-                    info.stride,
-                    info.width,
-                    info.height,
-                    radius as u32,
-                    FastBlurChannels::Channels4,
-                    ThreadingPolicy::Adaptive,
-                );
+
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                libblur::tent_blur(&src_image, &mut dst_image, sigma, ThreadingPolicy::Adaptive)
+                    .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -859,17 +959,30 @@ pub mod android {
         match bitmap_info {
             Ok(info) => {
                 let mut dst_vec: Vec<u8> = vec![0u8; info.stride as usize * info.height as usize];
+
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::median_blur(
-                    &info.data,
-                    info.stride,
-                    &mut dst_vec,
-                    info.stride,
-                    info.width,
-                    info.height,
+                    &src_image,
+                    &mut dst_image,
                     radius as u32,
-                    FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -931,8 +1044,8 @@ pub mod android {
         }
 
         let precise_level = match precise_level {
-            0 => GaussianPreciseLevel::EXACT,
-            1 => GaussianPreciseLevel::INTEGRAL,
+            0 => ConvolutionMode::Exact,
+            1 => ConvolutionMode::FixedPoint,
             _ => {
                 let clazz = env
                     .find_class("java/lang/Exception")
@@ -967,18 +1080,33 @@ pub mod android {
                 let mut dst_vec: Vec<u8> =
                     vec![0u8; info.width as usize * 4 * info.height as usize];
                 let edge_mode: EdgeMode = (edge_mode as usize).into();
+
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::gaussian_blur(
-                    &info.data,
-                    &mut dst_vec,
-                    info.width,
-                    info.height,
+                    &src_image,
+                    &mut dst_image,
                     kernel_size as u32,
                     sigma,
-                    FastBlurChannels::Channels4,
                     edge_mode,
                     ThreadingPolicy::Adaptive,
                     precise_level,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -1041,16 +1169,21 @@ pub mod android {
         let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
         match bitmap_info {
             Ok(mut info) => {
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::fast_gaussian(
-                    &mut info.data,
-                    info.stride,
-                    info.width,
-                    info.height,
+                    &mut dst_image,
                     radius as u32,
-                    FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
                     edge_mode,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -1113,16 +1246,21 @@ pub mod android {
         let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
         match bitmap_info {
             Ok(mut info) => {
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::fast_gaussian_next(
-                    &mut info.data,
-                    info.stride,
-                    info.width,
-                    info.height,
+                    &mut dst_image,
                     radius as u32,
-                    FastBlurChannels::Channels4,
                     ThreadingPolicy::Adaptive,
                     edge_mode,
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -1198,33 +1336,33 @@ pub mod android {
         let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
         match bitmap_info {
             Ok(mut info) => {
-                let mut new_bitmap = vec![0u8; info.height as usize * info.width as usize * 4];
-                copy_image::<u8>(
-                    &info.data,
-                    info.stride,
-                    &mut new_bitmap,
-                    (info.width as usize * 4) as u32,
-                    info.width,
-                    info.height,
-                    4u32,
-                );
-                info.data.resize(0, 0);
-
                 let mut bilateral_dst_image =
                     vec![0u8; info.height as usize * info.width as usize * 4];
 
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut bilateral_dst_image),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.width * 4,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::fast_bilateral_filter(
-                    &new_bitmap,
-                    &mut bilateral_dst_image,
-                    info.width,
-                    info.height,
+                    &src_image,
+                    &mut dst_image,
                     kernel_size as u32,
                     spatial_sigma,
                     range_sigma,
-                    FastBlurChannels::Channels4,
-                );
-
-                new_bitmap.resize(0, 0);
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -1293,34 +1431,37 @@ pub mod android {
         let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
         match bitmap_info {
             Ok(info) => {
-                let mut src_vec = vec![0u8; info.width as usize * 4 * info.height as usize];
-
-                for (src_chunk, dst_chunk) in info
-                    .data
-                    .chunks_exact(info.stride as usize)
-                    .zip(src_vec.chunks_exact_mut(4 * info.width as usize))
-                {
-                    for (src_layout, dst_layout) in src_chunk.iter().zip(dst_chunk.iter_mut()) {
-                        *dst_layout = *src_layout;
-                    }
-                }
-
                 let mut dst_vec: Vec<u8> =
                     vec![0u8; info.width as usize * 4 * info.height as usize];
 
                 let scalar = get_scalar_from_java(&mut env, border_scalar);
 
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&info.data),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.stride,
+                    channels: FastBlurChannels::Channels4,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.width * 4,
+                    channels: FastBlurChannels::Channels4,
+                };
+
                 libblur::motion_blur(
-                    &src_vec,
-                    &mut dst_vec,
-                    ImageSize::new(info.width as usize, info.height as usize),
+                    &src_image,
+                    &mut dst_image,
                     angle,
                     kernel_size as usize,
                     edge_mode,
                     scalar,
-                    FastBlurChannels::Channels4,
                     ThreadingPolicy::default(),
-                );
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -1449,26 +1590,29 @@ pub mod android {
         match bitmap_info {
             Ok(info) => {
                 if use_rgba {
-                    let mut src_vec = vec![0u8; info.width as usize * 4 * info.height as usize];
-
-                    for (src_chunk, dst_chunk) in info
-                        .data
-                        .chunks_exact(info.stride as usize)
-                        .zip(src_vec.chunks_exact_mut(4 * info.width as usize))
-                    {
-                        for (src_layout, dst_layout) in src_chunk.iter().zip(dst_chunk.iter_mut()) {
-                            *dst_layout = *src_layout;
-                        }
-                    }
-
                     let mut dst_vec: Vec<u8> =
                         vec![0u8; info.width as usize * 4 * info.height as usize];
 
+                    let src_image = BlurImage {
+                        data: std::borrow::Cow::Borrowed(&info.data),
+                        width: info.width,
+                        height: info.height,
+                        stride: info.stride,
+                        channels: FastBlurChannels::Channels4,
+                    };
+
+                    let mut dst_image = BlurImageMut {
+                        data: BufferStore::Borrowed(&mut dst_vec),
+                        width: info.width,
+                        height: info.height,
+                        stride: info.width * 4,
+                        channels: FastBlurChannels::Channels4,
+                    };
+
                     if kernel_width < 10 && kernel_height < 10 {
                         match libblur::filter_2d_rgba::<u8, f32>(
-                            &src_vec,
-                            &mut dst_vec,
-                            ImageSize::new(info.width as usize, info.height as usize),
+                            &src_image,
+                            &mut dst_image,
                             &local_kernel,
                             KernelShape::new(kernel_width as usize, kernel_height as usize),
                             edge_mode,
@@ -1480,15 +1624,15 @@ pub mod android {
                                 let clazz = env
                                     .find_class("java/lang/Exception")
                                     .expect("Found exception class");
-                                env.throw_new(clazz, err).expect("Failed to access JNI");
+                                env.throw_new(clazz, err.to_string())
+                                    .expect("Failed to access JNI");
                                 return JObject::null().as_raw();
                             }
                         }
                     } else {
                         match libblur::filter_2d_rgba_fft::<u8, f32, f32>(
-                            &src_vec,
-                            &mut dst_vec,
-                            ImageSize::new(info.width as usize, info.height as usize),
+                            &src_image,
+                            &mut dst_image,
                             &local_kernel,
                             KernelShape::new(kernel_width as usize, kernel_height as usize),
                             edge_mode,
@@ -1499,7 +1643,8 @@ pub mod android {
                                 let clazz = env
                                     .find_class("java/lang/Exception")
                                     .expect("Found exception class");
-                                env.throw_new(clazz, err).expect("Failed to access JNI");
+                                env.throw_new(clazz, err.to_string())
+                                    .expect("Failed to access JNI");
                                 return JObject::null().as_raw();
                             }
                         }
@@ -1543,11 +1688,26 @@ pub mod android {
                     let mut dst_vec: Vec<u8> =
                         vec![0u8; info.width as usize * 3 * info.height as usize];
 
+                    let src_image = BlurImage {
+                        data: std::borrow::Cow::Borrowed(&src_vec),
+                        width: info.width,
+                        height: info.height,
+                        stride: info.width * 3,
+                        channels: FastBlurChannels::Channels3,
+                    };
+
+                    let mut dst_image = BlurImageMut {
+                        data: BufferStore::Borrowed(&mut dst_vec),
+                        width: info.width,
+                        height: info.height,
+                        stride: info.width * 3,
+                        channels: FastBlurChannels::Channels3,
+                    };
+
                     if kernel_width < 10 && kernel_height < 10 {
                         match libblur::filter_2d_rgb::<u8, f32>(
-                            &src_vec,
-                            &mut dst_vec,
-                            ImageSize::new(info.width as usize, info.height as usize),
+                            &src_image,
+                            &mut dst_image,
                             &local_kernel,
                             KernelShape::new(kernel_width as usize, kernel_height as usize),
                             edge_mode,
@@ -1559,15 +1719,15 @@ pub mod android {
                                 let clazz = env
                                     .find_class("java/lang/Exception")
                                     .expect("Found exception class");
-                                env.throw_new(clazz, err).expect("Failed to access JNI");
+                                env.throw_new(clazz, err.to_string())
+                                    .expect("Failed to access JNI");
                                 return JObject::null().as_raw();
                             }
                         }
                     } else {
                         match libblur::filter_2d_rgb_fft::<u8, f32, f32>(
-                            &src_vec,
-                            &mut dst_vec,
-                            ImageSize::new(info.width as usize, info.height as usize),
+                            &src_image,
+                            &mut dst_image,
                             &local_kernel,
                             KernelShape::new(kernel_width as usize, kernel_height as usize),
                             edge_mode,
@@ -1578,7 +1738,8 @@ pub mod android {
                                 let clazz = env
                                     .find_class("java/lang/Exception")
                                     .expect("Found exception class");
-                                env.throw_new(clazz, err).expect("Failed to access JNI");
+                                env.throw_new(clazz, err.to_string())
+                                    .expect("Failed to access JNI");
                                 return JObject::null().as_raw();
                             }
                         }
@@ -1674,27 +1835,39 @@ pub mod android {
                     }
                 }
 
-                let mut dst_vec: Vec<u8> =
-                    vec![0u8; info.width as usize * info.height as usize];
+                let mut dst_vec: Vec<u8> = vec![0u8; info.width as usize * info.height as usize];
+
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&src_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.width,
+                    channels: FastBlurChannels::Plane,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.width,
+                    channels: FastBlurChannels::Plane,
+                };
 
                 libblur::sobel(
-                    &src_vec,
-                    &mut dst_vec,
-                    ImageSize::new(info.width as usize, info.height as usize),
+                    &src_image,
+                    &mut dst_image,
                     edge_mode,
                     border_scalar,
-                    FastBlurChannels::Plane,
                     ThreadingPolicy::Adaptive,
-                );
+                )
+                .unwrap();
 
                 src_vec.resize(0, 0u8);
 
                 let mut new_image: Vec<u8> =
                     vec![0u8; info.width as usize * 4 * info.height as usize];
 
-                for (src_layout, dst_layout) in
-                    dst_vec.iter().zip(new_image.chunks_exact_mut(4))
-                {
+                for (src_layout, dst_layout) in dst_vec.iter().zip(new_image.chunks_exact_mut(4)) {
                     let val = *src_layout;
                     dst_layout[0] = val;
                     dst_layout[1] = val;
@@ -1777,27 +1950,39 @@ pub mod android {
                     }
                 }
 
-                let mut dst_vec: Vec<u8> =
-                    vec![0u8; info.width as usize * info.height as usize];
+                let mut dst_vec: Vec<u8> = vec![0u8; info.width as usize * info.height as usize];
+
+                let src_image = BlurImage {
+                    data: std::borrow::Cow::Borrowed(&src_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.width,
+                    channels: FastBlurChannels::Plane,
+                };
+
+                let mut dst_image = BlurImageMut {
+                    data: BufferStore::Borrowed(&mut dst_vec),
+                    width: info.width,
+                    height: info.height,
+                    stride: info.width,
+                    channels: FastBlurChannels::Plane,
+                };
 
                 libblur::laplacian(
-                    &src_vec,
-                    &mut dst_vec,
-                    ImageSize::new(info.width as usize, info.height as usize),
+                    &src_image,
+                    &mut dst_image,
                     edge_mode,
                     border_scalar,
-                    FastBlurChannels::Plane,
                     ThreadingPolicy::Adaptive,
-                );
+                )
+                .unwrap();
 
                 src_vec.resize(0, 0u8);
 
                 let mut new_image: Vec<u8> =
                     vec![0u8; info.width as usize * 4 * info.height as usize];
 
-                for (src_layout, dst_layout) in
-                    dst_vec.iter().zip(new_image.chunks_exact_mut(4))
-                {
+                for (src_layout, dst_layout) in dst_vec.iter().zip(new_image.chunks_exact_mut(4)) {
                     let val = *src_layout;
                     dst_layout[0] = val;
                     dst_layout[1] = val;

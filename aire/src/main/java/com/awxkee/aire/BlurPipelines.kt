@@ -233,10 +233,10 @@ interface BlurPipelines {
      * Made in *linear* colorspace.
      * O(1) complexity, slow.
      *
-     * @param radius - radius of blurring kernel, almost any size is supported
+     * @param sigma - flattening level
      * @param transferFunction - transfer function in linear and its inverse
      */
-    fun linearTentBlur(bitmap: Bitmap, radius: Int, transferFunction: TransferFunction): Bitmap
+    fun linearTentBlur(bitmap: Bitmap, sigma: Float, transferFunction: TransferFunction): Bitmap
 
     /**
      * Gaussian blur just make 3 passes of box blur as per [Central limit theorem](https://en.wikipedia.org/wiki/Central_limit_theorem).
@@ -245,12 +245,12 @@ interface BlurPipelines {
      * Made in *linear* colorspace.
      * O(1) complexity, slow.
      *
-     * @param radius - radius of blurring kernel, almost any size is supported
+     * @param sigma - flattening level
      * @param transferFunction - transfer function in linear and its inverse
      */
     fun linearGaussianBoxBlur(
         bitmap: Bitmap,
-        radius: Int,
+        sigma: Float,
         transferFunction: TransferFunction
     ): Bitmap
 
@@ -261,9 +261,9 @@ interface BlurPipelines {
      * Made in *perceptual* colorspace.
      * O(1) complexity, medium speed.
      *
-     * @param radius - radius of blurring kernel, almost any size is supported
+     * @param sigma - flattening level
      */
-    fun tentBlur(bitmap: Bitmap, radius: Int): Bitmap
+    fun tentBlur(bitmap: Bitmap, sigma: Float): Bitmap
 
     /**
      * Gaussian blur just make 3 passes of box blur as per [Central limit theorem](https://en.wikipedia.org/wiki/Central_limit_theorem).
@@ -272,9 +272,9 @@ interface BlurPipelines {
      * Made in *perceptual* colorspace.
      * O(1) complexity, medium speed.
      *
-     * @param radius - radius of blurring kernel, almost any size is supported
+     * @param sigma - flattening level
      */
-    fun gaussianBoxBlur(bitmap: Bitmap, radius: Int): Bitmap
+    fun gaussianBoxBlur(bitmap: Bitmap, sigma: Float): Bitmap
 
     fun anisotropicDiffusion(
         bitmap: Bitmap,

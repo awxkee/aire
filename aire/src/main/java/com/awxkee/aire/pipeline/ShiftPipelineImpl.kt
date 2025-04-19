@@ -32,7 +32,6 @@ package com.awxkee.aire.pipeline
 
 import android.graphics.Bitmap
 import com.awxkee.aire.ShiftPipelines
-import com.awxkee.aire.argbToRgba
 import java.security.InvalidParameterException
 
 class ShiftPipelineImpl : ShiftPipelines {
@@ -42,7 +41,7 @@ class ShiftPipelineImpl : ShiftPipelines {
         streamsCount: Int,
         clearColor: Int
     ): Bitmap {
-        return horizontalWindStaggerImpl(bitmap, windStrength, streamsCount, argbToRgba(clearColor))
+        return horizontalWindStaggerImpl(bitmap, windStrength, streamsCount, clearColor)
     }
 
     override fun tiltShift(

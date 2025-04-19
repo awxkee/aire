@@ -131,9 +131,9 @@ dependencies = [
 
 [[package]]
 name = "fast_morphology"
-version = "0.2.1"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd8da5ab30b76567579a33bf86d35dc13078978997b54e1c007983fbce64716c"
+checksum = "32d8580ec514f0a59526b27a684d71918469b63e8736306b0bf705f48f4f00c8"
 dependencies = [
  "num-traits",
  "rayon",
@@ -141,9 +141,9 @@ dependencies = [
 
 [[package]]
 name = "fast_transpose"
-version = "0.1.0"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70a2714bf0e4afa420670d704b658b4db4c30e3fb4331b298c3a5fa5d2b99e62"
+checksum = "9c2d2b59e139013dffe85ab5023a5768d706e5adced64affd9f2c1260228e03b"
 dependencies = [
  "bytemuck",
 ]
@@ -167,14 +167,14 @@ checksum = "bf151400ff0baff5465007dd2f3e717f3fe502074ca563069ce3a6629d07b289"
 
 [[package]]
 name = "histogram_equalization"
-version = "0.2.2"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1fa38408bf38e2eb3a27233e0ab4ce72dba5bcc3d11a3b8ae1d4c63c46599270"
+checksum = "1cba4fb49502d10e699c8907af302e4ecdd930773a1cd63a9fce6a9ab8223d93"
 dependencies = [
  "colorutils-rs",
  "num-traits",
  "rayon",
- "yuvutils-rs",
+ "yuv",
 ]
 
 [[package]]
@@ -211,12 +211,11 @@ checksum = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
 
 [[package]]
 name = "libblur"
-version = "0.14.9"
+version = "0.17.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd21de3e6b0c652cf6036bb93f705dec09833a5e44317ca1c07a1a28298f33d0"
+checksum = "efbd74aa97ef73fef543d7b8ef9cca5eefe3f46b7e673edb1c182523445c47b8"
 dependencies = [
  "colorutils-rs",
- "erydanos",
  "fast_transpose",
  "half",
  "libc",
@@ -334,9 +333,9 @@ dependencies = [
 
 [[package]]
 name = "pic-scale"
-version = "0.4.0"
+version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7811a50919a971ad675a6d017b9a8ffd211e98a9207a57a8b81193ea1da4d85e"
+checksum = "4b695dc4f45a3bc3cf87f4a2d0b1d99b08892cb242e0a816210133510a5bef90"
 dependencies = [
  "colorutils-rs",
  "libc",
@@ -674,10 +673,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "yuvutils-rs"
-version = "0.5.13"
+name = "yuv"
+version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a9622ba86f1b7be056dc6042615247f7ff29f7108ab9a71fb27c9359f9b828d"
+checksum = "286db5a334f270dc6fdb6577946d4588768e154bc3dfd291c833cd035afd22f6"
 dependencies = [
  "num-traits",
 ]

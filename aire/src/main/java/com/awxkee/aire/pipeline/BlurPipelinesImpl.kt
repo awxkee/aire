@@ -53,22 +53,22 @@ class BlurPipelinesImpl : BlurPipelines {
 
     override fun linearTentBlur(
         bitmap: Bitmap,
-        radius: Int,
+        sigma: Float,
         transferFunction: TransferFunction
     ): Bitmap {
-        return tentBlurLinearImpl(bitmap, radius, transferFunction.value)
+        return tentBlurLinearImpl(bitmap, sigma, transferFunction.value)
     }
 
     override fun linearGaussianBoxBlur(
         bitmap: Bitmap,
-        radius: Int,
+        sigma: Float,
         transferFunction: TransferFunction
     ): Bitmap {
-        return gaussianBoxBlurLinearImpl(bitmap, radius, transferFunction.value)
+        return gaussianBoxBlurLinearImpl(bitmap, sigma, transferFunction.value)
     }
 
-    override fun gaussianBoxBlur(bitmap: Bitmap, radius: Int): Bitmap {
-        return gaussianBoxBlurImpl(bitmap, radius)
+    override fun gaussianBoxBlur(bitmap: Bitmap, sigma: Float): Bitmap {
+        return gaussianBoxBlurImpl(bitmap, sigma)
     }
 
     override fun linearFastGaussianNext(
@@ -208,11 +208,11 @@ class BlurPipelinesImpl : BlurPipelines {
         return fastGaussianNextImpl(bitmap, radius, edgeMode.value)
     }
 
-    override fun tentBlur(bitmap: Bitmap, radius: Int): Bitmap {
-        if (radius < 1) {
+    override fun tentBlur(bitmap: Bitmap, sigma: Float): Bitmap {
+        if (sigma < 0) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
-        return tentBlurImpl(bitmap, radius)
+        return tentBlurImpl(bitmap, sigma)
     }
 
     override fun fastGaussian4Degree(bitmap: Bitmap, radius: Int): Bitmap {
@@ -345,17 +345,17 @@ class BlurPipelinesImpl : BlurPipelines {
 
     private external fun boxBlurImpl(bitmap: Bitmap, radius: Int): Bitmap
 
-    private external fun tentBlurImpl(bitmap: Bitmap, radius: Int): Bitmap
+    private external fun tentBlurImpl(bitmap: Bitmap, sigma: Float): Bitmap
 
-    private external fun gaussianBoxBlurImpl(bitmap: Bitmap, radius: Int): Bitmap
+    private external fun gaussianBoxBlurImpl(bitmap: Bitmap, sigma: Float): Bitmap
 
     private external fun boxBlurLinearImpl(bitmap: Bitmap, radius: Int, transfer: Int): Bitmap
 
-    private external fun tentBlurLinearImpl(bitmap: Bitmap, radius: Int, transfer: Int): Bitmap
+    private external fun tentBlurLinearImpl(bitmap: Bitmap, sigma: Float, transfer: Int): Bitmap
 
     private external fun gaussianBoxBlurLinearImpl(
         bitmap: Bitmap,
-        radius: Int,
+        sigma: Float,
         transfer: Int
     ): Bitmap
 }

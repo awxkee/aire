@@ -1,6 +1,6 @@
 set -e
 
-RUSTFLAGS="-C target-feature=+neon -C opt-level=3 -C strip=symbols" cargo +nightly build --target aarch64-linux-android --features nightly_i8mm --release
+RUSTFLAGS="-C target-feature=+neon -C opt-level=3 -C strip=symbols" cargo +nightly build --target aarch64-linux-android --release
 #cp -r target/aarch64-linux-android/release/libaire_filters.a ../aire/src/main/cpp/lib/arm64-v8a/libaire_filters.a
 cp -r target/aarch64-linux-android/release/libaire_filters.so ../aire/src/main/cpp/lib/arm64-v8a/libaire_filters.so
 #
