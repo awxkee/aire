@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
 ////                        var radius = 77
 //////
 //                        var time = measureTimeMillis {
-//                            val image = Aire.scale(bitmap, 500, 500, ResizeFunction.Lanczos3, ScaleColorSpace.SRGB)
+//                            val image = Aire.gaussianBlur(bitmap, 35, 35, 0f, 0f, EdgeMode.WRAP, GaussianPreciseLevel.INTEGRAL)
 //                            scope.launch {
 //                                imagesArray.add(image)
 //                            }

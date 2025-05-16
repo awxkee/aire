@@ -73,42 +73,60 @@ class BlurPipelinesImpl : BlurPipelines {
 
     override fun linearFastGaussianNext(
         bitmap: Bitmap,
-        radius: Int,
+        horizontalRadius: Int,
+        verticalRadius: Int,
         transferFunction: TransferFunction,
         edgeMode: EdgeMode,
     ): Bitmap {
-        return fastGaussianNextLinearImpl(bitmap, radius, transferFunction.value, edgeMode.value)
+        return fastGaussianNextLinearImpl(
+            bitmap,
+            horizontalRadius,
+            verticalRadius,
+            transferFunction.value,
+            edgeMode.value
+        )
     }
 
     override fun linearFastGaussian(
         bitmap: Bitmap,
-        radius: Int,
+        horizontalRadius: Int,
+        verticalRadius: Int,
         transferFunction: TransferFunction,
         edgeMode: EdgeMode
     ): Bitmap {
-        return fastGaussianLinearImpl(bitmap, radius, transferFunction.value, edgeMode.value)
+        return fastGaussianLinearImpl(
+            bitmap,
+            horizontalRadius,
+            verticalRadius,
+            transferFunction.value,
+            edgeMode.value
+        )
     }
 
     override fun linearGaussianBlur(
         bitmap: Bitmap,
-        kernelSize: Int,
-        sigma: Float,
+        horizontalKernelSize: Int,
+        verticalKernelSize: Int,
+        horizontalSigma: Float,
+        verticalSigma: Float,
         edgeMode: EdgeMode,
         transferFunction: TransferFunction
     ): Bitmap {
-        if (kernelSize < 1) {
+        if (horizontalKernelSize < 1 || verticalKernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
-        if (sigma < 0) {
-            throw IllegalStateException("Sigma must be more than 0")
+        if (horizontalSigma < 0 || verticalSigma < 0) {
+            throw IllegalStateException("Sigma must be more than or equal to 0")
         }
-        if (kernelSize % 2 == 0) {
+        if (horizontalKernelSize % 2 == 0 || verticalKernelSize % 2 == 0) {
             throw IllegalStateException("Kernel size must be odd")
         }
         return gaussianBlurLinearImpl(
             bitmap,
-            kernelSize,
-            sigma,
+            horizontalKernelSize,
+            verticalKernelSize,
+            horizontalSigma,
+            verticalSigma,
             edgeMode.value,
             transferFunction.value
         )
@@ -116,32 +134,37 @@ class BlurPipelinesImpl : BlurPipelines {
 
     override fun linearStackBlur(
         bitmap: Bitmap,
-        radius: Int,
+        horizontalRadius: Int,
+        verticalRadius: Int,
         transferFunction: TransferFunction
     ): Bitmap {
-        return stackBlurLinearImpl(bitmap, radius, transferFunction.value)
+        return stackBlurLinearImpl(bitmap, horizontalRadius, verticalRadius, transferFunction.value)
     }
 
     override fun gaussianBlur(
         bitmap: Bitmap,
-        kernelSize: Int,
-        sigma: Float,
+        horizontalKernelSize: Int,
+        verticalKernelSize: Int,
+        horizontalSigma: Float,
+        verticalSigma: Float,
         edgeMode: EdgeMode,
         gaussianPreciseLevel: GaussianPreciseLevel
     ): Bitmap {
-        if (kernelSize < 1) {
+        if (horizontalKernelSize < 1 || verticalKernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
-        if (sigma < 0) {
+        if (horizontalSigma < 0 || verticalSigma < 0) {
             throw IllegalStateException("Sigma must be more than or equal to 0")
         }
-        if (kernelSize % 2 == 0) {
+        if (horizontalKernelSize % 2 == 0 || verticalKernelSize % 2 == 0) {
             throw IllegalStateException("Kernel size must be odd")
         }
         return gaussianBlurImpl(
             bitmap,
-            kernelSize,
-            sigma,
+            horizontalKernelSize,
+            verticalKernelSize,
+            horizontalSigma,
+            verticalSigma,
             edgeMode.value,
             gaussianPreciseLevel.value
         )
@@ -186,11 +209,11 @@ class BlurPipelinesImpl : BlurPipelines {
         return poissonBlurPipeline(bitmap, kernelSize)
     }
 
-    override fun stackBlur(bitmap: Bitmap, radius: Int): Bitmap {
-        if (radius < 1) {
+    override fun stackBlur(bitmap: Bitmap, horizontalRadius: Int, verticalRadius: Int): Bitmap {
+        if (horizontalRadius < 1 || verticalRadius < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
         }
-        return stackBlurImpl(bitmap, radius)
+        return stackBlurImpl(bitmap, horizontalRadius, verticalRadius)
     }
 
     override fun medianBlur(bitmap: Bitmap, kernelSize: Int): Bitmap {
@@ -200,12 +223,22 @@ class BlurPipelinesImpl : BlurPipelines {
         return medianBlurImpl(bitmap, kernelSize)
     }
 
-    override fun fastGaussian2Degree(bitmap: Bitmap, radius: Int, edgeMode: EdgeMode): Bitmap {
-        return fastGaussianImpl(bitmap, radius, edgeMode.value)
+    override fun fastGaussian2Degree(
+        bitmap: Bitmap,
+        horizontalRadius: Int,
+        verticalRadius: Int,
+        edgeMode: EdgeMode
+    ): Bitmap {
+        return fastGaussianImpl(bitmap, horizontalRadius, verticalRadius, edgeMode.value)
     }
 
-    override fun fastGaussian3Degree(bitmap: Bitmap, radius: Int, edgeMode: EdgeMode): Bitmap {
-        return fastGaussianNextImpl(bitmap, radius, edgeMode.value)
+    override fun fastGaussian3Degree(
+        bitmap: Bitmap,
+        horizontalRadius: Int,
+        verticalRadius: Int,
+        edgeMode: EdgeMode
+    ): Bitmap {
+        return fastGaussianNextImpl(bitmap, horizontalRadius, verticalRadius, edgeMode.value)
     }
 
     override fun tentBlur(bitmap: Bitmap, sigma: Float): Bitmap {
@@ -258,7 +291,14 @@ class BlurPipelinesImpl : BlurPipelines {
         scalar: Scalar,
         mode: MorphOpMode
     ): Bitmap {
-        return Aire.convolve2D(bitmap, Aire.getBokehConvolutionKernel(kernelSize, sides), KernelShape(kernelSize, kernelSize), edgeMode, scalar, mode)
+        return Aire.convolve2D(
+            bitmap,
+            Aire.getBokehConvolutionKernel(kernelSize, sides),
+            KernelShape(kernelSize, kernelSize),
+            edgeMode,
+            scalar,
+            mode
+        )
     }
 
     private external fun motionBlurImpl(
@@ -279,20 +319,30 @@ class BlurPipelinesImpl : BlurPipelines {
         angle: Float
     ): Bitmap
 
-    private external fun fastGaussianImpl(bitmap: Bitmap, radius: Int, edgeMode: Int): Bitmap
+    private external fun fastGaussianImpl(
+        bitmap: Bitmap,
+        horizontalRadius: Int,
+        verticalRadius: Int,
+        edgeMode: Int
+    ): Bitmap
 
     private external fun fastGaussianLinearImpl(
         bitmap: Bitmap,
-        radius: Int,
+        horizontalRadius: Int, verticalRadius: Int,
         transfer: Int,
         edgeMode: Int
     ): Bitmap
 
-    private external fun fastGaussianNextImpl(bitmap: Bitmap, radius: Int, edgeMode: Int): Bitmap
+    private external fun fastGaussianNextImpl(
+        bitmap: Bitmap,
+        horizontalRadius: Int,
+        verticalRadius: Int,
+        edgeMode: Int
+    ): Bitmap
 
     private external fun fastGaussianNextLinearImpl(
         bitmap: Bitmap,
-        radius: Int,
+        horizontalRadius: Int, verticalRadius: Int,
         transfer: Int, edgeMode: Int
     ): Bitmap
 
@@ -316,16 +366,20 @@ class BlurPipelinesImpl : BlurPipelines {
 
     private external fun gaussianBlurImpl(
         bitmap: Bitmap,
-        radius: Int,
-        sigma: Float,
+        horizontalKernelSize: Int,
+        verticalKernelSize: Int,
+        horizontalSigma: Float,
+        verticalSigma: Float,
         kernelMode: Int,
         preciseLevel: Int,
     ): Bitmap
 
     private external fun gaussianBlurLinearImpl(
         bitmap: Bitmap,
-        radius: Int,
-        sigma: Float,
+        horizontalKernelSize: Int,
+        verticalKernelSize: Int,
+        horizontalSigma: Float,
+        verticalSigma: Float,
         kernelMode: Int,
         transfer: Int
     ): Bitmap
@@ -339,9 +393,18 @@ class BlurPipelinesImpl : BlurPipelines {
 
     private external fun medianBlurImpl(bitmap: Bitmap, radius: Int): Bitmap
 
-    private external fun stackBlurImpl(bitmap: Bitmap, radius: Int): Bitmap
+    private external fun stackBlurImpl(
+        bitmap: Bitmap,
+        horizontalRadius: Int,
+        verticalRadius: Int,
+    ): Bitmap
 
-    private external fun stackBlurLinearImpl(bitmap: Bitmap, radius: Int, transfer: Int): Bitmap
+    private external fun stackBlurLinearImpl(
+        bitmap: Bitmap,
+        horizontalRadius: Int,
+        verticalRadius: Int,
+        transfer: Int
+    ): Bitmap
 
     private external fun boxBlurImpl(bitmap: Bitmap, radius: Int): Bitmap
 

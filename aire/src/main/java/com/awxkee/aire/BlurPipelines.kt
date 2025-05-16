@@ -54,8 +54,10 @@ interface BlurPipelines {
      */
     fun gaussianBlur(
         bitmap: Bitmap,
-        kernelSize: Int,
-        sigma: Float = 0f,
+        horizontalKernelSize: Int,
+        verticalKernelSize: Int,
+        horizontalSigma: Float = 0f,
+        verticalSigma: Float = 0f,
         edgeMode: EdgeMode,
         gaussianPreciseLevel: GaussianPreciseLevel
     ): Bitmap
@@ -70,8 +72,10 @@ interface BlurPipelines {
      */
     fun linearGaussianBlur(
         bitmap: Bitmap,
-        kernelSize: Int,
-        sigma: Float,
+        horizontalKernelSize: Int,
+        verticalKernelSize: Int,
+        horizontalSigma: Float,
+        verticalSigma: Float,
         edgeMode: EdgeMode,
         transferFunction: TransferFunction,
     ): Bitmap
@@ -83,7 +87,12 @@ interface BlurPipelines {
         spatialSigma: Float
     ): Bitmap
 
-    fun fastBilateralBlur(bitmap: Bitmap, kernelSize: Int, spatialSigma: Float, rangeSigma: Float): Bitmap
+    fun fastBilateralBlur(
+        bitmap: Bitmap,
+        kernelSize: Int,
+        spatialSigma: Float,
+        rangeSigma: Float
+    ): Bitmap
 
     /***
      * Performs motion blur on the image
@@ -93,7 +102,13 @@ interface BlurPipelines {
      * @param borderMode - See [EdgeMode]
      * @param borderScalar - See [Scalar]
      */
-    fun motionBlur(bitmap: Bitmap, kernelSize: Int, angle: Float, borderMode: EdgeMode, borderScalar: Scalar): Bitmap
+    fun motionBlur(
+        bitmap: Bitmap,
+        kernelSize: Int,
+        angle: Float,
+        borderMode: EdgeMode,
+        borderScalar: Scalar
+    ): Bitmap
 
     /**
      * Box blur averages all pixels to make a blur in perceptual colorspace.
@@ -128,7 +143,7 @@ interface BlurPipelines {
      *
      * @param radius - blurring radius, radius ~[2, 254]
      */
-    fun stackBlur(bitmap: Bitmap, radius: Int): Bitmap
+    fun stackBlur(bitmap: Bitmap, horizontalRadius: Int, verticalRadius: Int): Bitmap
 
     /**
      * The fastest gaussian blur approximation in linear colorspace, this is much slower
@@ -139,7 +154,12 @@ interface BlurPipelines {
      * @param radius - blurring radius, blurring radius almost unlimited since transformation is in f32
      * @param transferFunction - transfer function in linear and its inverse
      */
-    fun linearStackBlur(bitmap: Bitmap, radius: Int, transferFunction: TransferFunction): Bitmap
+    fun linearStackBlur(
+        bitmap: Bitmap,
+        horizontalRadius: Int,
+        verticalRadius: Int,
+        transferFunction: TransferFunction
+    ): Bitmap
 
     /**
      *  Extended Binomial Filter of the Gaussian Blur 2 degree, extended box level, very fast compare to gaussian.
@@ -155,7 +175,8 @@ interface BlurPipelines {
      */
     fun linearFastGaussian(
         bitmap: Bitmap,
-        radius: Int,
+        horizontalRadius: Int,
+        verticalRadius: Int,
         transferFunction: TransferFunction,
         edgeMode: EdgeMode
     ): Bitmap
@@ -174,7 +195,8 @@ interface BlurPipelines {
      */
     fun linearFastGaussianNext(
         bitmap: Bitmap,
-        radius: Int,
+        horizontalRadius: Int,
+        verticalRadius: Int,
         transferFunction: TransferFunction,
         edgeMode: EdgeMode,
     ): Bitmap
@@ -188,7 +210,12 @@ interface BlurPipelines {
      * @param radius - blurring radius, radius ~[1, 319]
      * @param edgeMode - Edge handling mode, *Kernel clip* is not supported here!
      */
-    fun fastGaussian2Degree(bitmap: Bitmap, radius: Int, edgeMode: EdgeMode): Bitmap
+    fun fastGaussian2Degree(
+        bitmap: Bitmap,
+        horizontalRadius: Int,
+        verticalRadius: Int,
+        edgeMode: EdgeMode
+    ): Bitmap
 
     /**
      *  Extended Binomial Filter of the Gaussian Blur 3 degree, very fast compare to gaussian.
@@ -199,7 +226,10 @@ interface BlurPipelines {
      * @param radius - blurring radius, radius ~[1, 280]
      * @param edgeMode - Edge handling mode, *Kernel clip* is not supported here!
      */
-    fun fastGaussian3Degree(bitmap: Bitmap, radius: Int, edgeMode: EdgeMode): Bitmap
+    fun fastGaussian3Degree(
+        bitmap: Bitmap, horizontalRadius: Int,
+        verticalRadius: Int, edgeMode: EdgeMode
+    ): Bitmap
 
     /**
      *  Extended Binomial Filter of the Gaussian Blur 4 degree, very close level to gaussian,

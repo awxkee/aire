@@ -3,7 +3,6 @@
 pub mod android {
     extern crate jni;
 
-    use crate::android_bitmap::copy_image;
     use crate::bitmap_helper::android_bitmap;
     use crate::scalar::android::get_scalar_from_java;
     use crate::transfer_resolve::param_into_transfer;
@@ -11,8 +10,9 @@ pub mod android {
     use jni::sys::{jfloat, jfloatArray, jint, jobject};
     use jni::JNIEnv;
     use libblur::{
-        BlurImage, BlurImageMut, BufferStore, ConvolutionMode, EdgeMode, FastBlurChannels,
-        ImageSize, KernelShape, ThreadingPolicy,
+        AnisotropicRadius, BlurImage, BlurImageMut, BoxBlurParameters, BufferStore, CLTParameters,
+        ConvolutionMode, EdgeMode, FastBlurChannels, GaussianBlurParams, KernelShape,
+        ThreadingPolicy,
     };
     #[no_mangle]
     pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_gaussianBoxBlurLinearImpl(
@@ -67,7 +67,10 @@ pub mod android {
                 libblur::gaussian_box_blur_in_linear(
                     &src_image,
                     &mut dst_image,
-                    sigma,
+                    CLTParameters {
+                        x_sigma: sigma,
+                        y_sigma: sigma,
+                    },
                     ThreadingPolicy::Adaptive,
                     transfer,
                 )
@@ -154,7 +157,7 @@ pub mod android {
                 libblur::tent_blur_in_linear(
                     &src_image,
                     &mut dst_image,
-                    sigma,
+                    CLTParameters::new(sigma),
                     ThreadingPolicy::Adaptive,
                     transfer,
                 )
@@ -244,7 +247,7 @@ pub mod android {
                 libblur::box_blur_in_linear(
                     &src_image,
                     &mut dst_image,
-                    radius as u32,
+                    BoxBlurParameters::new(radius as u32),
                     ThreadingPolicy::Adaptive,
                     transfer,
                 )
@@ -321,7 +324,7 @@ pub mod android {
                 libblur::gaussian_box_blur(
                     &src_image,
                     &mut dst_image,
-                    sigma,
+                    CLTParameters::new(sigma),
                     ThreadingPolicy::Adaptive,
                 )
                 .unwrap();
@@ -362,11 +365,12 @@ pub mod android {
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        radius: jint,
+        h_radius: jint,
+        v_radius: jint,
         transfer: jint,
         edge_mode: jint,
     ) -> jobject {
-        if radius <= 0 {
+        if h_radius <= 0 || v_radius <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -410,7 +414,7 @@ pub mod android {
 
                 libblur::fast_gaussian_next_in_linear(
                     &mut dst_image,
-                    radius as u32,
+                    AnisotropicRadius::create(h_radius as u32, v_radius as u32),
                     ThreadingPolicy::Adaptive,
                     transfer,
                     edge_mode,
@@ -453,11 +457,12 @@ pub mod android {
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        radius: jint,
+        h_radius: jint,
+        v_radius: jint,
         transfer: jint,
         edge_mode: jint,
     ) -> jobject {
-        if radius <= 0 {
+        if h_radius <= 0 || v_radius <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -501,7 +506,7 @@ pub mod android {
 
                 libblur::fast_gaussian_in_linear(
                     &mut dst_image,
-                    radius as u32,
+                    AnisotropicRadius::create(h_radius as u32, v_radius as u32),
                     ThreadingPolicy::Adaptive,
                     transfer,
                     edge_mode,
@@ -544,12 +549,14 @@ pub mod android {
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        kernel_size: jint,
-        sigma: jfloat,
+        h_kernel: jint,
+        v_kernel: jint,
+        h_sigma: jfloat,
+        v_sigma: jfloat,
         kernel_mode: jint,
         transfer: jint,
     ) -> jobject {
-        if kernel_size <= 0 {
+        if h_kernel <= 0 || v_kernel <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -558,16 +565,15 @@ pub mod android {
             return bitmap;
         }
 
-        if kernel_size % 2 == 0 {
+        if h_sigma < 0. || v_sigma < 0. {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
-            env.throw_new(clazz, "Kernel size must be odd")
+            env.throw_new(clazz, "Sigma must be more than 0")
                 .expect("Failed to access JNI");
             return bitmap;
         }
-
-        if sigma <= 0f32 {
+        if h_sigma < 0f32 || v_sigma < 0. {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -613,8 +619,12 @@ pub mod android {
                 libblur::gaussian_blur_in_linear(
                     &src_image,
                     &mut dst_image,
-                    kernel_size as u32,
-                    sigma,
+                    GaussianBlurParams {
+                        x_kernel: h_kernel as u32,
+                        y_kernel: v_kernel as u32,
+                        x_sigma: h_sigma as f64,
+                        y_sigma: v_sigma as f64,
+                    },
                     edge_mode,
                     ThreadingPolicy::Adaptive,
                     transfer,
@@ -657,10 +667,11 @@ pub mod android {
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        radius: jint,
+        h_radius: jint,
+        v_radius: jint,
         transfer: jint,
     ) -> jobject {
-        if radius <= 0 {
+        if h_radius <= 0 || v_radius <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -694,7 +705,7 @@ pub mod android {
 
                 libblur::stack_blur_in_linear(
                     &mut dst_image,
-                    radius as u32,
+                    AnisotropicRadius::create(h_radius as u32, v_radius as u32),
                     ThreadingPolicy::Adaptive,
                     transfer,
                 )
@@ -736,9 +747,10 @@ pub mod android {
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        radius: jint,
+        h_radius: jint,
+        v_radius: jint,
     ) -> jobject {
-        if radius <= 0 {
+        if h_radius <= 0 || v_radius <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -758,8 +770,12 @@ pub mod android {
                     channels: FastBlurChannels::Channels4,
                 };
 
-                libblur::stack_blur(&mut dst_image, radius as u32, ThreadingPolicy::Adaptive)
-                    .unwrap();
+                libblur::stack_blur(
+                    &mut dst_image,
+                    AnisotropicRadius::create(h_radius as u32, v_radius as u32),
+                    ThreadingPolicy::Adaptive,
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -832,7 +848,7 @@ pub mod android {
                 libblur::box_blur(
                     &src_image,
                     &mut dst_image,
-                    kernel_size as u32,
+                    BoxBlurParameters::new(kernel_size as u32),
                     ThreadingPolicy::Adaptive,
                 )
                 .unwrap();
@@ -905,8 +921,13 @@ pub mod android {
                     channels: FastBlurChannels::Channels4,
                 };
 
-                libblur::tent_blur(&src_image, &mut dst_image, sigma, ThreadingPolicy::Adaptive)
-                    .unwrap();
+                libblur::tent_blur(
+                    &src_image,
+                    &mut dst_image,
+                    CLTParameters::new(sigma as f32),
+                    ThreadingPolicy::Adaptive,
+                )
+                .unwrap();
 
                 let new_bitmap_r = android_bitmap::create_bitmap(
                     &mut env,
@@ -1020,12 +1041,14 @@ pub mod android {
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        kernel_size: jint,
-        sigma: jfloat,
+        h_kernel: jint,
+        v_kernel: jint,
+        h_sigma: jfloat,
+        v_sigma: jfloat,
         edge_mode: jint,
         precise_level: jint,
     ) -> jobject {
-        if kernel_size <= 0 {
+        if h_kernel <= 0 || v_kernel <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -1034,7 +1057,16 @@ pub mod android {
             return bitmap;
         }
 
-        if kernel_size % 2 == 0 {
+        if h_sigma < 0. || v_sigma < 0. {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Sigma must be more than 0")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
+
+        if h_kernel % 2 == 0 || v_kernel % 2 == 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -1100,8 +1132,12 @@ pub mod android {
                 libblur::gaussian_blur(
                     &src_image,
                     &mut dst_image,
-                    kernel_size as u32,
-                    sigma,
+                    GaussianBlurParams {
+                        x_kernel: h_kernel as u32,
+                        y_kernel: v_kernel as u32,
+                        x_sigma: h_sigma as f64,
+                        y_sigma: v_sigma as f64,
+                    },
                     edge_mode,
                     ThreadingPolicy::Adaptive,
                     precise_level,
@@ -1144,10 +1180,11 @@ pub mod android {
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        radius: jint,
+        h_radius: jint,
+        v_radius: jint,
         edge_mode: jint,
     ) -> jobject {
-        if radius <= 0 {
+        if h_radius <= 0 || v_radius <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -1179,7 +1216,7 @@ pub mod android {
 
                 libblur::fast_gaussian(
                     &mut dst_image,
-                    radius as u32,
+                    AnisotropicRadius::create(h_radius as u32, v_radius as u32),
                     ThreadingPolicy::Adaptive,
                     edge_mode,
                 )
@@ -1221,10 +1258,11 @@ pub mod android {
         mut env: JNIEnv,
         _: jobject,
         bitmap: jobject,
-        radius: jint,
+        h_radius: jint,
+        v_radius: jint,
         edge_mode: jint,
     ) -> jobject {
-        if radius <= 0 {
+        if h_radius <= 0 || v_radius <= 0 {
             let clazz = env
                 .find_class("java/lang/Exception")
                 .expect("Found exception class");
@@ -1256,7 +1294,7 @@ pub mod android {
 
                 libblur::fast_gaussian_next(
                     &mut dst_image,
-                    radius as u32,
+                    AnisotropicRadius::create(h_radius as u32, v_radius as u32),
                     ThreadingPolicy::Adaptive,
                     edge_mode,
                 )

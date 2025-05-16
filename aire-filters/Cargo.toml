@@ -16,10 +16,10 @@ colorutils-rs = "0.7.1"
 fast_morphology = "0.3.1"
 half = { version = "2.4.1", default-features = true, features = ["std", "alloc", "num-traits"] }
 histogram_equalization = "0.2.4"
-libblur = {version = "0.17.2", features = ["fft"], default-features = true}
+libblur = {version = "0.18.0", features = ["fft"], default-features = true}
 num-traits = "0.2.19"
 palette-transfer = "0.2.0"
-pic-scale = "0.5.5"
+pic-scale = "0.6.2"
 
 [features]
 
