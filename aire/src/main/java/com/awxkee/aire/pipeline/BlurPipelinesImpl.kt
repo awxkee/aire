@@ -45,10 +45,16 @@ class BlurPipelinesImpl : BlurPipelines {
 
     override fun linearBoxBlur(
         bitmap: Bitmap,
-        radius: Int,
+        kernelSize: Int,
         transferFunction: TransferFunction
     ): Bitmap {
-        return boxBlurLinearImpl(bitmap, radius, transferFunction.value)
+        if (kernelSize <= 0) {
+            throw IllegalArgumentException("Kernel size must be positive")
+        }
+        if (kernelSize % 2 == 0) {
+            throw IllegalArgumentException("Kernel size must be odd")
+        }
+        return boxBlurLinearImpl(bitmap, kernelSize, transferFunction.value)
     }
 
     override fun linearTentBlur(
@@ -198,7 +204,7 @@ class BlurPipelinesImpl : BlurPipelines {
         if (kernelSize < 1) {
             throw IllegalStateException("Kernel size must be more or equal 1")
         }
-        if (kernelSize % 2 == 0 ){
+        if (kernelSize % 2 == 0) {
             throw IllegalArgumentException("Kernel size must be odd")
         }
         return boxBlurImpl(bitmap, kernelSize)

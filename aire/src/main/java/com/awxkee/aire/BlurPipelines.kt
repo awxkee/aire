@@ -251,10 +251,10 @@ interface BlurPipelines {
      * Made in *linear* colorspace.
      * O(1) complexity, slow.
      *
-     * @param radius - radius of blurring kernel, almost any size is supported
+     * @param kernelSize - radius of blurring kernel, almost any size is supported
      * @param transferFunction - transfer function in linear and its inverse
      */
-    fun linearBoxBlur(bitmap: Bitmap, radius: Int, transferFunction: TransferFunction): Bitmap
+    fun linearBoxBlur(bitmap: Bitmap, kernelSize: Int, transferFunction: TransferFunction): Bitmap
 
     /**
      * Tent blur just make 2 passes of box blur as per [Central limit theorem](https://en.wikipedia.org/wiki/Central_limit_theorem).
