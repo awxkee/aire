@@ -194,11 +194,14 @@ class BlurPipelinesImpl : BlurPipelines {
         return fastBilateralBlurImpl(bitmap, kernelSize, spatialSigma, rangeSigma)
     }
 
-    override fun boxBlur(bitmap: Bitmap, radius: Int): Bitmap {
-        if (radius < 1) {
-            throw IllegalStateException("Radius must be more or equal 1")
+    override fun boxBlur(bitmap: Bitmap, kernelSize: Int): Bitmap {
+        if (kernelSize < 1) {
+            throw IllegalStateException("Kernel size must be more or equal 1")
         }
-        return boxBlurImpl(bitmap, radius)
+        if (kernelSize % 2 == 0 ){
+            throw IllegalArgumentException("Kernel size must be odd")
+        }
+        return boxBlurImpl(bitmap, kernelSize)
     }
 
 

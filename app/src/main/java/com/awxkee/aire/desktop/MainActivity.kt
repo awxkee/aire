@@ -64,31 +64,31 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(key1 = Unit, block = {
                     scope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-//                        val bitmap =
+                        val bitmap =
+                            BitmapFactory.decodeResource(resources, R.drawable.haze)
+                                .copy(Bitmap.Config.ARGB_8888, true)
+                                .scaleWith(0.4f)
+
+//                        val bitmap1 =
 //                            BitmapFactory.decodeResource(resources, R.drawable.haze)
+//                                .scaleWith(0.6f)
 //                                .copy(Bitmap.Config.ARGB_8888, true)
-//                                .scaleWith(0.4f)
-//
-////                        val bitmap1 =
-////                            BitmapFactory.decodeResource(resources, R.drawable.haze)
-////                                .scaleWith(0.6f)
-////                                .copy(Bitmap.Config.ARGB_8888, true)
-//////
-////                        scope.launch {
-////                            imagesArray.add(bitmap)
-////                        }
-//
-//////                        delay(2000L)
 ////
-////                        var radius = 77
-//////
-//                        var time = measureTimeMillis {
-//                            val image = Aire.gaussianBlur(bitmap, 35, 35, 0f, 0f, EdgeMode.WRAP, GaussianPreciseLevel.INTEGRAL)
-//                            scope.launch {
-//                                imagesArray.add(image)
-//                            }
+//                        scope.launch {
+//                            imagesArray.add(bitmap)
 //                        }
-//                        Log.d("MainActivity", "Exec time $time")
+
+////                        delay(2000L)
+//
+//                        var radius = 77
+////
+                        var time = measureTimeMillis {
+                            val image = Aire.boxBlur(bitmap, 6)
+                            scope.launch {
+                                imagesArray.add(image)
+                            }
+                        }
+                        Log.d("MainActivity", "Exec time $time")
                     }
                 })
 //                var sliderValue by remember { mutableFloatStateOf(100f) }  // Initial value of the slider

@@ -823,6 +823,14 @@ pub mod android {
                 .expect("Failed to access JNI");
             return bitmap;
         }
+        if kernel_size % 2 == 0 {
+            let clazz = env
+                .find_class("java/lang/Exception")
+                .expect("Found exception class");
+            env.throw_new(clazz, "Kernel size must be odd")
+                .expect("Failed to access JNI");
+            return bitmap;
+        }
 
         let bitmap_info = android_bitmap::get_bitmap_rgba8888(&mut env, bitmap);
         match bitmap_info {

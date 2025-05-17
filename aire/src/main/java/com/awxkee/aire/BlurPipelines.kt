@@ -117,9 +117,9 @@ interface BlurPipelines {
      * Made in *perceptual* colorspace.
      * O(1) complexity, medium speed.
      *
-     * @param radius - radius of blurring kernel, almost any size is supported
+     * @param kernelSize - radius of blurring kernel, almost any size is supported
      */
-    fun boxBlur(bitmap: Bitmap, radius: Int): Bitmap
+    fun boxBlur(bitmap: Bitmap, kernelSize: Int): Bitmap
 
     /**
      * @param angle - default is PI / 2
