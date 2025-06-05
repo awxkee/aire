@@ -180,7 +180,9 @@ class BlurPipelinesImpl : BlurPipelines {
         bitmap: Bitmap,
         kernelSize: Int,
         rangeSigma: Float,
-        spatialSigma: Float
+        spatialSigma: Float,
+        edgeMode: EdgeMode,
+        borderScalar: Scalar
     ): Bitmap {
         if (kernelSize < 1) {
             throw IllegalStateException("Radius must be more or equal 1")
@@ -188,7 +190,14 @@ class BlurPipelinesImpl : BlurPipelines {
         if (rangeSigma < 0 || spatialSigma < 0) {
             throw IllegalStateException("Sigma must be more than 0")
         }
-        return bilateralBlurPipeline(bitmap, kernelSize, rangeSigma, spatialSigma)
+        return bilateralBlurImpl(
+            bitmap,
+            kernelSize,
+            rangeSigma,
+            spatialSigma,
+            edgeMode.value,
+            borderScalar
+        )
     }
 
     override fun fastBilateralBlur(
@@ -393,11 +402,13 @@ class BlurPipelinesImpl : BlurPipelines {
         transfer: Int
     ): Bitmap
 
-    private external fun bilateralBlurPipeline(
+    private external fun bilateralBlurImpl(
         bitmap: Bitmap,
         radius: Int,
         sigma: Float,
-        spatialSigma: Float
+        spatialSigma: Float,
+        edgeMode: Int,
+        borderScalar: Scalar,
     ): Bitmap
 
     private external fun medianBlurImpl(bitmap: Bitmap, radius: Int): Bitmap

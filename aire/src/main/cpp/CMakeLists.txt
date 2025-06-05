@@ -4,7 +4,6 @@ project("aire")
 
 add_library(${CMAKE_PROJECT_NAME} SHARED
         aire.cpp
-        blur/BilateralBlur.cpp
         blur/BoxBlur.cpp
         blur/GaussBlur.cpp
         blur/MedianBlur.cpp

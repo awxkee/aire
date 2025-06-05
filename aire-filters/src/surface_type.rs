@@ -1,7 +1,10 @@
 use std::mem::transmute;
 use std::slice;
 
-use colorutils_rs::{append_alpha, laba_to_srgb, linear_to_rgba, rgba_to_laba, rgba_to_linear, Luv, Rgb, Rgba, TransferFunction, SRGB_TO_XYZ_D65};
+use colorutils_rs::{
+    append_alpha, laba_to_srgb, linear_to_rgba, rgba_to_laba, rgba_to_linear, Luv, Rgb, Rgba,
+    TransferFunction, SRGB_TO_XYZ_D65,
+};
 
 pub fn reformat_surface_u8_to_linear(
     original: &[u8],

@@ -1,4 +1,7 @@
-use fast_morphology::{morphology_rgb, morphology_rgba, BorderMode, ImageSize, KernelShape, MorphExOp, MorphScalar, MorphologyThreadingPolicy};
+use fast_morphology::{
+    morphology_rgb, morphology_rgba, BorderMode, ImageSize, KernelShape, MorphExOp, MorphScalar,
+    MorphologyThreadingPolicy,
+};
 
 #[repr(C)]
 #[derive(Copy, Clone, PartialOrd, Eq, PartialEq, Hash, Debug)]
@@ -110,7 +113,7 @@ pub fn perform_morph(
         MorphOpMode::Rgba => {
             let mut dst_image = vec![0u8; width * height * 4];
             morphology_rgba(
-                &rgba_image,
+                rgba_image,
                 &mut dst_image,
                 morph_ex,
                 image_size,
@@ -130,14 +133,14 @@ pub fn perform_morph(
 pub mod android {
     extern crate jni;
 
-    use fast_morphology::MorphScalar;
     use crate::android_bitmap::copy_image;
     use crate::bitmap_helper::android_bitmap;
     use crate::morph::perform_morph;
+    use crate::scalar::android::scalar_from_java;
+    use fast_morphology::MorphScalar;
     use jni::objects::{JIntArray, JObject};
     use jni::sys::{jint, jintArray, jobject};
     use jni::JNIEnv;
-    use crate::scalar::android::get_scalar_from_java;
 
     #[no_mangle]
     pub unsafe extern "system" fn Java_com_awxkee_aire_pipeline_BasePipelinesImpl_morphologyImpl(
@@ -201,7 +204,7 @@ pub mod android {
         );
         bitmap_info.data.resize(0, 0);
 
-        let border_scalar = get_scalar_from_java(&mut env, border_constant);
+        let border_scalar = scalar_from_java(&mut env, border_constant);
 
         let morph_applied_image = match perform_morph(
             &new_bitmap,
@@ -213,7 +216,12 @@ pub mod android {
             &reworked_se,
             kernel_width,
             kernel_height,
-            MorphScalar::new(border_scalar.v0, border_scalar.v1, border_scalar.v2, border_scalar.v3),
+            MorphScalar::new(
+                border_scalar.v0,
+                border_scalar.v1,
+                border_scalar.v2,
+                border_scalar.v3,
+            ),
         ) {
             Ok(img) => img,
             Err(err) => {

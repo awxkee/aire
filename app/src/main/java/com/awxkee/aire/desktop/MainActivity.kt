@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
 ////                        var radius = 77
 //////
 //                        var time = measureTimeMillis {
-//                            val image = Aire.linearBoxBlur(bitmap, 15, TransferFunction.SRGB)
+//                            val image = Aire.bilateralBlur(bitmap, 35, 11f, 11f, EdgeMode.REFLECT_101, Scalar(0.0, 0.0, 0.0, 0.0))
 //                            scope.launch {
 //                                imagesArray.add(image)
 //                            }

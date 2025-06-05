@@ -45,6 +45,5 @@ pub(crate) fn aces_hill(rgb: Rgb<f32>) -> Rgb<f32> {
     let ca = color_in * (color_in + Rgb::dup(0.0245786f32)) - Rgb::dup(0.000090537f32);
     let cb = color_in * (Rgb::dup(0.983729f32) * color_in + Rgb::dup(0.4329510f32))
         + Rgb::dup(0.238081f32);
-    let c_out = mul_output(ca / cb);
-    c_out
+    mul_output(ca / cb)
 }

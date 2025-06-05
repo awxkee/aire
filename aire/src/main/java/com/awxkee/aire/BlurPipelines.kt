@@ -84,7 +84,9 @@ interface BlurPipelines {
         bitmap: Bitmap,
         kernelSize: Int,
         rangeSigma: Float,
-        spatialSigma: Float
+        spatialSigma: Float,
+        edgeMode: EdgeMode,
+        borderScalar: Scalar,
     ): Bitmap
 
     fun fastBilateralBlur(

@@ -141,9 +141,9 @@ dependencies = [
 
 [[package]]
 name = "fast_transpose"
-version = "0.2.3"
+version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c2d2b59e139013dffe85ab5023a5768d706e5adced64affd9f2c1260228e03b"
+checksum = "87fd7bef897517e02c834586f88572f4e2f485d5e9c0bbd1f3497ed6b5a7f6e2"
 dependencies = [
  "bytemuck",
 ]
@@ -211,13 +211,11 @@ checksum = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
 
 [[package]]
 name = "libblur"
-version = "0.18.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08a2f2d15aa0ca7986ac5efdac5786ab1975c2cf7ccc2cbe49f3399897b37d29"
+version = "0.19.2"
 dependencies = [
- "colorutils-rs",
  "fast_transpose",
  "half",
+ "num-complex",
  "num-traits",
  "rayon",
  "rustfft",
@@ -326,9 +324,9 @@ dependencies = [
 
 [[package]]
 name = "pic-scale"
-version = "0.6.2"
+version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d5ae0718b1fb5e8f031deb2ebf0383301e33749d842b7e30f6cf434b7d3cfee5"
+checksum = "ed92711b161720f0c23139f4feb33f440cae637033a4bcf4799343006740cd54"
 dependencies = [
  "colorutils-rs",
  "num-traits",

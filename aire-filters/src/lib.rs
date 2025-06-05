@@ -1,3 +1,4 @@
+#![allow(clippy::excessive_precision, clippy::manual_clamp)]
 pub use surface_type::aire_reformat_surface_laba_to_u8;
 pub use surface_type::aire_reformat_surface_linear_to_u8;
 pub use surface_type::aire_reformat_surface_luva_to_u8;

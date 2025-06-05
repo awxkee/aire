@@ -8,7 +8,7 @@ pub mod android {
     use jni::JNIEnv;
     use libblur::Scalar;
 
-    pub fn get_scalar_from_java(env: &mut JNIEnv, scalar_class: jobject) -> Scalar {
+    pub fn scalar_from_java(env: &mut JNIEnv, scalar_class: jobject) -> Scalar {
         let new_obj = unsafe { JObject::from_raw(scalar_class) };
         let r_field_val = env.get_field(&new_obj, "r", "D").unwrap().d().unwrap();
         let g_field_val = env.get_field(&new_obj, "g", "D").unwrap().d().unwrap();

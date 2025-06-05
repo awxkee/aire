@@ -35,7 +35,6 @@
 #include "blur/ShgStackBlur.h"
 #include "blur/MedianBlur.h"
 #include "blur/BoxBlur.h"
-#include "blur/BilateralBlur.h"
 #include "blur/GaussBlur.h"
 #include "blur/PoissonBlur.h"
 #include <string>
@@ -116,44 +115,7 @@ Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_medianBlurPipeline(JNIEnv *env, 
         return nullptr;
     }
 }
-extern "C"
-JNIEXPORT jobject JNICALL
-Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_bilateralBlurPipeline(JNIEnv *env, jobject thiz,
-                                                                      jobject bitmap,
-                                                                      jint radius, jfloat sigma,
-                                                                      jfloat spatialSigma) {
-    try {
-        std::vector<AcquirePixelFormat> formats;
-        formats.insert(formats.begin(), APF_RGBA8888);
-        jobject newBitmap = AcquireBitmapPixels(env,
-                                                bitmap,
-                                                formats,
-                                                false,
-                                                [radius, sigma, spatialSigma](
-                                                        std::vector<uint8_t> &input, int stride,
-                                                        int width, int height, AcquirePixelFormat fmt) -> BuiltImagePresentation {
-                                                    if (fmt == APF_RGBA8888) {
-                                                        aire::bilateralBlur<uint8_t>(input.data(),
-                                                                                     stride, width,
-                                                                                     height, radius,
-                                                                                     sigma,
-                                                                                     spatialSigma);
-                                                    }
-                                                    return {
-                                                            .data = input,
-                                                            .stride = stride,
-                                                            .width = width,
-                                                            .height = height,
-                                                            .pixelFormat = fmt
-                                                    };
-                                                });
-        return newBitmap;
-    } catch (AireError &err) {
-        std::string msg = err.what();
-        throwException(env, msg);
-        return nullptr;
-    }
-}
+
 extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_awxkee_aire_pipeline_BlurPipelinesImpl_gaussianBlurPipeline(JNIEnv *env, jobject thiz,
